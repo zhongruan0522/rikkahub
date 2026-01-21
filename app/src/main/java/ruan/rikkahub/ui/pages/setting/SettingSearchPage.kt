@@ -328,6 +328,8 @@ private fun SearchProviderCard(
                             }
                         }
 
+                        is SearchServiceOptions.OllamaOptions -> {}
+
                         is SearchServiceOptions.PerplexityOptions -> {
                             PerplexityOptions(options as SearchServiceOptions.PerplexityOptions) {
                                 options = it

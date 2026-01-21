@@ -238,6 +238,7 @@ private fun ChatPageContent(
 ) {
     val scope = rememberCoroutineScope()
     val toaster = LocalToaster.current
+    val configApiDesc = stringResource(R.string.setting_page_config_api_desc)
     var previewMode by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(loadingJob) {
@@ -285,7 +286,7 @@ private fun ChatPageContent(
                     },
                     onSendClick = {
                         if (currentChatModel == null) {
-                            toaster.show(stringResource(R.string.setting_page_config_api_desc), type = ToastType.Error)
+                            toaster.show(configApiDesc, type = ToastType.Error)
                             return@ChatInput
                         }
                         if (inputState.isEditing()) {
@@ -303,7 +304,7 @@ private fun ChatPageContent(
                     },
                     onLongSendClick = {
                         if (currentChatModel == null) {
-                            toaster.show(stringResource(R.string.setting_page_config_api_desc), type = ToastType.Error)
+                            toaster.show(configApiDesc, type = ToastType.Error)
                             return@ChatInput
                         }
                         if (inputState.isEditing()) {

@@ -44,6 +44,30 @@ import kotlin.uuid.Uuid
 
 private const val TAG = "PreferencesStore"
 
+private fun isSupportedSearchService(service: SearchServiceOptions): Boolean {
+    return when (service) {
+        is SearchServiceOptions.ZhipuOptions,
+        is SearchServiceOptions.TavilyOptions,
+        is SearchServiceOptions.ExaOptions,
+        is SearchServiceOptions.SearXNGOptions,
+        is SearchServiceOptions.BraveOptions -> true
+        else -> false
+    }
+}
+
+private fun normalizeSearchServices(
+    services: List<SearchServiceOptions>,
+    selectedIndex: Int
+): Pair<List<SearchServiceOptions>, Int> {
+    val selectedService = services.getOrNull(selectedIndex)
+    val normalizedService = when {
+        selectedService != null && isSupportedSearchService(selectedService) -> selectedService
+        else -> services.firstOrNull(::isSupportedSearchService)
+    } ?: SearchServiceOptions.ZhipuOptions()
+
+    return listOf(normalizedService) to 0
+}
+
 private val REMOVED_PRESET_PROVIDER_IDS = setOf(
     // 阿里Qwen / 阿里云百炼
     Uuid.parse("f76cae46-069a-4334-ab8e-224e4979e58c"),
@@ -192,7 +216,7 @@ class SettingsStore(
                 displaySetting = JsonInstant.decodeFromString(preferences[DISPLAY_SETTING] ?: "{}"),
                 searchServices = preferences[SEARCH_SERVICES]?.let {
                     JsonInstant.decodeFromString(it)
-                } ?: listOf(SearchServiceOptions.DEFAULT),
+                } ?: listOf(SearchServiceOptions.ZhipuOptions()),
                 searchCommonOptions = preferences[SEARCH_COMMON]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: SearchCommonOptions(),
@@ -271,10 +295,10 @@ class SettingsStore(
             } else {
                 DEFAULT_SYSTEM_TTS_ID
             }
-            val searchServices = it.searchServices
-                .filterNot { service -> service is SearchServiceOptions.OllamaOptions }
-                .ifEmpty { listOf(SearchServiceOptions.DEFAULT) }
-            val searchServiceSelected = it.searchServiceSelected.coerceIn(0, searchServices.size - 1)
+            val (searchServices, searchServiceSelected) = normalizeSearchServices(
+                services = it.searchServices,
+                selectedIndex = it.searchServiceSelected
+            )
             it.copy(
                 providers = providers,
                 chatModelId = chatModelId,
@@ -347,7 +371,15 @@ class SettingsStore(
             Log.w(TAG, "Cannot update dummy settings")
             return
         }
-        settingsFlow.value = settings
+        val (searchServices, searchServiceSelected) = normalizeSearchServices(
+            services = settings.searchServices,
+            selectedIndex = settings.searchServiceSelected
+        )
+        val settingsToSave = settings.copy(
+            searchServices = searchServices,
+            searchServiceSelected = searchServiceSelected,
+        )
+        settingsFlow.value = settingsToSave
         dataStore.edit { preferences ->
             preferences[DYNAMIC_COLOR] = settings.dynamicColor
             preferences[THEME_ID] = settings.themeId
@@ -375,18 +407,16 @@ class SettingsStore(
             preferences[SELECT_ASSISTANT] = settings.assistantId.toString()
             preferences[ASSISTANT_TAGS] = JsonInstant.encodeToString(settings.assistantTags)
 
-            preferences[SEARCH_SERVICES] = JsonInstant.encodeToString(settings.searchServices)
-            preferences[SEARCH_COMMON] = JsonInstant.encodeToString(settings.searchCommonOptions)
-            val maxSearchServiceIndex = (settings.searchServices.size - 1).coerceAtLeast(0)
-            preferences[SEARCH_SELECTED] = settings.searchServiceSelected.coerceIn(0, maxSearchServiceIndex)
+            preferences[SEARCH_SERVICES] = JsonInstant.encodeToString(settingsToSave.searchServices)
+            preferences[SEARCH_COMMON] = JsonInstant.encodeToString(settingsToSave.searchCommonOptions)
+            val maxSearchServiceIndex = (settingsToSave.searchServices.size - 1).coerceAtLeast(0)
+            preferences[SEARCH_SELECTED] = settingsToSave.searchServiceSelected.coerceIn(0, maxSearchServiceIndex)
 
             preferences[MCP_SERVERS] = JsonInstant.encodeToString(settings.mcpServers)
             preferences[WEBDAV_CONFIG] = JsonInstant.encodeToString(settings.webDavConfig)
             preferences[S3_CONFIG] = JsonInstant.encodeToString(settings.s3Config)
             preferences[TTS_PROVIDERS] = JsonInstant.encodeToString(settings.ttsProviders)
-            settings.selectedTTSProviderId?.let {
-                preferences[SELECTED_TTS_PROVIDER] = it.toString()
-            } ?: preferences.remove(SELECTED_TTS_PROVIDER)
+            preferences[SELECTED_TTS_PROVIDER] = settings.selectedTTSProviderId.toString()
             preferences[MODE_INJECTIONS] = JsonInstant.encodeToString(settings.modeInjections)
             preferences[LOREBOOKS] = JsonInstant.encodeToString(settings.lorebooks)
         }
@@ -405,7 +435,7 @@ class SettingsStore(
 
 @Serializable
 data class Settings(
-    @Transient
+    @kotlinx.serialization.Transient
     val init: Boolean = false,
     val dynamicColor: Boolean = true,
     val themeId: String = PresetThemes[0].id,
@@ -429,7 +459,7 @@ data class Settings(
     val providers: List<ProviderSetting> = DEFAULT_PROVIDERS,
     val assistants: List<Assistant> = DEFAULT_ASSISTANTS,
     val assistantTags: List<Tag> = emptyList(),
-    val searchServices: List<SearchServiceOptions> = listOf(SearchServiceOptions.DEFAULT),
+    val searchServices: List<SearchServiceOptions> = listOf(SearchServiceOptions.ZhipuOptions()),
     val searchCommonOptions: SearchCommonOptions = SearchCommonOptions(),
     val searchServiceSelected: Int = 0,
     val mcpServers: List<McpServerConfig> = emptyList(),
@@ -520,9 +550,7 @@ fun Settings.getAssistantById(id: Uuid): Assistant? {
 }
 
 fun Settings.getSelectedTTSProvider(): TTSProviderSetting? {
-    return selectedTTSProviderId?.let { id ->
-        ttsProviders.find { it.id == id }
-    } ?: ttsProviders.firstOrNull()
+    return ttsProviders.find { it.id == selectedTTSProviderId } ?: ttsProviders.firstOrNull()
 }
 
 fun Model.findProvider(providers: List<ProviderSetting>, checkOverwrite: Boolean = true): ProviderSetting? {

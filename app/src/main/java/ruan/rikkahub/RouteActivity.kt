@@ -82,7 +82,6 @@ import ruan.rikkahub.ui.pages.menu.MenuPage
 import ruan.rikkahub.ui.pages.prompts.PromptPage
 import ruan.rikkahub.ui.pages.setting.SettingAboutPage
 import ruan.rikkahub.ui.pages.setting.SettingDisplayPage
-import ruan.rikkahub.ui.pages.setting.SettingDonatePage
 import ruan.rikkahub.ui.pages.setting.SettingMcpPage
 import ruan.rikkahub.ui.pages.setting.SettingModelPage
 import ruan.rikkahub.ui.pages.setting.SettingPage
@@ -345,10 +344,6 @@ class RouteActivity : ComponentActivity() {
                         SettingMcpPage()
                     }
 
-                    composable<Screen.SettingDonate> {
-                        SettingDonatePage()
-                    }
-
                     composable<Screen.Developer> {
                         DeveloperPage()
                     }
@@ -490,9 +485,6 @@ sealed interface Screen {
 
     @Serializable
     data object SettingMcp : Screen
-
-    @Serializable
-    data object SettingDonate : Screen
 
     @Serializable
     data object Developer : Screen

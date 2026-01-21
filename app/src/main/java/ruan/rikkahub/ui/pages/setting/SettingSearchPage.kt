@@ -6,21 +6,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
@@ -37,18 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.composables.icons.lucide.GripHorizontal
 import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Plus
 import com.composables.icons.lucide.SquarePen
-import com.composables.icons.lucide.Trash2
 import com.composables.icons.lucide.X
 import ruan.rikkahub.R
 import ruan.rikkahub.data.datastore.Settings
@@ -64,9 +55,15 @@ import me.rerere.search.SearchCommonOptions
 import me.rerere.search.SearchService
 import me.rerere.search.SearchServiceOptions
 import org.koin.androidx.compose.koinViewModel
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.reflect.full.primaryConstructor
+
+private val SUPPORTED_SEARCH_SERVICE_TYPES = listOf(
+    SearchServiceOptions.ZhipuOptions::class,
+    SearchServiceOptions.TavilyOptions::class,
+    SearchServiceOptions.ExaOptions::class,
+    SearchServiceOptions.SearXNGOptions::class,
+    SearchServiceOptions.BraveOptions::class,
+)
 
 @Composable
 fun SettingSearchPage(vm: SettingVM = koinViewModel()) {
@@ -85,24 +82,6 @@ fun SettingSearchPage(vm: SettingVM = koinViewModel()) {
         }
     ) {
         val lazyListState = rememberLazyListState()
-        val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-            // 需要考虑标题和按钮以及通用选项可能占用的位置
-            val offset = 1 // 第一个item是标题和按钮
-            val fromIndex = from.index - offset
-            val toIndex = to.index - offset
-
-            if (fromIndex >= 0 && toIndex >= 0 && fromIndex < settings.searchServices.size && toIndex < settings.searchServices.size) {
-                val newServices = settings.searchServices.toMutableList().apply {
-                    add(toIndex, removeAt(fromIndex))
-                }
-                vm.updateSettings(
-                    settings.copy(
-                        searchServices = newServices
-                    )
-                )
-            }
-        }
-        val haptic = LocalHapticFeedback.current
 
         LazyColumn(
             modifier = Modifier
@@ -114,83 +93,25 @@ fun SettingSearchPage(vm: SettingVM = koinViewModel()) {
         ) {
             // 搜索提供商标题和添加按钮
             item("providers_header") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(R.string.setting_page_search_providers),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    OutlinedButton(
-                        onClick = {
-                            vm.updateSettings(
-                                settings.copy(
-                                    searchServices =  listOf(SearchServiceOptions.BingLocalOptions()) + settings.searchServices
-                                )
-                            )
-                        }
-                    ) {
-                        Icon(
-                            Lucide.Plus,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(stringResource(R.string.setting_page_search_add_provider))
-                    }
-                }
+                Text(
+                    text = stringResource(R.string.setting_page_search_providers),
+                    style = MaterialTheme.typography.headlineMedium
+                )
             }
 
-            // 搜索提供商列表
-            items(settings.searchServices, key = { it.id }) { service ->
-                val index = settings.searchServices.indexOf(service)
-                ReorderableItem(
-                    state = reorderableState,
-                    key = service.id
-                ) { isDragging ->
-                    SearchProviderCard(
-                        service = service,
-                        onUpdateService = { updatedService ->
-                            val newServices = settings.searchServices.toMutableList()
-                            newServices[index] = updatedService
-                            vm.updateSettings(
-                                settings.copy(
-                                    searchServices = newServices
-                                )
+            item("provider") {
+                val service = settings.searchServices.firstOrNull() ?: SearchServiceOptions.ZhipuOptions()
+                SearchProviderCard(
+                    service = service,
+                    onUpdateService = { updatedService ->
+                        vm.updateSettings(
+                            settings.copy(
+                                searchServices = listOf(updatedService),
+                                searchServiceSelected = 0,
                             )
-                        },
-                        onDeleteService = {
-                            if (settings.searchServices.size > 1) {
-                                val newServices = settings.searchServices.toMutableList()
-                                newServices.removeAt(index)
-                                vm.updateSettings(
-                                    settings.copy(
-                                        searchServices = newServices
-                                    )
-                                )
-                            }
-                        },
-                        canDelete = settings.searchServices.size > 1,
-                        modifier = Modifier
-                            .scale(if (isDragging) 0.95f else 1f)
-                            .animateItem(),
-                        dragHandle = {
-                            Icon(
-                                imageVector = Lucide.GripHorizontal,
-                                contentDescription = null,
-                                modifier = Modifier.longPressDraggableHandle(
-                                    onDragStarted = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-                                    },
-                                    onDragStopped = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                                    }
-                                )
-                            )
-                        }
-                    )
-                }
+                        )
+                    }
+                )
             }
 
             // 通用选项
@@ -215,10 +136,7 @@ fun SettingSearchPage(vm: SettingVM = koinViewModel()) {
 private fun SearchProviderCard(
     service: SearchServiceOptions,
     onUpdateService: (SearchServiceOptions) -> Unit,
-    onDeleteService: () -> Unit,
-    canDelete: Boolean,
-    modifier: Modifier = Modifier,
-    dragHandle: @Composable () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     var options by remember(service) {
         mutableStateOf(service)
@@ -238,7 +156,7 @@ private fun SearchProviderCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Select(
-                    options = SearchServiceOptions.TYPES.keys.toList(),
+                    options = SUPPORTED_SEARCH_SERVICE_TYPES,
                     selectedOption = options::class,
                     optionToString = { SearchServiceOptions.TYPES[it] ?: "[Unknown]" },
                     onOptionSelected = {
@@ -364,31 +282,6 @@ private fun SearchProviderCard(
                     ProvideTextStyle(MaterialTheme.typography.labelMedium) {
                         SearchService.getService(options).Description()
                     }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (canDelete) {
-                    IconButton(
-                        onClick = onDeleteService
-                    ) {
-                        Icon(
-                            Lucide.Trash2,
-                            contentDescription = stringResource(R.string.setting_page_search_delete_provider)
-                        )
-                    }
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {}
-                ) {
-                    dragHandle()
                 }
             }
         }

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -200,7 +201,7 @@ class McpManager(
         if (client.transport == null) {
             client.connect(getTransport(config))
         }
-        val serverTools = client.listTools()?.tools ?: emptyList()
+        val serverTools = client.listTools().tools ?: emptyList()
         Log.i(TAG, "sync: tools: $serverTools")
         settingsStore.update { old ->
             old.copy(
@@ -291,6 +292,7 @@ class McpManager(
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 internal val McpJson: Json by lazy {
     Json {
         ignoreUnknownKeys = true

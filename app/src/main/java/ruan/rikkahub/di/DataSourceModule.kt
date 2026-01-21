@@ -15,7 +15,6 @@ import ruan.rikkahub.data.ai.transformers.AssistantTemplateLoader
 import ruan.rikkahub.data.ai.GenerationHandler
 import ruan.rikkahub.data.ai.transformers.TemplateTransformer
 import ruan.rikkahub.data.api.RikkaHubAPI
-import ruan.rikkahub.data.api.SponsorAPI
 import ruan.rikkahub.data.datastore.SettingsStore
 import ruan.rikkahub.data.db.AppDatabase
 import ruan.rikkahub.data.db.migrations.Migration_6_7
@@ -113,10 +112,6 @@ val dataSourceModule = module {
                 level = HttpLoggingInterceptor.Level.HEADERS
             })
             .build()
-    }
-
-    single {
-        SponsorAPI.create(get())
     }
 
     single {

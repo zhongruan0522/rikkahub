@@ -27,7 +27,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -62,6 +61,8 @@ import ruan.rikkahub.ui.context.LocalToaster
 import ruan.rikkahub.utils.getText
 import org.koin.androidx.compose.koinViewModel
 import java.util.Locale
+
+private val SpanishLocale by lazy { Locale.forLanguageTag("es-ES") }
 
 @Composable
 fun TranslatorPage(vm: TranslatorVM = koinViewModel()) {
@@ -215,7 +216,7 @@ private val Locales by lazy {
         Locale.FRENCH,
         Locale.GERMAN,
         Locale.ITALIAN,
-        Locale("es", "ES")
+        SpanishLocale
     )
 }
 
@@ -237,7 +238,7 @@ private fun LanguageSelector(
             Locale.FRENCH -> stringResource(R.string.language_french)
             Locale.GERMAN -> stringResource(R.string.language_german)
             Locale.ITALIAN -> stringResource(R.string.language_italian)
-            Locale("es", "ES") -> stringResource(R.string.language_spanish)
+            SpanishLocale -> stringResource(R.string.language_spanish)
             else -> locale.getDisplayLanguage(Locale.getDefault())
         }
     }

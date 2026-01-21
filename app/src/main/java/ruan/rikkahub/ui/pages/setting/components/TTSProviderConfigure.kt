@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +61,7 @@ fun TTSProviderConfigure(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -209,16 +209,16 @@ private fun OpenAITTSConfiguration(
         ) {
             OutlinedTextField(
                 value = setting.voice,
-                onValueChange = { newVoice ->
-                    onValueChange(setting.copy(voice = newVoice))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryEditable),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded)
-                }
-            )
+                    onValueChange = { newVoice ->
+                        onValueChange(setting.copy(voice = newVoice))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded)
+                    }
+                )
             ExposedDropdownMenu(
                 expanded = voiceExpanded,
                 onDismissRequest = { voiceExpanded = false }
@@ -312,16 +312,16 @@ private fun MiniMaxTTSConfiguration(
         ) {
             OutlinedTextField(
                 value = setting.voiceId,
-                onValueChange = { newVoiceId ->
-                    onValueChange(setting.copy(voiceId = newVoiceId))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryEditable),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceIdExpanded)
-                }
-            )
+                    onValueChange = { newVoiceId ->
+                        onValueChange(setting.copy(voiceId = newVoiceId))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceIdExpanded)
+                    }
+                )
             ExposedDropdownMenu(
                 expanded = voiceIdExpanded,
                 onDismissRequest = { voiceIdExpanded = false }
@@ -353,16 +353,16 @@ private fun MiniMaxTTSConfiguration(
         ) {
             OutlinedTextField(
                 value = setting.emotion,
-                onValueChange = { newEmotion ->
-                    onValueChange(setting.copy(emotion = newEmotion))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryEditable),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = emotionExpanded)
-                }
-            )
+                    onValueChange = { newEmotion ->
+                        onValueChange(setting.copy(emotion = newEmotion))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = emotionExpanded)
+                    }
+                )
             ExposedDropdownMenu(
                 expanded = emotionExpanded,
                 onDismissRequest = { emotionExpanded = false }
@@ -575,16 +575,16 @@ private fun QwenTTSConfiguration(
         ) {
             OutlinedTextField(
                 value = setting.voice,
-                onValueChange = { newVoice ->
-                    onValueChange(setting.copy(voice = newVoice))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryEditable),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded)
-                }
-            )
+                    onValueChange = { newVoice ->
+                        onValueChange(setting.copy(voice = newVoice))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = voiceExpanded)
+                    }
+                )
             ExposedDropdownMenu(
                 expanded = voiceExpanded,
                 onDismissRequest = { voiceExpanded = false }
@@ -616,16 +616,16 @@ private fun QwenTTSConfiguration(
         ) {
             OutlinedTextField(
                 value = setting.languageType,
-                onValueChange = { newLanguageType ->
-                    onValueChange(setting.copy(languageType = newLanguageType))
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryEditable),
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded)
-                }
-            )
+                    onValueChange = { newLanguageType ->
+                        onValueChange(setting.copy(languageType = newLanguageType))
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded)
+                    }
+                )
             ExposedDropdownMenu(
                 expanded = languageExpanded,
                 onDismissRequest = { languageExpanded = false }

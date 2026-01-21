@@ -1,8 +1,5 @@
 package ruan.rikkahub.ui.pages.setting
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,14 +42,11 @@ import com.composables.icons.lucide.Drama
 import com.composables.icons.lucide.Earth
 import com.composables.icons.lucide.Hammer
 import com.composables.icons.lucide.HardDrive
-import com.composables.icons.lucide.Heart
-import com.composables.icons.lucide.Library
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MessageCircleWarning
 import com.composables.icons.lucide.Monitor
 import com.composables.icons.lucide.Palette
 import com.composables.icons.lucide.ScrollText
-import com.composables.icons.lucide.Share2
 import com.composables.icons.lucide.SunMoon
 import com.composables.icons.lucide.Terminal
 import com.composables.icons.lucide.Volume2
@@ -66,7 +60,6 @@ import ruan.rikkahub.ui.hooks.rememberColorMode
 import ruan.rikkahub.ui.pages.setting.components.PresetThemeButtonGroup
 import ruan.rikkahub.ui.theme.ColorMode
 import ruan.rikkahub.utils.countChatFiles
-import ruan.rikkahub.utils.openUrl
 import ruan.rikkahub.utils.plus
 import org.koin.androidx.compose.koinViewModel
 
@@ -310,66 +303,12 @@ fun SettingPage(vm: SettingVM = koinViewModel()) {
             }
 
             item {
-                val context = LocalContext.current
-                SettingItem(
-                    navController = navController,
-                    title = { Text(stringResource(R.string.setting_page_documentation)) },
-                    description = { Text(stringResource(R.string.setting_page_documentation_desc)) },
-                    icon = { Icon(Lucide.Library, stringResource(R.string.setting_page_documentation)) },
-                    onClick = {
-                        context.openUrl("https://docs.rikka-ai.com/docs/basic/get-started")
-                    }
-                )
-            }
-
-            item {
                 SettingItem(
                     navController = navController,
                     title = { Text(stringResource(R.string.setting_page_request_logs)) },
                     description = { Text(stringResource(R.string.setting_page_request_logs_desc)) },
                     icon = { Icon(Lucide.ScrollText, stringResource(R.string.setting_page_request_logs)) },
                     link = Screen.Log
-                )
-            }
-
-            item {
-                SettingItem(
-                    navController = navController,
-                    title = { Text(stringResource(R.string.setting_page_donate)) },
-                    description = {
-                        Text(stringResource(R.string.setting_page_donate_desc))
-                    },
-                    icon = {
-                        Icon(Lucide.Heart, "Donate")
-                    },
-                    link = Screen.SettingDonate
-                )
-            }
-
-            item {
-                val context = LocalContext.current
-                val shareText = stringResource(R.string.setting_page_share_text)
-                val share = stringResource(R.string.setting_page_share)
-                val noShareApp = stringResource(R.string.setting_page_no_share_app)
-                SettingItem(
-                    navController = navController,
-                    title = { Text(stringResource(R.string.setting_page_share)) },
-                    description = {
-                        Text(stringResource(R.string.setting_page_share_desc))
-                    },
-                    icon = {
-                        Icon(Lucide.Share2, "Share")
-                    },
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_SEND)
-                        intent.type = "text/plain"
-                        intent.putExtra(Intent.EXTRA_TEXT, shareText)
-                        try {
-                            context.startActivity(Intent.createChooser(intent, share))
-                        } catch (e: ActivityNotFoundException) {
-                            Toast.makeText(context, noShareApp, Toast.LENGTH_SHORT).show()
-                        }
-                    }
                 )
             }
         }

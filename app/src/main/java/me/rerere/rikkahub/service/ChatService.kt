@@ -372,7 +372,11 @@ class ChatService(
         messageRange: ClosedRange<Int>? = null
     ) {
         val settings = settingsStore.settingsFlow.first()
-        val model = settings.getCurrentChatModel() ?: return
+        val model = settings.getCurrentChatModel()
+        if (model == null) {
+            addError(IllegalStateException(context.getString(R.string.setting_page_config_api_desc)))
+            return
+        }
 
         runCatching {
             val conversation = getConversationFlow(conversationId).value

@@ -130,7 +130,6 @@ sealed class SearchServiceOptions {
             LinkUpOptions::class to "LinkUp",
             BraveOptions::class to "Brave",
             MetasoOptions::class to "秘塔",
-            OllamaOptions::class to "Ollama",
             PerplexityOptions::class to "Perplexity",
             FirecrawlOptions::class to "Firecrawl",
             JinaOptions::class to "Jina",

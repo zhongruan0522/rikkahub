@@ -44,6 +44,35 @@ import kotlin.uuid.Uuid
 
 private const val TAG = "PreferencesStore"
 
+private val REMOVED_PRESET_PROVIDER_IDS = setOf(
+    // 阿里Qwen / 阿里云百炼
+    Uuid.parse("f76cae46-069a-4334-ab8e-224e4979e58c"),
+    // AiHubMix
+    Uuid.parse("1b1395ed-b702-4aeb-8bc1-b681c4456953"),
+    // 硅基流动
+    Uuid.parse("56a94d29-c88b-41c5-8e09-38a7612d6cf8"),
+    // OpenRouter
+    Uuid.parse("d5734028-d39b-4d41-9841-fd648d65440e"),
+    // 火山引擎
+    Uuid.parse("3dfd6f9b-f9d9-417f-80c1-ff8d77184191"),
+    // 阶跃星辰
+    Uuid.parse("f4f8870e-82d3-495b-9b64-d58e508b3b2c"),
+    // JuheNext
+    Uuid.parse("89e67540-32fe-4c62-9970-2e9aed9bd59d"),
+    // 302AI
+    Uuid.parse("da93779f-3956-48cc-82ef-67bb482eaaf7"),
+    // xAI
+    Uuid.parse("ff3cde7e-0f65-43d7-8fb2-6475c99f5990"),
+    // 腾讯
+    Uuid.parse("ef5d149b-8e34-404b-818c-6ec242e5c3c5"),
+    // AckAI
+    Uuid.parse("53027b08-1b58-43d5-90ed-29173203e3d8"),
+    // 月之暗面
+    Uuid.parse("d6c4d8c6-3f62-4ca9-a6f3-7ade6b15ecc3"),
+    // 小马算力
+    Uuid.parse("da020a90-f7b3-4c29-b90e-c511a0630630"),
+)
+
 private val Context.settingsStore by preferencesDataStore(
     name = "settings",
     produceMigrations = { context ->
@@ -124,26 +153,28 @@ class SettingsStore(
                 throw exception
             }
         }.map { preferences ->
+            val chatModelId = preferences[SELECT_MODEL]?.let { Uuid.parse(it) } ?: Uuid.random()
+            val titleModelId = preferences[TITLE_MODEL]?.let { Uuid.parse(it) } ?: chatModelId
+            val translateModeId = preferences[TRANSLATE_MODEL]?.let { Uuid.parse(it) } ?: chatModelId
+            val suggestionModelId = preferences[SUGGESTION_MODEL]?.let { Uuid.parse(it) } ?: chatModelId
+            val compressModelId = preferences[COMPRESS_MODEL]?.let { Uuid.parse(it) } ?: chatModelId
+
             Settings(
                 enableWebSearch = preferences[ENABLE_WEB_SEARCH] == true,
                 favoriteModels = preferences[FAVORITE_MODELS]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: emptyList(),
-                chatModelId = preferences[SELECT_MODEL]?.let { Uuid.parse(it) }
-                    ?: SILICONFLOW_QWEN3_8B_ID,
-                titleModelId = preferences[TITLE_MODEL]?.let { Uuid.parse(it) }
-                    ?: SILICONFLOW_QWEN3_8B_ID,
-                translateModeId = preferences[TRANSLATE_MODEL]?.let { Uuid.parse(it) }
-                    ?: SILICONFLOW_QWEN3_8B_ID,
-                suggestionModelId = preferences[SUGGESTION_MODEL]?.let { Uuid.parse(it) }
-                    ?: SILICONFLOW_QWEN3_8B_ID,
+                chatModelId = chatModelId,
+                titleModelId = titleModelId,
+                translateModeId = translateModeId,
+                suggestionModelId = suggestionModelId,
                 imageGenerationModelId = preferences[IMAGE_GENERATION_MODEL]?.let { Uuid.parse(it) } ?: Uuid.random(),
                 titlePrompt = preferences[TITLE_PROMPT] ?: DEFAULT_TITLE_PROMPT,
                 translatePrompt = preferences[TRANSLATION_PROMPT] ?: DEFAULT_TRANSLATION_PROMPT,
                 suggestionPrompt = preferences[SUGGESTION_PROMPT] ?: DEFAULT_SUGGESTION_PROMPT,
                 ocrModelId = preferences[OCR_MODEL]?.let { Uuid.parse(it) } ?: Uuid.random(),
                 ocrPrompt = preferences[OCR_PROMPT] ?: DEFAULT_OCR_PROMPT,
-                compressModelId = preferences[COMPRESS_MODEL]?.let { Uuid.parse(it) } ?: SILICONFLOW_QWEN3_8B_ID,
+                compressModelId = compressModelId,
                 compressPrompt = preferences[COMPRESS_PROMPT] ?: DEFAULT_COMPRESS_PROMPT,
                 assistantId = preferences[SELECT_ASSISTANT]?.let { Uuid.parse(it) }
                     ?: DEFAULT_ASSISTANT_ID,
@@ -187,6 +218,7 @@ class SettingsStore(
         }
         .map {
             var providers = it.providers.ifEmpty { DEFAULT_PROVIDERS }.toMutableList()
+            providers = providers.filterNot { provider -> provider.id in REMOVED_PRESET_PROVIDER_IDS }.toMutableList()
             DEFAULT_PROVIDERS.forEach { defaultProvider ->
                 if (providers.none { it.id == defaultProvider.id }) {
                     providers.add(defaultProvider.copyProvider())
@@ -202,6 +234,19 @@ class SettingsStore(
                     )
                 } else provider
             }.toMutableList()
+            val firstModelId = providers.asSequence()
+                .flatMap { provider -> provider.models.asSequence() }
+                .map { model -> model.id }
+                .firstOrNull()
+            val chatModelId = if (providers.findModelById(it.chatModelId) != null) it.chatModelId
+            else firstModelId ?: it.chatModelId
+            val titleModelId = if (providers.findModelById(it.titleModelId) != null) it.titleModelId else chatModelId
+            val translateModeId =
+                if (providers.findModelById(it.translateModeId) != null) it.translateModeId else chatModelId
+            val suggestionModelId =
+                if (providers.findModelById(it.suggestionModelId) != null) it.suggestionModelId else chatModelId
+            val compressModelId =
+                if (providers.findModelById(it.compressModelId) != null) it.compressModelId else chatModelId
             val assistants = it.assistants.ifEmpty { DEFAULT_ASSISTANTS }.toMutableList()
             DEFAULT_ASSISTANTS.forEach { defaultAssistant ->
                 if (assistants.none { it.id == defaultAssistant.id }) {
@@ -214,10 +259,21 @@ class SettingsStore(
                     ttsProviders.add(defaultTTSProvider.copyProvider())
                 }
             }
+            val searchServices = it.searchServices
+                .filterNot { service -> service is SearchServiceOptions.OllamaOptions }
+                .ifEmpty { listOf(SearchServiceOptions.DEFAULT) }
+            val searchServiceSelected = it.searchServiceSelected.coerceIn(0, searchServices.size - 1)
             it.copy(
                 providers = providers,
+                chatModelId = chatModelId,
+                titleModelId = titleModelId,
+                translateModeId = translateModeId,
+                suggestionModelId = suggestionModelId,
+                compressModelId = compressModelId,
                 assistants = assistants,
-                ttsProviders = ttsProviders
+                ttsProviders = ttsProviders,
+                searchServices = searchServices,
+                searchServiceSelected = searchServiceSelected,
             )
         }
         .map { settings ->
@@ -308,7 +364,8 @@ class SettingsStore(
 
             preferences[SEARCH_SERVICES] = JsonInstant.encodeToString(settings.searchServices)
             preferences[SEARCH_COMMON] = JsonInstant.encodeToString(settings.searchCommonOptions)
-            preferences[SEARCH_SELECTED] = settings.searchServiceSelected.coerceIn(0, settings.searchServices.size - 1)
+            val maxSearchServiceIndex = (settings.searchServices.size - 1).coerceAtLeast(0)
+            preferences[SEARCH_SELECTED] = settings.searchServiceSelected.coerceIn(0, maxSearchServiceIndex)
 
             preferences[MCP_SERVERS] = JsonInstant.encodeToString(settings.mcpServers)
             preferences[WEBDAV_CONFIG] = JsonInstant.encodeToString(settings.webDavConfig)

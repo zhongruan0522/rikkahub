@@ -110,7 +110,6 @@ private fun computeAIIconByName(name: String): String? {
         PATTERN_ALIYUN.containsMatchIn(lowerName) -> "alibabacloud-color.svg"
         PATTERN_BYTEDANCE.containsMatchIn(lowerName) -> "bytedance-color.svg"
         PATTERN_SILLICON_CLOUD.containsMatchIn(lowerName) -> "siliconflow.svg"
-        PATTERN_AIHUBMIX.containsMatchIn(lowerName) -> "aihubmix-color.svg"
         PATTERN_GITHUB.containsMatchIn(lowerName) -> "github.svg"
         PATTERN_CLOUDFLARE.containsMatchIn(lowerName) -> "cloudflare-color.svg"
         PATTERN_MINIMAX.containsMatchIn(lowerName) -> "minimax-color.svg"
@@ -171,7 +170,6 @@ private val PATTERN_PERPLEXITY = Regex("perplexity")
 private val PATTERN_BYTEDANCE = Regex("bytedance|火山")
 private val PATTERN_ALIYUN = Regex("aliyun|阿里云|百炼")
 private val PATTERN_SILLICON_CLOUD = Regex("silicon|硅基")
-private val PATTERN_AIHUBMIX = Regex("aihubmix")
 private val PATTERN_GITHUB = Regex("github")
 private val PATTERN_CLOUDFLARE = Regex("cloudflare")
 private val PATTERN_MINIMAX = Regex("minimax")

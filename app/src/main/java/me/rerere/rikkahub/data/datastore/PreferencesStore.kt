@@ -47,7 +47,6 @@ private const val TAG = "PreferencesStore"
 private val REMOVED_PRESET_PROVIDER_IDS = setOf(
     // 阿里Qwen / 阿里云百炼
     Uuid.parse("f76cae46-069a-4334-ab8e-224e4979e58c"),
-    // AiHubMix
     Uuid.parse("1b1395ed-b702-4aeb-8bc1-b681c4456953"),
     // 硅基流动
     Uuid.parse("56a94d29-c88b-41c5-8e09-38a7612d6cf8"),
@@ -71,6 +70,10 @@ private val REMOVED_PRESET_PROVIDER_IDS = setOf(
     Uuid.parse("d6c4d8c6-3f62-4ca9-a6f3-7ade6b15ecc3"),
     // 小马算力
     Uuid.parse("da020a90-f7b3-4c29-b90e-c511a0630630"),
+)
+
+private val REMOVED_PRESET_TTS_PROVIDER_IDS = setOf(
+    Uuid.parse("e36b22ef-ca82-40ab-9e70-60cad861911c"),
 )
 
 private val Context.settingsStore by preferencesDataStore(
@@ -253,11 +256,20 @@ class SettingsStore(
                     assistants.add(defaultAssistant.copy())
                 }
             }
-            val ttsProviders = it.ttsProviders.ifEmpty { DEFAULT_TTS_PROVIDERS }.toMutableList()
+            var ttsProviders = it.ttsProviders
+                .ifEmpty { DEFAULT_TTS_PROVIDERS }
+                .filterNot { provider -> provider.id in REMOVED_PRESET_TTS_PROVIDER_IDS }
+                .ifEmpty { DEFAULT_TTS_PROVIDERS }
+                .toMutableList()
             DEFAULT_TTS_PROVIDERS.forEach { defaultTTSProvider ->
                 if (ttsProviders.none { provider -> provider.id == defaultTTSProvider.id }) {
                     ttsProviders.add(defaultTTSProvider.copyProvider())
                 }
+            }
+            val selectedTTSProviderId = if (ttsProviders.any { provider -> provider.id == it.selectedTTSProviderId }) {
+                it.selectedTTSProviderId
+            } else {
+                DEFAULT_SYSTEM_TTS_ID
             }
             val searchServices = it.searchServices
                 .filterNot { service -> service is SearchServiceOptions.OllamaOptions }
@@ -272,6 +284,7 @@ class SettingsStore(
                 compressModelId = compressModelId,
                 assistants = assistants,
                 ttsProviders = ttsProviders,
+                selectedTTSProviderId = selectedTTSProviderId,
                 searchServices = searchServices,
                 searchServiceSelected = searchServiceSelected,
             )
@@ -566,13 +579,6 @@ private val DEFAULT_TTS_PROVIDERS = listOf(
         id = DEFAULT_SYSTEM_TTS_ID,
         name = "",
     ),
-    TTSProviderSetting.OpenAI(
-        id = Uuid.parse("e36b22ef-ca82-40ab-9e70-60cad861911c"),
-        name = "AiHubMix",
-        baseUrl = "https://aihubmix.com/v1",
-        model = "gpt-4o-mini-tts",
-        voice = "alloy",
-    )
 )
 
 internal val DEFAULT_ASSISTANTS_IDS = DEFAULT_ASSISTANTS.map { it.id }

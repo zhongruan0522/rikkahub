@@ -7,6 +7,35 @@
 - Tests: `ai/src/test` (unit), `ai/src/androidTest` (instrumented); `app/src/test` scaffolded.
 - Assets: `app/src/main/assets`, resources under `app/src/main/res`.
 
+## Architecture & Key Concepts
+- Detailed reference: `CLAUDE.md` and `locale-tui/CLAUDE.md`.
+- **Assistant**: Assistant configuration (system prompt, model params, headers/tools/memory/transformers). (`app/src/main/java/me/rerere/rikkahub/data/model/Assistant.kt`)
+- **Conversation / MessageNode**: Persistent thread with message branching via a tree of nodes. (`app/src/main/java/me/rerere/rikkahub/data/model/Conversation.kt`)
+- **UIMessage**: Provider-agnostic message abstraction supporting mixed content parts + streaming merges. (`ai/src/main/java/me/rerere/ai/ui/Message.kt`)
+- **Message Transformers**: Pre-/post-processing pipeline (templates, `<think>`, regex, docs-as-prompt, OCR, etc.). (`app/src/main/java/me/rerere/rikkahub/data/ai/transformers/Transformer.kt`)
+
+## UI Development
+- Follow Material Design 3 and prefer reusing existing composables from `app/src/main/java/me/rerere/rikkahub/ui/components/`.
+- Page layout patterns: reference `SettingProviderPage.kt`; use `FormItem` for consistent form rows.
+- Icons: use `Lucide.XXX` and import `import com.composables.icons.lucide.XXX` for each icon.
+- Toasts: use `LocalToaster.current`.
+
+## Internationalization
+- String resources: `app/src/main/res/values-*/strings.xml`; Compose uses `stringResource(R.string.key_name)`.
+- Key naming: page-specific keys should use a page prefix (e.g., `setting_page_`).
+- If the user does not explicitly request localization, prioritize functionality first without adding localized strings.
+- If the user explicitly requests localization, all supported languages should be updated (en, zh, ja, zh-rTW, ko-rKR).
+- Translation tool: `locale-tui` (see `locale-tui/CLAUDE.md`); supports CLI/TUI workflows for adding and translating keys.
+- For `locale-tui` auto-translation, the source value should be English.
+
+## Database
+- Room database with migration support; schema files in `app/schemas/`.
+- Database version tracked in `AppDatabase.kt`; keep migrations forward-only and compatible.
+
+## AI Provider Integration
+- New providers: `ai/src/main/java/me/rerere/ai/provider/providers/` (extend base `Provider`, follow existing patterns).
+- Streaming responses use SSE (OkHttp); changes should preserve existing streaming behaviors.
+
 ## Coding Style & Naming
 - Kotlin with 4‑space indent, 120 char line limit (`.editorconfig`).
 - Classes/objects: PascalCase; functions/properties: camelCase; resources: snake_case.

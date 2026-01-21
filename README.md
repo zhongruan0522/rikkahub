@@ -1,16 +1,9 @@
 <div align="center">
-  <img src="docs/icon.png" alt="App Icon" width="100" />
+  <img src="docs/icon.png" alt="App 图标" width="100" />
   <h1>RikkaHub</h1>
 
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rikkahub/rikkahub)
-  [![Ask DeepWiki](https://img.shields.io/badge/zread.ai-blue?style=flat&logo=readthedocs)](https://zread.ai/rikkahub/rikkahub)
+一个原生Android LLM 聊天客户端，支持切换不同的供应商进行聊天 🤖💬
 
-A native Android LLM chat client that supports switching between different providers for
-conversations 🤖💬
-
-Click to join our Discord server 👉 [【RikkaHub】](https://discord.gg/9weBqxe5c4)
-
-[简体中文](README_ZH_CN.md) | [繁體中文](README_ZH_TW.md) | English
 </div>
 
 <div align="center">
@@ -20,83 +13,46 @@ Click to join our Discord server 👉 [【RikkaHub】](https://discord.gg/9weBqx
   <img src="docs/img/assistants.png" alt="Assistants" width="150" />
 </div>
 
-## 🚀 Download
+## ✨ 功能特色
 
-🔗 [Download from Website](https://rikka-ai.com/download)
+- 🎨 现代化安卓APP设计（Material You / 预测性返回）
+- 🌙 暗色模式
+- 🛠️ MCP 支持
+- 🔄 多种类型的供应商支持，自定义 API / URL / 模型（目前支持 OpenAI、Google、Anthropic）
+- 🖼️ 多模态输入支持
+- 📝 Markdown 渲染（支持代码高亮、数学公式、表格、Mermaid）
+- 🔍 搜索功能（Exa、Tavily、Zhipu、LinkUp、Brave、Perplexity、..）
+- 🧩 Prompt 变量（模型名称、时间等）
+- 🤳 二维码导出和导入提供商
+- 🤖 智能体自定义
+- 🧠 类ChatGPT记忆功能
+- 📝 AI翻译
+- 🌐 自定义HTTP请求头和请求体
 
-🔗 [Download from Google Play](https://play.google.com/store/apps/details?id=me.rerere.rikkahub)
+## ✨ 贡献
 
-## 💖 Sponsors
+本项目使用[Android Studio](https://developer.android.com/studio)开发，欢迎提交PR
 
-<div align="center">
-  <img src="app/src/main/assets/icons/aihubmix-color.svg" alt="Aihubmix" width="50" />
-  <p style="font-size: 16px; font-weight: bold;">Aihubmix</p>
-  <p style="font-size: 14px;">Thanks to <a href="https://aihubmix.com?aff=pG7r">aihubmix.com</a> for their financial support. We recommend using aihubmix as a one-stop shop for mainstream models worldwide. (OpenAI, Claude, Google Gemini, DeepSeek, Qwen, and hundreds more).</p>
-</div>
-<div align="center">
-  <img src="app/src/main/assets/icons/siliconflow.svg" alt="SiliconFlow" width="50" />
-  <p style="font-size: 16px; font-weight: bold;">SiliconFlow</p>
-  <p style="font-size: 14px;">Thanks to <a href="https://siliconflow.cn/">siliconflow.cn</a> providing free models in cooperation with us.</p>
-</div>
+技术栈文档:
 
-
-## ✨ Features
-
-- 🎨 Material You Design and 🌙 Dark mode
-- 🔄 Multiple AI Provider Support: custom API / URL / models (all OpenAI, Google, Anthropic compatible api)
-- 🖼️ Multimodal input support (Image, Text Documentation, PDF, Docx)
-- 🛠️ MCP support
-- 📝 Markdown Rendering (with code highlighting, Latex formulas, tables, Mermaid)
-- 🪾 Message Branching
-- 🔍 Search capabilities (Exa, Tavily, Zhipu, LinkUp, Brave, Perplexity, etc.)
-- 🧩 Prompt variables (model name, time, etc.)
-- 🤳 QR code export and import for providers
-- 🤖 Agent customization
-- 🧠 ChatGPT-like memory feature
-- 📝 AI Translation
-- 🌐 Custom HTTP request headers and request bodies
-- 💌 Silly Tavern character card import
-
-## ✨ Contributing
-
-This project is developed using [Android Studio](https://developer.android.com/studio). PRs are
-welcome!
-
-Technology stack documentation:
-
-- [Kotlin](https://kotlinlang.org/) (Development language)
-- [Koin](https://insert-koin.io/) (Dependency Injection)
-- [Jetpack Compose](https://developer.android.com/jetpack/compose) (UI framework)
-- [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (Preference data
-  storage)
-- [Room](https://developer.android.com/training/data-storage/room) (Database)
-- [Coil](https://coil-kt.github.io/coil/) (Image loading)
-- [Material You](https://m3.material.io/) (UI design)
-- [Navigation Compose](https://developer.android.com/develop/ui/compose/navigation) (Navigation)
-- [Okhttp](https://square.github.io/okhttp/) (HTTP client)
-- [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) (JSON serialization)
-- [compose-icons/lucide](https://composeicons.com/icon-libraries/lucide) (Icon library)
+- [Kotlin](https://kotlinlang.org/) (开发语言)
+- [Koin](https://insert-koin.io/) (依赖注入)
+- [Jetpack Compose](https://developer.android.com/jetpack/compose) (UI 框架)
+- [DataStore](https://developer.android.com/topic/libraries/architecture/datastore?hl=zh-cn#preferences-datastore) (
+  偏好数据存储)
+- [Room](https://developer.android.com/training/data-storage/room) (数据库)
+- [Coil](https://coil-kt.github.io/coil/) (图片加载)
+- [Material You](https://m3.material.io/) (UI 设计)
+- [Navigation Compose](https://developer.android.com/develop/ui/compose/navigation) (导航)
+- [Okhttp](https://square.github.io/okhttp/) (HTTP 客户端)
+- [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) (Json序列化)
+- [compose-icons/lucide](https://composeicons.com/icon-libraries/lucide) (图标库)
 
 > [!TIP]
-> You need a `google-services.json` file at `app` folder to build the app.
+> 你需要在 `app` 文件夹下添加 `google-services.json` 文件才能构建应用。
 
 > [!IMPORTANT]  
-> The following PRs will be rejected: 
-> 1. Translation related changes, such as adding new languages or updating existing translations
-> 2. Adding new features, this project is opinionated and will not accept pull requests for new features
-> 3. Large-scale refactoring and changes generated by AI
-
-## 💰 Donate
-
-* [Patreon](https://patreon.com/rikkahub)
-* [爱发电](https://afdian.com/a/reovo)
-
-## ⭐ Star History
-
-If you like this project, please give it a star ⭐
-
-[![Star History Chart](https://api.star-history.com/svg?repos=re-ovo/rikkahub&type=Date)](https://star-history.com/#re-ovo/rikkahub&Date)
-
-## 📄 License
-
-[License](LICENSE)
+> 以下PR将被拒绝：
+> 1. 添加新语言，因为添加新语言会增加后续本地化的工作量
+> 2. 添加新功能，这个项目是有态度的
+> 3. AI生成的大规模重构和更改

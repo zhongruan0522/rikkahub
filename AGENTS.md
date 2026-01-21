@@ -20,13 +20,11 @@
 - Icons: use `Lucide.XXX` and import `import com.composables.icons.lucide.XXX` for each icon.
 - Toasts: use `LocalToaster.current`.
 
-## Internationalization
-- String resources: `app/src/main/res/values-*/strings.xml`; Compose uses `stringResource(R.string.key_name)`.
+## Strings (Chinese-only)
+- This fork keeps a single Chinese string set in default `values/strings.xml` (no `values-xx` locales).
+- String resources: `app/src/main/res/values/strings.xml` and `search/src/main/res/values/strings.xml`; Compose uses `stringResource(R.string.key_name)`.
 - Key naming: page-specific keys should use a page prefix (e.g., `setting_page_`).
-- If the user does not explicitly request localization, prioritize functionality first without adding localized strings.
-- If the user explicitly requests localization, all supported languages should be updated (en, zh, ja, zh-rTW, ko-rKR).
-- Translation tool: `locale-tui` (see `locale-tui/CLAUDE.md`); supports CLI/TUI workflows for adding and translating keys.
-- For `locale-tui` auto-translation, the source value should be English.
+- APK locale pruning: `app/build.gradle.kts` uses `androidResources.localeFilters += listOf("zh")` to strip other locales (including dependencies).
 
 ## Database
 - Room database with migration support; schema files in `app/schemas/`.

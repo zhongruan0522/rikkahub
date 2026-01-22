@@ -32,6 +32,7 @@ import ruan.rikkahub.AppScope
 import ruan.rikkahub.data.ai.mcp.transport.SseClientTransport
 import ruan.rikkahub.data.ai.mcp.transport.StreamableHttpClientTransport
 import ruan.rikkahub.data.datastore.SettingsStore
+import ruan.rikkahub.data.datastore.getAssistantById
 import ruan.rikkahub.data.datastore.getCurrentAssistant
 import ruan.rikkahub.utils.checkDifferent
 import okhttp3.OkHttpClient
@@ -104,9 +105,9 @@ class McpManager(
         return clients.entries.find { it.key.id == config.id }?.value
     }
 
-    fun getAllAvailableTools(): List<McpTool> {
+    fun getAllAvailableTools(assistantId: Uuid): List<McpTool> {
         val settings = settingsStore.settingsFlow.value
-        val assistant = settings.getCurrentAssistant()
+        val assistant = settings.getAssistantById(assistantId) ?: settings.getCurrentAssistant()
         val mcpServers = settings.mcpServers
             .filter {
                 it.commonOptions.enable && it.id in assistant.mcpServers
@@ -117,8 +118,13 @@ class McpManager(
         return mcpServers
     }
 
-    suspend fun callTool(toolName: String, args: JsonObject): JsonElement {
-        val tools = getAllAvailableTools()
+    fun getAllAvailableTools(): List<McpTool> {
+        val settings = settingsStore.settingsFlow.value
+        return getAllAvailableTools(settings.getCurrentAssistant().id)
+    }
+
+    suspend fun callTool(assistantId: Uuid, toolName: String, args: JsonObject): JsonElement {
+        val tools = getAllAvailableTools(assistantId)
         val tool = tools.find { it.name == toolName }
             ?: return JsonPrimitive("Failed to execute tool, because no such tool")
         val client =
@@ -138,6 +144,11 @@ class McpManager(
             options = RequestOptions(timeout = 60.seconds),
         )
         return McpJson.encodeToJsonElement(result.content)
+    }
+
+    suspend fun callTool(toolName: String, args: JsonObject): JsonElement {
+        val settings = settingsStore.settingsFlow.value
+        return callTool(settings.getCurrentAssistant().id, toolName, args)
     }
 
     private fun getTransport(config: McpServerConfig): AbstractTransport = when (config) {

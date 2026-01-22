@@ -34,8 +34,32 @@ data class Assistant(
     val mcpServers: Set<Uuid> = emptySet(),
     val localTools: List<LocalToolOption> = emptyList(),
     val background: String? = null,
+    val proactiveMessageConfig: ProactiveMessageConfig = ProactiveMessageConfig(),
     val modeInjectionIds: Set<Uuid> = emptySet(),      // 关联的模式注入 ID
     val lorebookIds: Set<Uuid> = emptySet(),            // 关联的 Lorebook ID
+)
+
+@Serializable
+data class ProactiveMessageConfig(
+    val enabled: Boolean = false,
+    val intervalMinutes: Int = 60,
+    val conversationMode: ProactiveConversationMode = ProactiveConversationMode.USE_LATEST,
+    val prompt: String = "",
+    val quietTime: ProactiveQuietTime = ProactiveQuietTime(),
+    val lastTriggeredAtEpochMillis: Long = 0L,
+)
+
+@Serializable
+enum class ProactiveConversationMode {
+    USE_LATEST,
+    NEW_CONVERSATION,
+}
+
+@Serializable
+data class ProactiveQuietTime(
+    val enabled: Boolean = false,
+    val startMinuteOfDay: Int = 0,
+    val endMinuteOfDay: Int = 0,
 )
 
 @Serializable

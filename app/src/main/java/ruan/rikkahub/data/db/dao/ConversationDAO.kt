@@ -27,6 +27,9 @@ interface ConversationDAO {
     @Query("SELECT * FROM conversationentity WHERE assistant_id = :assistantId ORDER BY is_pinned DESC, update_at DESC LIMIT :limit")
     suspend fun getRecentConversationsOfAssistant(assistantId: String, limit: Int): List<ConversationEntity>
 
+    @Query("SELECT id FROM conversationentity WHERE assistant_id = :assistantId ORDER BY update_at DESC LIMIT 1")
+    suspend fun getLatestConversationIdOfAssistant(assistantId: String): String?
+
     @Query("SELECT * FROM conversationentity WHERE title LIKE '%' || :searchText || '%' ORDER BY is_pinned DESC, update_at DESC")
     fun searchConversations(searchText: String): Flow<List<ConversationEntity>>
 

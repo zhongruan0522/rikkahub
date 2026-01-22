@@ -29,6 +29,8 @@ import org.koin.core.context.startKoin
 private const val TAG = "RikkaHubApp"
 
 const val CHAT_COMPLETED_NOTIFICATION_CHANNEL_ID = "chat_completed"
+const val PROACTIVE_MESSAGE_NOTIFICATION_CHANNEL_ID = "proactive_message"
+const val PROACTIVE_MESSAGE_TRIGGER_NOTIFICATION_CHANNEL_ID = "proactive_message_triggered"
 
 class RikkaHubApp : Application() {
     override fun onCreate() {
@@ -77,6 +79,26 @@ class RikkaHubApp : Application() {
             .setVibrationEnabled(true)
             .build()
         notificationManager.createNotificationChannel(chatCompletedChannel)
+
+        val proactiveMessageChannel = NotificationChannelCompat
+            .Builder(
+                PROACTIVE_MESSAGE_NOTIFICATION_CHANNEL_ID,
+                NotificationManagerCompat.IMPORTANCE_LOW
+            )
+            .setName(getString(R.string.notification_channel_proactive_message))
+            .setVibrationEnabled(false)
+            .build()
+        notificationManager.createNotificationChannel(proactiveMessageChannel)
+
+        val proactiveMessageTriggeredChannel = NotificationChannelCompat
+            .Builder(
+                PROACTIVE_MESSAGE_TRIGGER_NOTIFICATION_CHANNEL_ID,
+                NotificationManagerCompat.IMPORTANCE_HIGH
+            )
+            .setName(getString(R.string.notification_channel_proactive_message_triggered))
+            .setVibrationEnabled(false)
+            .build()
+        notificationManager.createNotificationChannel(proactiveMessageTriggeredChannel)
     }
 
     override fun onTerminate() {

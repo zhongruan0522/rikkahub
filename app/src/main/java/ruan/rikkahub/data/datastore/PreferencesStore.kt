@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import io.pebbletemplates.pebble.PebbleEngine
@@ -146,6 +147,12 @@ class SettingsStore(
         val SELECT_ASSISTANT = stringPreferencesKey("select_assistant")
         val ASSISTANTS = stringPreferencesKey("assistants")
         val ASSISTANT_TAGS = stringPreferencesKey("assistant_tags")
+
+        // 主动消息：用户对话空闲检测（避免每次都写入庞大的 Settings 对象）
+        val LAST_USER_MESSAGE_AT_EPOCH_MILLIS = longPreferencesKey("last_user_message_at_epoch_millis")
+        val LAST_USER_CONVERSATION_DONE_AT_EPOCH_MILLIS =
+            longPreferencesKey("last_user_conversation_done_at_epoch_millis")
+        val LAST_APP_BACKGROUND_AT_EPOCH_MILLIS = longPreferencesKey("last_app_background_at_epoch_millis")
 
         // 搜索
         val SEARCH_SERVICES = stringPreferencesKey("search_services")
@@ -366,6 +373,39 @@ class SettingsStore(
         .distinctUntilChanged()
         .toMutableStateFlow(scope, Settings.dummy())
 
+    val lastUserMessageAtFlow = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[LAST_USER_MESSAGE_AT_EPOCH_MILLIS] ?: 0L }
+        .distinctUntilChanged()
+
+    val lastUserConversationDoneAtFlow = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[LAST_USER_CONVERSATION_DONE_AT_EPOCH_MILLIS] ?: 0L }
+        .distinctUntilChanged()
+
+    val lastAppBackgroundAtFlow = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[LAST_APP_BACKGROUND_AT_EPOCH_MILLIS] ?: 0L }
+        .distinctUntilChanged()
+
     suspend fun update(settings: Settings) {
         if(settings.init) {
             Log.w(TAG, "Cannot update dummy settings")
@@ -424,6 +464,24 @@ class SettingsStore(
 
     suspend fun update(fn: (Settings) -> Settings) {
         update(fn(settingsFlow.value))
+    }
+
+    suspend fun updateLastUserMessageAt(epochMillis: Long) {
+        dataStore.edit { preferences ->
+            preferences[LAST_USER_MESSAGE_AT_EPOCH_MILLIS] = epochMillis
+        }
+    }
+
+    suspend fun updateLastUserConversationDoneAt(epochMillis: Long) {
+        dataStore.edit { preferences ->
+            preferences[LAST_USER_CONVERSATION_DONE_AT_EPOCH_MILLIS] = epochMillis
+        }
+    }
+
+    suspend fun updateLastAppBackgroundAt(epochMillis: Long) {
+        dataStore.edit { preferences ->
+            preferences[LAST_APP_BACKGROUND_AT_EPOCH_MILLIS] = epochMillis
+        }
     }
 
     suspend fun updateAssistant(assistantId: Uuid) {

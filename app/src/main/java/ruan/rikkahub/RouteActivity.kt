@@ -70,6 +70,7 @@ import ruan.rikkahub.ui.pages.assistant.detail.AssistantLocalToolPage
 import ruan.rikkahub.ui.pages.assistant.detail.AssistantMcpPage
 import ruan.rikkahub.ui.pages.assistant.detail.AssistantMemoryPage
 import ruan.rikkahub.ui.pages.assistant.detail.AssistantPromptPage
+import ruan.rikkahub.ui.pages.assistant.detail.AssistantProactivePage
 import ruan.rikkahub.ui.pages.assistant.detail.AssistantRequestPage
 import ruan.rikkahub.ui.pages.backup.BackupPage
 import ruan.rikkahub.ui.pages.chat.ChatPage
@@ -265,6 +266,11 @@ class RouteActivity : ComponentActivity() {
                         AssistantMemoryPage(route.id)
                     }
 
+                    composable<Screen.AssistantProactive> { backStackEntry ->
+                        val route = backStackEntry.toRoute<Screen.AssistantProactive>()
+                        AssistantProactivePage(route.id)
+                    }
+
                     composable<Screen.AssistantRequest> { backStackEntry ->
                         val route = backStackEntry.toRoute<Screen.AssistantRequest>()
                         AssistantRequestPage(route.id)
@@ -431,6 +437,9 @@ sealed interface Screen {
 
     @Serializable
     data class AssistantMemory(val id: String) : Screen
+
+    @Serializable
+    data class AssistantProactive(val id: String) : Screen
 
     @Serializable
     data class AssistantRequest(val id: String) : Screen

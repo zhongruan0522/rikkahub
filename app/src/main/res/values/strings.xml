@@ -738,5 +738,32 @@
   <string name="setting_display_page_paste_long_text_as_file_title">粘贴长文本为文件</string>
   <string name="setting_display_page_paste_long_text_as_file_desc">当粘贴的文本超过阈值时，自动将其保存为文件附件</string>
   <string name="setting_display_page_paste_long_text_threshold_title">文本长度阈值</string>
+  <string name="assistant_page_tab_proactive">主动消息</string>
+  <string name="assistant_detail_proactive_desc">定时向 AI 主动发送提示词</string>
+  <string name="assistant_proactive_enable">开启主动消息</string>
+  <string name="assistant_proactive_enable_desc">以持续通知的前台服务运行，最小间隔 15 分钟</string>
+  <string name="assistant_proactive_interval">触发间隔</string>
+  <string name="assistant_proactive_interval_desc">单位：分钟，最小 15 分钟</string>
+  <string name="assistant_proactive_interval_input">分钟</string>
+  <string name="assistant_proactive_conversation_mode">会话选择</string>
+  <string name="assistant_proactive_conversation_mode_desc">选择把主动消息发到哪个会话（按触发时动态决定）</string>
+  <string name="assistant_proactive_mode_latest">最近会话</string>
+  <string name="assistant_proactive_mode_new">新建会话</string>
+  <string name="assistant_proactive_prompt">主动提示词</string>
+  <string name="assistant_proactive_prompt_desc">将作为一条用户消息发送给 AI，支持 {{cur_datetime}} 等占位符</string>
+  <string name="assistant_proactive_quiet_time">黑名单时间段</string>
+  <string name="assistant_proactive_quiet_time_desc">在该时间段内不触发</string>
+  <string name="assistant_proactive_quiet_time_range">时间范围</string>
+  <string name="assistant_proactive_quiet_time_range_desc">输入 4 位数字 HHmm（例如 2330）</string>
+  <string name="assistant_proactive_quiet_time_start">开始</string>
+  <string name="assistant_proactive_quiet_time_end">结束</string>
+
+  <string name="notification_channel_proactive_message">主动消息</string>
+  <string name="notification_channel_proactive_message_triggered">主动消息提醒</string>
+  <string name="notification_proactive_message_title">主动消息运行中</string>
+  <string name="notification_proactive_message_desc">已开启 %d 个助手</string>
+  <string name="notification_proactive_message_action_stop">停止</string>
+  <string name="notification_proactive_message_triggered_title">主动消息：%s</string>
+  <string name="notification_proactive_message_triggered_desc">点击查看会话</string>
 </resources>
 

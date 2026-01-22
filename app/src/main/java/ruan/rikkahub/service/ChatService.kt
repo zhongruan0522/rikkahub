@@ -66,6 +66,7 @@ import ruan.rikkahub.data.datastore.Settings
 import ruan.rikkahub.data.datastore.SettingsStore
 import ruan.rikkahub.data.datastore.findModelById
 import ruan.rikkahub.data.datastore.findProvider
+import ruan.rikkahub.data.datastore.getAssistantById
 import ruan.rikkahub.data.datastore.getCurrentAssistant
 import ruan.rikkahub.data.datastore.getCurrentChatModel
 import ruan.rikkahub.data.model.Conversation
@@ -158,7 +159,13 @@ class ChatService(
     private val lifecycleObserver = LifecycleEventObserver { _, event ->
         when (event) {
             Lifecycle.Event.ON_START -> _isForeground.value = true
-            Lifecycle.Event.ON_STOP -> _isForeground.value = false
+            Lifecycle.Event.ON_STOP -> {
+                _isForeground.value = false
+                val nowEpochMillis = System.currentTimeMillis()
+                appScope.launch {
+                    settingsStore.updateLastAppBackgroundAt(nowEpochMillis)
+                }
+            }
             else -> {}
         }
     }
@@ -239,6 +246,10 @@ class ChatService(
         return generationJobs
     }
 
+    fun isGenerating(conversationId: Uuid): Boolean {
+        return _generationJobs.value[conversationId] != null
+    }
+
     private fun setGenerationJob(conversationId: Uuid, job: Job?) {
         if (job == null) {
             removeGenerationJob(conversationId)
@@ -279,9 +290,48 @@ class ChatService(
     }
 
     // 发送消息
-    fun sendMessage(conversationId: Uuid, content: List<UIMessagePart>, answer: Boolean = true) {
+    suspend fun initializeConversationForAssistant(
+        conversationId: Uuid,
+        assistantId: Uuid,
+        setAsCurrentAssistant: Boolean = false,
+    ) {
+        val conversation = conversationRepo.getConversationById(conversationId)
+        if (conversation != null) {
+            updateConversation(conversationId, conversation)
+            if (setAsCurrentAssistant) {
+                settingsStore.updateAssistant(conversation.assistantId)
+            }
+            return
+        }
+
+        val currentSettings = settingsStore.settingsFlowRaw.first()
+        val assistant = currentSettings.getAssistantById(assistantId) ?: currentSettings.getCurrentAssistant()
+        val newConversation = Conversation.ofId(
+            id = conversationId,
+            assistantId = assistant.id,
+            newConversation = true
+        ).updateCurrentMessages(assistant.presetMessages)
+        updateConversation(conversationId, newConversation)
+        if (setAsCurrentAssistant) {
+            settingsStore.updateAssistant(assistant.id)
+        }
+    }
+
+    fun sendMessage(
+        conversationId: Uuid,
+        content: List<UIMessagePart>,
+        answer: Boolean = true,
+        recordUserActivity: Boolean = true,
+    ) {
         // 取消现有的生成任务
         getGenerationJob(conversationId)?.cancel()
+
+        if (recordUserActivity) {
+            val nowEpochMillis = System.currentTimeMillis()
+            appScope.launch {
+                settingsStore.updateLastUserMessageAt(nowEpochMillis)
+            }
+        }
 
         val job = appScope.launch {
             try {
@@ -309,6 +359,12 @@ class ChatService(
         }
         setGenerationJob(conversationId, job)
         job.invokeOnCompletion {
+            if (recordUserActivity) {
+                val nowEpochMillis = System.currentTimeMillis()
+                appScope.launch {
+                    settingsStore.updateLastUserConversationDoneAt(nowEpochMillis)
+                }
+            }
             setGenerationJob(conversationId, null)
             // 取消生成任务后，检查是否有其他任务在进行
             appScope.launch {
@@ -325,6 +381,11 @@ class ChatService(
         regenerateAssistantMsg: Boolean = true
     ) {
         getGenerationJob(conversationId)?.cancel()
+
+        val nowEpochMillis = System.currentTimeMillis()
+        appScope.launch {
+            settingsStore.updateLastUserMessageAt(nowEpochMillis)
+        }
 
         val job = appScope.launch {
             try {
@@ -357,6 +418,10 @@ class ChatService(
 
         setGenerationJob(conversationId, job)
         job.invokeOnCompletion {
+            val doneEpochMillis = System.currentTimeMillis()
+            appScope.launch {
+                settingsStore.updateLastUserConversationDoneAt(doneEpochMillis)
+            }
             setGenerationJob(conversationId, null)
             // 取消生成任务后，检查是否有其他任务在进行
             appScope.launch {
@@ -372,21 +437,21 @@ class ChatService(
         messageRange: ClosedRange<Int>? = null
     ) {
         val settings = settingsStore.settingsFlow.first()
-        val model = settings.getCurrentChatModel()
+        val conversation = getConversationFlow(conversationId).value
+        val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
+        val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
         if (model == null) {
             addError(IllegalStateException(context.getString(R.string.setting_page_config_api_desc)))
             return
         }
 
         runCatching {
-            val conversation = getConversationFlow(conversationId).value
-
             // reset suggestions
             updateConversation(conversationId, conversation.copy(chatSuggestions = emptyList()))
 
             // memory tool
             if (!model.abilities.contains(ModelAbility.TOOL)) {
-                if (settings.enableWebSearch || mcpManager.getAllAvailableTools().isNotEmpty()) {
+                if (settings.enableWebSearch || mcpManager.getAllAvailableTools(assistant.id).isNotEmpty()) {
                     addError(IllegalStateException(context.getString(R.string.tools_warning)))
                 }
             }
@@ -405,8 +470,8 @@ class ChatService(
                         it
                     }
                 },
-                assistant = settings.getCurrentAssistant(),
-                memories = memoryRepository.getMemoriesOfAssistant(settings.assistantId.toString()),
+                assistant = assistant,
+                memories = memoryRepository.getMemoriesOfAssistant(assistant.id.toString()),
                 inputTransformers = buildList {
                     addAll(inputTransformers)
                     add(templateTransformer)
@@ -416,15 +481,15 @@ class ChatService(
                     if (settings.enableWebSearch) {
                         addAll(createSearchTool(settings))
                     }
-                    addAll(localTools.getTools(settings.getCurrentAssistant().localTools))
-                    mcpManager.getAllAvailableTools().forEach { tool ->
+                    addAll(localTools.getTools(assistant.localTools))
+                    mcpManager.getAllAvailableTools(assistant.id).forEach { tool ->
                         add(
                             Tool(
                                 name = "mcp__" + tool.name,
                                 description = tool.description ?: "",
                                 parameters = { tool.inputSchema },
                                 execute = {
-                                    mcpManager.callTool(tool.name, it.jsonObject)
+                                    mcpManager.callTool(assistant.id, tool.name, it.jsonObject)
                                 },
                             )
                         )

@@ -544,7 +544,6 @@ data class DisplaySetting(
     val showModelName: Boolean = true,
     val showTokenUsage: Boolean = true,
     val autoCloseThinking: Boolean = true,
-    val showUpdates: Boolean = true,
     val showMessageJumper: Boolean = true,
     val messageJumperOnLeft: Boolean = false,
     val fontSizeRatio: Float = 1.0f,

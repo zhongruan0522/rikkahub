@@ -46,8 +46,6 @@ import ruan.rikkahub.data.repository.ConversationRepository
 import ruan.rikkahub.service.ChatError
 import ruan.rikkahub.service.ChatService
 import ruan.rikkahub.ui.hooks.writeStringPreference
-import ruan.rikkahub.utils.UiState
-import ruan.rikkahub.utils.UpdateChecker
 import ruan.rikkahub.utils.createChatFilesByContents
 import ruan.rikkahub.utils.deleteChatFiles
 import ruan.rikkahub.utils.toLocalString
@@ -64,7 +62,6 @@ class ChatVM(
     private val settingsStore: SettingsStore,
     private val conversationRepo: ConversationRepository,
     private val chatService: ChatService,
-    val updateChecker: UpdateChecker,
     private val analytics: FirebaseAnalytics,
 ) : ViewModel() {
     private val _conversationId: Uuid = Uuid.parse(id)
@@ -247,10 +244,6 @@ class ChatVM(
             }
         }
     }
-
-    // Update checker
-    val updateState =
-        updateChecker.checkUpdate().stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Loading)
 
     /**
      * 处理消息发送

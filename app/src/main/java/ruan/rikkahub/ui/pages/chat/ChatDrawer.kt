@@ -58,10 +58,8 @@ import ruan.rikkahub.ui.components.ai.AssistantPicker
 import ruan.rikkahub.ui.components.ui.Greeting
 import ruan.rikkahub.ui.components.ui.Tooltip
 import ruan.rikkahub.ui.components.ui.UIAvatar
-import ruan.rikkahub.ui.components.ui.UpdateCard
 import ruan.rikkahub.ui.hooks.EditStateContent
 import ruan.rikkahub.ui.hooks.readBooleanPreference
-import ruan.rikkahub.ui.hooks.rememberIsPlayStoreVersion
 import ruan.rikkahub.ui.hooks.useEditState
 import ruan.rikkahub.ui.modifier.onClick
 import ruan.rikkahub.utils.navigateToChatPage
@@ -79,7 +77,6 @@ fun ChatDrawerContent(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val isPlayStore = rememberIsPlayStoreVersion()
     val repo = koinInject<ConversationRepository>()
 
     val conversations = vm.conversations.collectAsLazyPagingItems()
@@ -112,10 +109,6 @@ fun ChatDrawerContent(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (settings.displaySetting.showUpdates && !isPlayStore) {
-                UpdateCard(vm)
-            }
-
             // 用户头像和昵称自定义区域
             Row(
                 modifier = Modifier

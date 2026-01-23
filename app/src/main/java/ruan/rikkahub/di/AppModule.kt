@@ -13,7 +13,6 @@ import ruan.rikkahub.service.ChatService
 import ruan.rikkahub.utils.EmojiData
 import ruan.rikkahub.utils.EmojiUtils
 import ruan.rikkahub.utils.JsonInstant
-import ruan.rikkahub.utils.UpdateChecker
 import me.rerere.tts.provider.TTSManager
 import org.koin.dsl.module
 
@@ -26,10 +25,6 @@ val appModule = module {
 
     single {
         LocalTools(get())
-    }
-
-    single {
-        UpdateChecker(get())
     }
 
     single {

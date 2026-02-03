@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -90,6 +91,7 @@ import com.composables.icons.lucide.X
 import com.dokar.sonner.ToastType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import me.rerere.ai.provider.BuiltInSearchProvider
 import me.rerere.ai.provider.BuiltInTools
 import me.rerere.ai.provider.Modality
 import me.rerere.ai.provider.Model
@@ -99,6 +101,7 @@ import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.ProviderProxy
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.TextGenerationParams
+import me.rerere.ai.provider.detectBuiltInSearchProviderFromModelId
 import me.rerere.ai.registry.ModelRegistry
 import me.rerere.ai.ui.UIMessage
 import ruan.rikkahub.R
@@ -111,6 +114,7 @@ import ruan.rikkahub.ui.components.nav.BackButton
 import ruan.rikkahub.ui.components.ui.AutoAIIcon
 import ruan.rikkahub.ui.components.ui.ShareSheet
 import ruan.rikkahub.ui.components.ui.SiliconFlowPowerByIcon
+import ruan.rikkahub.ui.components.ui.Select
 import ruan.rikkahub.ui.components.ui.Tag
 import ruan.rikkahub.ui.components.ui.TagType
 import ruan.rikkahub.ui.components.ui.rememberShareSheetState
@@ -868,10 +872,8 @@ private fun ModelSettingsForm(
                 2 -> {
                     // 内置工具页面
                     BuiltInToolsSettings(
-                        tools = model.tools,
-                        onUpdateTools = { tools ->
-                            onModelChange(model.copy(tools = tools))
-                        }
+                        model = model,
+                        onModelChange = onModelChange
                     )
                 }
             }
@@ -1554,9 +1556,22 @@ private fun ModelCard(
 
 @Composable
 private fun BuiltInToolsSettings(
-    tools: Set<BuiltInTools>,
-    onUpdateTools: (Set<BuiltInTools>) -> Unit
+    model: Model,
+    onModelChange: (Model) -> Unit
 ) {
+    val tools = model.tools
+    val autoProvider = remember(model.modelId) {
+        detectBuiltInSearchProviderFromModelId(model.modelId)
+    }
+
+    fun updateTools(updatedTools: Set<BuiltInTools>) {
+        onModelChange(model.copy(tools = updatedTools))
+    }
+
+    fun updateSearchProvider(provider: BuiltInSearchProvider?) {
+        onModelChange(model.copy(builtInSearchProvider = provider))
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -1612,13 +1627,48 @@ private fun BuiltInToolsSettings(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+
+                    if (tool == BuiltInTools.Search) {
+                        Select(
+                            options = listOf(
+                                null,
+                                BuiltInSearchProvider.Gemini,
+                                BuiltInSearchProvider.OpenAI,
+                                BuiltInSearchProvider.Claude,
+                            ),
+                            selectedOption = model.builtInSearchProvider,
+                            onOptionSelected = { provider ->
+                                updateSearchProvider(provider)
+                            },
+                            modifier = Modifier.widthIn(min = 96.dp, max = 170.dp),
+                            optionToString = { provider ->
+                                when (provider) {
+                                    null -> stringResource(
+                                        R.string.built_in_search_provider_auto_format,
+                                        stringResource(
+                                            when (autoProvider) {
+                                                BuiltInSearchProvider.Gemini -> R.string.built_in_search_provider_gemini
+                                                BuiltInSearchProvider.OpenAI -> R.string.built_in_search_provider_gpt
+                                                BuiltInSearchProvider.Claude -> R.string.built_in_search_provider_claude
+                                                null -> R.string.built_in_search_provider_unknown
+                                            }
+                                        )
+                                    )
+
+                                    BuiltInSearchProvider.Gemini -> stringResource(R.string.built_in_search_provider_gemini)
+                                    BuiltInSearchProvider.OpenAI -> stringResource(R.string.built_in_search_provider_gpt)
+                                    BuiltInSearchProvider.Claude -> stringResource(R.string.built_in_search_provider_claude)
+                                }
+                            }
+                        )
+                    }
                     Switch(
                         checked = tool in tools,
                         onCheckedChange = { checked ->
                             if (checked) {
-                                onUpdateTools(tools + tool)
+                                updateTools(tools + tool)
                             } else {
-                                onUpdateTools(tools - tool)
+                                updateTools(tools - tool)
                             }
                         }
                     )

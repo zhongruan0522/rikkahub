@@ -24,6 +24,7 @@ import kotlinx.serialization.json.putJsonObject
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.core.TokenUsage
+import me.rerere.ai.provider.BuiltInSearchProvider
 import me.rerere.ai.provider.BuiltInTools
 import me.rerere.ai.provider.ImageGenerationParams
 import me.rerere.ai.provider.Modality
@@ -34,6 +35,7 @@ import me.rerere.ai.provider.Provider
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.TextGenerationParams
 import me.rerere.ai.provider.providers.vertex.ServiceAccountTokenProvider
+import me.rerere.ai.provider.resolveBuiltInSearchProvider
 import me.rerere.ai.registry.ModelRegistry
 import me.rerere.ai.ui.ImageAspectRatio
 import me.rerere.ai.ui.ImageGenerationItem
@@ -434,13 +436,17 @@ class GoogleProvider(private val client: OkHttpClient) : Provider<ProviderSettin
         // Model BuiltIn Tools
         // 目前不能和工具调用兼容
         if (params.model.tools.isNotEmpty()) {
-            put("tools", buildJsonArray {
+            val builtInSearchProvider =
+                params.model.resolveBuiltInSearchProvider(defaultProvider = BuiltInSearchProvider.Gemini)
+            val builtInToolsArray = buildJsonArray {
                 params.model.tools.forEach { builtInTool ->
                     when (builtInTool) {
                         BuiltInTools.Search -> {
-                            add(buildJsonObject {
-                                put("google_search", buildJsonObject {})
-                            })
+                            if (builtInSearchProvider == BuiltInSearchProvider.Gemini) {
+                                add(buildJsonObject {
+                                    put("google_search", buildJsonObject {})
+                                })
+                            }
                         }
 
                         BuiltInTools.UrlContext -> {
@@ -450,7 +456,10 @@ class GoogleProvider(private val client: OkHttpClient) : Provider<ProviderSettin
                         }
                     }
                 }
-            })
+            }
+            if (builtInToolsArray.isNotEmpty()) {
+                put("tools", builtInToolsArray)
+            }
         }
 
         // Safety Settings

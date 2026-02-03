@@ -20,10 +20,13 @@ import kotlinx.serialization.json.putJsonArray
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.core.TokenUsage
+import me.rerere.ai.provider.BuiltInSearchProvider
+import me.rerere.ai.provider.BuiltInTools
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelAbility
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.TextGenerationParams
+import me.rerere.ai.provider.resolveBuiltInSearchProvider
 import me.rerere.ai.registry.ModelRegistry
 import me.rerere.ai.ui.MessageChunk
 import me.rerere.ai.ui.UIMessage
@@ -203,20 +206,40 @@ class ResponseAPI(private val client: OkHttpClient) : OpenAIImpl {
             }
 
             // tools
-            if (params.model.abilities.contains(ModelAbility.TOOL) && params.tools.isNotEmpty()) {
+            val canUseTools = params.model.abilities.contains(ModelAbility.TOOL)
+            val builtInTools = buildList {
+                val builtInSearchProvider =
+                    params.model.resolveBuiltInSearchProvider(defaultProvider = BuiltInSearchProvider.OpenAI)
+
+                if (canUseTools && BuiltInTools.Search in params.model.tools && builtInSearchProvider == BuiltInSearchProvider.OpenAI) {
+                    val toolType = if (params.model.modelId.contains("search-preview", ignoreCase = true)) {
+                        "web_search_preview"
+                    } else {
+                        "web_search"
+                    }
+                    add(buildJsonObject {
+                        put("type", toolType)
+                    })
+                }
+            }
+            val hasFunctionTools = canUseTools && params.tools.isNotEmpty()
+            if (builtInTools.isNotEmpty() || hasFunctionTools) {
                 putJsonArray("tools") {
-                    params.tools.forEach { tool ->
-                        add(buildJsonObject {
-                            put("type", "function")
-                            put("name", tool.name)
-                            put("description", tool.description)
-                            put(
-                                "parameters",
-                                json.encodeToJsonElement(
-                                    tool.parameters()
+                    builtInTools.forEach { add(it) }
+                    if (hasFunctionTools) {
+                        params.tools.forEach { tool ->
+                            add(buildJsonObject {
+                                put("type", "function")
+                                put("name", tool.name)
+                                put("description", tool.description)
+                                put(
+                                    "parameters",
+                                    json.encodeToJsonElement(
+                                        tool.parameters()
+                                    )
                                 )
-                            )
-                        })
+                            })
+                        }
                     }
                 }
             }

@@ -16,6 +16,8 @@ data class Model(
     val outputModalities: List<Modality> = listOf(Modality.TEXT),
     val abilities: List<ModelAbility> = emptyList(),
     val tools: Set<BuiltInTools> = emptySet(),
+    // 覆盖内置搜索提供方；为空时根据 modelId 自动识别
+    val builtInSearchProvider: BuiltInSearchProvider? = null,
     val providerOverwrite: ProviderSetting? = null,
 )
 
@@ -50,6 +52,32 @@ sealed class BuiltInTools {
     @Serializable
     @SerialName("url_context")
     data object UrlContext : BuiltInTools()
+}
+
+@Serializable
+enum class BuiltInSearchProvider {
+    @SerialName("openai")
+    OpenAI,
+
+    @SerialName("gemini")
+    Gemini,
+
+    @SerialName("claude")
+    Claude,
+}
+
+fun detectBuiltInSearchProviderFromModelId(modelId: String): BuiltInSearchProvider? {
+    val id = modelId.lowercase()
+    return when {
+        "gemini" in id -> BuiltInSearchProvider.Gemini
+        "gpt" in id -> BuiltInSearchProvider.OpenAI
+        "claude" in id -> BuiltInSearchProvider.Claude
+        else -> null
+    }
+}
+
+fun Model.resolveBuiltInSearchProvider(defaultProvider: BuiltInSearchProvider? = null): BuiltInSearchProvider? {
+    return builtInSearchProvider ?: detectBuiltInSearchProviderFromModelId(modelId) ?: defaultProvider
 }
 
 

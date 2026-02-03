@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -42,14 +43,16 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Search
 import com.composables.icons.lucide.Settings2
 import kotlinx.coroutines.launch
+import me.rerere.ai.provider.BuiltInSearchProvider
 import me.rerere.ai.provider.BuiltInTools
 import me.rerere.ai.provider.Model
-import me.rerere.ai.registry.ModelRegistry
+import me.rerere.ai.provider.detectBuiltInSearchProviderFromModelId
 import ruan.rikkahub.R
 import ruan.rikkahub.Screen
 import ruan.rikkahub.data.datastore.Settings
 import ruan.rikkahub.data.datastore.SettingsStore
 import ruan.rikkahub.ui.components.ui.AutoAIIcon
+import ruan.rikkahub.ui.components.ui.Select
 import ruan.rikkahub.ui.components.ui.Tag
 import ruan.rikkahub.ui.components.ui.TagType
 import ruan.rikkahub.ui.components.ui.ToggleSurface
@@ -156,7 +159,10 @@ private fun SearchPicker(
     val navBackStack = LocalNavController.current
 
     // 模型内置搜索
-    if (model != null && ModelRegistry.GEMINI_SERIES.match(model.modelId)) {
+    val autoBuiltInSearchProvider = remember(model?.modelId) {
+        model?.modelId?.let(::detectBuiltInSearchProviderFromModelId)
+    }
+    if (model != null && (model.tools.contains(BuiltInTools.Search) || model.builtInSearchProvider != null || autoBuiltInSearchProvider != null)) {
         BuiltInSearchSetting(model = model)
     }
 
@@ -290,6 +296,23 @@ private fun AppSearchSettings(
 private fun BuiltInSearchSetting(model: Model) {
     val settingsStore = koinInject<SettingsStore>()
     val scope = rememberCoroutineScope()
+    val autoProvider = remember(model.modelId) {
+        detectBuiltInSearchProviderFromModelId(model.modelId)
+    }
+
+    fun updateModel(updatedModel: Model) {
+        val settings = settingsStore.settingsFlow.value
+        scope.launch {
+            settingsStore.update(
+                settings.copy(
+                    providers = settings.providers.map { providerSetting ->
+                        providerSetting.editModel(updatedModel)
+                    }
+                )
+            )
+        }
+    }
+
     Card {
         Row(
             modifier = Modifier
@@ -314,23 +337,51 @@ private fun BuiltInSearchSetting(model: Model) {
                 )
             }
 
-            Switch(
-                checked = model.tools.contains(BuiltInTools.Search),
-                onCheckedChange = { checked ->
-                    val settings = settingsStore.settingsFlow.value
-                    scope.launch {
-                        settingsStore.update(
-                            settings.copy(
-                                providers = settings.providers.map { providerSetting ->
-                                    providerSetting.editModel(
-                                        model.copy(
-                                            tools = if (checked) model.tools + BuiltInTools.Search else model.tools - BuiltInTools.Search
-                                        )
-                                    )
+            Select(
+                options = listOf(
+                    null,
+                    BuiltInSearchProvider.Gemini,
+                    BuiltInSearchProvider.OpenAI,
+                    BuiltInSearchProvider.Claude,
+                ),
+                selectedOption = model.builtInSearchProvider,
+                onOptionSelected = { provider ->
+                    updateModel(model.copy(builtInSearchProvider = provider))
+                },
+                modifier = Modifier.widthIn(min = 96.dp, max = 170.dp),
+                optionToString = { provider ->
+                    when (provider) {
+                        null -> stringResource(
+                            R.string.built_in_search_provider_auto_format,
+                            stringResource(
+                                when (autoProvider) {
+                                    BuiltInSearchProvider.Gemini -> R.string.built_in_search_provider_gemini
+                                    BuiltInSearchProvider.OpenAI -> R.string.built_in_search_provider_gpt
+                                    BuiltInSearchProvider.Claude -> R.string.built_in_search_provider_claude
+                                    null -> R.string.built_in_search_provider_unknown
                                 }
                             )
                         )
+
+                        BuiltInSearchProvider.Gemini -> stringResource(R.string.built_in_search_provider_gemini)
+                        BuiltInSearchProvider.OpenAI -> stringResource(R.string.built_in_search_provider_gpt)
+                        BuiltInSearchProvider.Claude -> stringResource(R.string.built_in_search_provider_claude)
                     }
+                }
+            )
+
+            Switch(
+                checked = model.tools.contains(BuiltInTools.Search),
+                onCheckedChange = { checked ->
+                    updateModel(
+                        model.copy(
+                            tools = if (checked) {
+                                model.tools + BuiltInTools.Search
+                            } else {
+                                model.tools - BuiltInTools.Search
+                            }
+                        )
+                    )
                 }
             )
         }

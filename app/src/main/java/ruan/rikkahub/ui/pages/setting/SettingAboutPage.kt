@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.composables.icons.lucide.Code
-import com.composables.icons.lucide.Earth
 import com.composables.icons.lucide.FileText
 import com.composables.icons.lucide.Github
 import com.composables.icons.lucide.Lucide
@@ -49,10 +46,7 @@ import ruan.rikkahub.R
 import ruan.rikkahub.Screen
 import ruan.rikkahub.ui.components.nav.BackButton
 import ruan.rikkahub.ui.components.easteregg.EmojiBurstHost
-import ruan.rikkahub.ui.components.ui.icons.DiscordIcon
-import ruan.rikkahub.ui.components.ui.icons.TencentQQIcon
 import ruan.rikkahub.ui.context.LocalNavController
-import ruan.rikkahub.utils.joinQQGroup
 import ruan.rikkahub.utils.openUrl
 
 @Composable
@@ -118,39 +112,6 @@ fun SettingAboutPage() {
                             text = "RikkaHub",
                             style = MaterialTheme.typography.displaySmall,
                         )
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(
-                                8.dp,
-                                Alignment.CenterHorizontally
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    context.joinQQGroup("wMdqlDETtzIz6o49HrBR2TeQlwcX6RH9")
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = TencentQQIcon,
-                                    contentDescription = "QQ",
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-
-                            IconButton(
-                                onClick = {
-                                    context.openUrl("https://discord.gg/9weBqxe5c4")
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = DiscordIcon,
-                                    contentDescription = "Discord",
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
                     }
                 }
 
@@ -197,18 +158,18 @@ fun SettingAboutPage() {
                 item {
                     ListItem(
                         headlineContent = {
-                            Text(stringResource(R.string.about_page_website))
+                            Text(stringResource(R.string.about_page_github))
                         },
                         supportingContent = {
                             Text(
-                                text = "https://rikka-ai.com"
+                                text = "https://github.com/zhongruan0522/rikkahub"
                             )
                         },
                         modifier = Modifier.clickable {
-                            context.openUrl("https://rikka-ai.com/")
+                            context.openUrl("https://github.com/zhongruan0522/rikkahub")
                         },
                         leadingContent = {
-                            Icon(Lucide.Earth, null)
+                            Icon(Lucide.Github, null)
                         }
                     )
                 }
@@ -216,7 +177,7 @@ fun SettingAboutPage() {
                 item {
                     ListItem(
                         headlineContent = {
-                            Text(stringResource(R.string.about_page_github))
+                            Text(stringResource(R.string.about_page_github_original))
                         },
                         supportingContent = {
                             Text(

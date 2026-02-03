@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
   <string name="about_page_github">Github</string>
+  <string name="about_page_github_original">GitHub原项目</string>
   <string name="about_page_license">License</string>
   <string name="about_page_system">系统</string>
   <string name="about_page_title">关于</string>

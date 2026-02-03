@@ -1,6 +1,5 @@
 *.iml
 .gradle
-/local.properties
 /.idea
 .DS_Store
 /build
@@ -13,4 +12,8 @@ local.properties
 .kotlin
 .gradle-user-home/
 .android-prefs/
-rikkahub.jks
+.android/
+*.jks
+*.keystore
+*.apk
+*.aab

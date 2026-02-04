@@ -13,6 +13,12 @@ local.properties
 .gradle-user-home/
 .android-prefs/
 .android/
+/.android-home/
+/.android-user-home/
+/.java-home/
+/.claude/
+/analytics.settings
+/git
 *.jks
 *.keystore
 *.apk

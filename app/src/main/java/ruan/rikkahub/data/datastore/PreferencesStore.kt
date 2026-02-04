@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ProviderSetting
 import ruan.rikkahub.AppScope
@@ -27,6 +28,7 @@ import ruan.rikkahub.data.ai.prompts.DEFAULT_SUGGESTION_PROMPT
 import ruan.rikkahub.data.ai.prompts.DEFAULT_TITLE_PROMPT
 import ruan.rikkahub.data.ai.prompts.DEFAULT_TRANSLATION_PROMPT
 import ruan.rikkahub.data.datastore.migration.PreferenceStoreV1Migration
+import ruan.rikkahub.data.datastore.migration.PreferenceStoreV2Migration
 import ruan.rikkahub.data.model.Assistant
 import ruan.rikkahub.data.model.Avatar
 import ruan.rikkahub.data.model.PromptInjection
@@ -35,6 +37,7 @@ import ruan.rikkahub.data.model.Lorebook
 import ruan.rikkahub.data.sync.s3.S3Config
 import ruan.rikkahub.ui.theme.PresetThemes
 import ruan.rikkahub.utils.JsonInstant
+import ruan.rikkahub.utils.migrateLegacyPolymorphicTypes
 import ruan.rikkahub.utils.toMutableStateFlow
 import me.rerere.search.SearchCommonOptions
 import me.rerere.search.SearchServiceOptions
@@ -44,6 +47,19 @@ import org.koin.core.component.get
 import kotlin.uuid.Uuid
 
 private const val TAG = "PreferencesStore"
+
+private inline fun <reified T> decodeJsonWithMigrations(raw: String?, defaultValue: T): T {
+    if (raw.isNullOrBlank()) return defaultValue
+
+    return runCatching {
+        JsonInstant.decodeFromString<T>(raw)
+    }.recoverCatching {
+        val migrated = JsonInstant.parseToJsonElement(raw).migrateLegacyPolymorphicTypes()
+        JsonInstant.decodeFromJsonElement<T>(migrated)
+    }.getOrElse {
+        defaultValue
+    }
+}
 
 private fun isSupportedSearchService(service: SearchServiceOptions): Boolean {
     return when (service) {
@@ -105,7 +121,8 @@ private val Context.settingsStore by preferencesDataStore(
     name = "settings",
     produceMigrations = { context ->
         listOf(
-            PreferenceStoreV1Migration()
+            PreferenceStoreV1Migration(),
+            PreferenceStoreV2Migration(),
         )
     }
 )
@@ -216,11 +233,11 @@ class SettingsStore(
                     JsonInstant.decodeFromString(it)
                 } ?: emptyList(),
                 providers = JsonInstant.decodeFromString(preferences[PROVIDERS] ?: "[]"),
-                assistants = JsonInstant.decodeFromString(preferences[ASSISTANTS] ?: "[]"),
+                assistants = decodeJsonWithMigrations(preferences[ASSISTANTS], emptyList<Assistant>()),
                 dynamicColor = preferences[DYNAMIC_COLOR] != false,
                 themeId = preferences[THEME_ID] ?: PresetThemes[0].id,
                 developerMode = preferences[DEVELOPER_MODE] == true,
-                displaySetting = JsonInstant.decodeFromString(preferences[DISPLAY_SETTING] ?: "{}"),
+                displaySetting = decodeJsonWithMigrations(preferences[DISPLAY_SETTING], DisplaySetting()),
                 searchServices = preferences[SEARCH_SERVICES]?.let {
                     JsonInstant.decodeFromString(it)
                 } ?: listOf(SearchServiceOptions.ZhipuOptions()),

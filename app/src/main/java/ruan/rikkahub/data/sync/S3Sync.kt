@@ -6,11 +6,13 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 import ruan.rikkahub.data.datastore.Settings
 import ruan.rikkahub.data.datastore.SettingsStore
 import ruan.rikkahub.data.sync.s3.S3Client
 import ruan.rikkahub.data.sync.s3.S3Config
 import ruan.rikkahub.utils.fileSizeToString
+import ruan.rikkahub.utils.migrateLegacyPolymorphicTypes
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -180,7 +182,8 @@ class S3Sync(
                             val settingsJson = zipIn.readBytes().toString(Charsets.UTF_8)
                             Log.i(TAG, "restoreFromBackupFile: Restoring settings")
                             try {
-                                val settings = json.decodeFromString<Settings>(settingsJson)
+                                val element = json.parseToJsonElement(settingsJson).migrateLegacyPolymorphicTypes()
+                                val settings = json.decodeFromJsonElement<Settings>(element)
                                 settingsStore.update(settings)
                                 Log.i(TAG, "restoreFromBackupFile: Settings restored successfully")
                             } catch (e: Exception) {

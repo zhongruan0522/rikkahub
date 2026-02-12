@@ -12,6 +12,7 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.rerere.common.http.ClientIdentity
 import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import ruan.rikkahub.Screen
@@ -66,6 +67,9 @@ suspend fun Context.saveMessageImage(image: String) = withContext(Dispatchers.IO
             kotlin.runCatching { // Use runCatching to handle potential network exceptions
                 val url = java.net.URL(image)
                 val connection = url.openConnection() as java.net.HttpURLConnection
+                connection.setRequestProperty(ClientIdentity.HEADER_X_TITLE, ClientIdentity.X_TITLE)
+                connection.setRequestProperty(ClientIdentity.HEADER_HTTP_REFERER, ClientIdentity.HTTP_REFERER)
+                connection.setRequestProperty(ClientIdentity.HEADER_USER_AGENT, ClientIdentity.USER_AGENT)
                 connection.connect()
 
                 if (connection.responseCode == java.net.HttpURLConnection.HTTP_OK) {

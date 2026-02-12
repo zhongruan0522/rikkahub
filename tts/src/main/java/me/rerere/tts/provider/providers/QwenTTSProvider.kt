@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import me.rerere.common.http.ClientIdentityInterceptor
 import me.rerere.tts.model.AudioChunk
 import me.rerere.tts.model.AudioFormat
 import me.rerere.tts.model.TTSRequest
@@ -21,6 +22,7 @@ private const val TAG = "QwenTTSProvider"
 
 class QwenTTSProvider : TTSProvider<TTSProviderSetting.Qwen> {
     private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(ClientIdentityInterceptor())
         .readTimeout(120, TimeUnit.SECONDS)
         .build()
 

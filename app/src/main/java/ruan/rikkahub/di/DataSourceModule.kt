@@ -7,8 +7,8 @@ import io.ktor.http.HttpHeaders
 import io.pebbletemplates.pebble.PebbleEngine
 import kotlinx.serialization.json.Json
 import me.rerere.ai.provider.ProviderManager
+import me.rerere.common.http.ClientIdentityInterceptor
 import me.rerere.common.http.AcceptLanguageBuilder
-import ruan.rikkahub.BuildConfig
 import ruan.rikkahub.data.ai.AIRequestInterceptor
 import ruan.rikkahub.data.ai.RequestLoggingInterceptor
 import ruan.rikkahub.data.ai.transformers.AssistantTemplateLoader
@@ -95,14 +95,11 @@ val dataSourceModule = module {
             .followSslRedirects(true)
             .followRedirects(true)
             .retryOnConnectionFailure(true)
+            .addInterceptor(ClientIdentityInterceptor())
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
                 val requestBuilder = originalRequest.newBuilder()
-                    .addHeader(HttpHeaders.AcceptLanguage, acceptLang)
-
-                if (originalRequest.header(HttpHeaders.UserAgent) == null) {
-                    requestBuilder.addHeader(HttpHeaders.UserAgent, "RikkaHub-Android/${BuildConfig.VERSION_NAME}")
-                }
+                    .header(HttpHeaders.AcceptLanguage, acceptLang)
 
                 chain.proceed(requestBuilder.build())
             }
@@ -137,6 +134,7 @@ val dataSourceModule = module {
                     followSslRedirects(true)
                     followRedirects(true)
                     retryOnConnectionFailure(true)
+                    addInterceptor(ClientIdentityInterceptor())
                 }
             }
         }
@@ -154,6 +152,7 @@ val dataSourceModule = module {
     single<Retrofit> {
         Retrofit.Builder()
             .baseUrl("https://api.rikka-ai.com")
+            .client(get())
             .addConverterFactory(get<Json>().asConverterFactory("application/json; charset=UTF8".toMediaType()))
             .build()
     }

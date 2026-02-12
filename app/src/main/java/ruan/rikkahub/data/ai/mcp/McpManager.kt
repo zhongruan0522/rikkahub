@@ -28,6 +28,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.encodeToJsonElement
 import me.rerere.ai.core.InputSchema
+import me.rerere.common.http.ClientIdentityInterceptor
 import ruan.rikkahub.AppScope
 import ruan.rikkahub.data.ai.mcp.transport.SseClientTransport
 import ruan.rikkahub.data.ai.mcp.transport.StreamableHttpClientTransport
@@ -52,6 +53,7 @@ class McpManager(
         .writeTimeout(120, TimeUnit.SECONDS)
         .followSslRedirects(true)
         .followRedirects(true)
+        .addInterceptor(ClientIdentityInterceptor())
         .build()
 
     private val client = HttpClient(OkHttp) {

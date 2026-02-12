@@ -5,6 +5,7 @@ import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
+import me.rerere.common.http.ClientIdentityInterceptor
 import me.rerere.tts.model.AudioChunk
 import me.rerere.tts.model.AudioFormat
 import me.rerere.tts.model.TTSRequest
@@ -21,6 +22,7 @@ private const val TAG = "OpenAITTSProvider"
 
 class OpenAITTSProvider : TTSProvider<TTSProviderSetting.OpenAI> {
     private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(ClientIdentityInterceptor())
         .readTimeout(120, TimeUnit.SECONDS)
         .build()
 

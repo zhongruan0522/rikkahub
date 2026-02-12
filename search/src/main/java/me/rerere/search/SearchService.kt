@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import me.rerere.ai.core.InputSchema
+import me.rerere.common.http.ClientIdentityInterceptor
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -65,6 +66,7 @@ interface SearchService<T : SearchServiceOptions> {
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(ClientIdentityInterceptor())
                 .build()
         }
 

@@ -10,6 +10,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import me.rerere.common.http.SseEvent
 import me.rerere.common.http.sseFlow
+import me.rerere.common.http.ClientIdentityInterceptor
 import me.rerere.tts.model.AudioChunk
 import me.rerere.tts.model.AudioFormat
 import me.rerere.tts.model.TTSRequest
@@ -37,6 +38,7 @@ private data class MiniMaxResponse(
 
 class MiniMaxTTSProvider : TTSProvider<TTSProviderSetting.MiniMax> {
     private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(ClientIdentityInterceptor())
         .readTimeout(60, TimeUnit.SECONDS)
         .build()
 

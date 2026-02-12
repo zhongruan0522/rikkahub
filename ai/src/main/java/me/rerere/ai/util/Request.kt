@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import me.rerere.ai.provider.CustomBody
 import me.rerere.ai.provider.CustomHeader
+import me.rerere.common.http.ClientIdentity
 import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
@@ -26,8 +27,8 @@ fun Request.Builder.configureReferHeaders(url: String): Request.Builder {
     return when (httpUrl.host) {
         "openrouter.ai" -> {
             this
-                .addHeader("X-Title", "RikkaHub")
-                .addHeader("HTTP-Referer", "https://rikka-ai.com")
+                .header(ClientIdentity.HEADER_X_TITLE, ClientIdentity.X_TITLE)
+                .header(ClientIdentity.HEADER_HTTP_REFERER, ClientIdentity.HTTP_REFERER)
         }
 
         else -> this

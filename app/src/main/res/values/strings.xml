@@ -769,5 +769,8 @@
   <string name="notification_proactive_message_action_stop">停止</string>
   <string name="notification_proactive_message_triggered_title">主动消息：%s</string>
   <string name="notification_proactive_message_triggered_desc">点击查看会话</string>
+
+  <string name="log_page_copy">复制</string>
+  <string name="log_page_copied">已复制到剪贴板</string>
 </resources>
 

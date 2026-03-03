@@ -11,21 +11,19 @@ import io.modelcontextprotocol.kotlin.sdk.shared.RequestOptions
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequestParams
 import io.modelcontextprotocol.kotlin.sdk.types.Implementation
-import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.encodeToJsonElement
-import me.rerere.ai.core.InputSchema
 import me.rerere.common.http.ClientIdentityInterceptor
 import ruan.rikkahub.AppScope
 import ruan.rikkahub.data.ai.RequestLoggingInterceptor
@@ -44,6 +42,8 @@ class McpManager(
     private val settingsStore: SettingsStore,
     private val appScope: AppScope,
 ) {
+    private val connectMutex = Mutex()
+
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.MINUTES)
@@ -135,8 +135,9 @@ class McpManager(
         val config = clients.entries.first { it.value == mcpClient }.key
         Log.i(TAG, "callTool: $toolName / $args")
 
-        if (mcpClient.transport == null) mcpClient.connect(createTransport(config, httpClient))
-        val result = mcpClient.callTool(
+        ensureConnected(config = config, client = mcpClient)
+        val result = runCatching {
+            mcpClient.callTool(
             request = CallToolRequest(
                 params = CallToolRequestParams(
                     name = tool.name,
@@ -144,7 +145,10 @@ class McpManager(
                 ),
             ),
             options = RequestOptions(timeout = 60.seconds),
-        )
+            )
+        }.onFailure {
+            setStatus(config = config, status = McpStatus.Error(it.message ?: it.javaClass.name))
+        }.getOrThrow()
         return McpJson.encodeToJsonElement(result.content)
     }
 
@@ -155,7 +159,6 @@ class McpManager(
 
     suspend fun addClient(config: McpServerConfig) = withContext(Dispatchers.IO) {
         removeClient(config) // Remove first
-        val transport = createTransport(config, httpClient)
         val client = Client(
             clientInfo = Implementation(
                 name = config.commonOptions.name,
@@ -164,10 +167,7 @@ class McpManager(
         )
         clients[config] = client
         runCatching {
-            setStatus(config = config, status = McpStatus.Connecting)
-            client.connect(transport)
             sync(config)
-            setStatus(config = config, status = McpStatus.Connected)
             Log.i(TAG, "addClient: connected ${config.commonOptions.name}")
         }.onFailure {
             it.printStackTrace()
@@ -180,10 +180,7 @@ class McpManager(
 
         setStatus(config = config, status = McpStatus.Connecting)
 
-        // Update tools
-        if (client.transport == null) {
-            client.connect(createTransport(config, httpClient))
-        }
+        ensureConnected(config = config, client = client)
         val serverTools = client.listTools().tools ?: emptyList()
         Log.i(TAG, "sync: tools: $serverTools")
         settingsStore.update { old ->
@@ -240,6 +237,23 @@ class McpManager(
         setStatus(config = config, status = McpStatus.Connected)
     }
 
+    private suspend fun ensureConnected(config: McpServerConfig, client: Client) {
+        connectMutex.withLock {
+            if (syncingStatus.value[config.id] is McpStatus.Connected) {
+                return
+            }
+            setStatus(config = config, status = McpStatus.Connecting)
+            runCatching {
+                client.connect(createTransport(config, httpClient))
+            }.onSuccess {
+                setStatus(config = config, status = McpStatus.Connected)
+            }.onFailure {
+                setStatus(config = config, status = McpStatus.Error(it.message ?: it.javaClass.name))
+                throw it
+            }
+        }
+    }
+
     suspend fun syncAll() = withContext(Dispatchers.IO) {
         clients.keys.toList().forEach { config ->
             runCatching {
@@ -273,19 +287,4 @@ class McpManager(
     fun getStatus(config: McpServerConfig): Flow<McpStatus> {
         return syncingStatus.map { it[config.id] ?: McpStatus.Idle }
     }
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-internal val McpJson: Json by lazy {
-    Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
-        isLenient = true
-        classDiscriminatorMode = ClassDiscriminatorMode.NONE
-        explicitNulls = false
-    }
-}
-
-private fun ToolSchema.toSchema(): InputSchema {
-    return InputSchema.Obj(properties = this.properties ?: JsonObject(emptyMap()), required = this.required)
 }

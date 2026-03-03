@@ -6,9 +6,7 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.sse.*
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.util.StringValues
 import io.modelcontextprotocol.kotlin.sdk.client.Client
-import io.modelcontextprotocol.kotlin.sdk.shared.AbstractTransport
 import io.modelcontextprotocol.kotlin.sdk.shared.RequestOptions
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequestParams
@@ -30,8 +28,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import me.rerere.ai.core.InputSchema
 import me.rerere.common.http.ClientIdentityInterceptor
 import ruan.rikkahub.AppScope
-import ruan.rikkahub.data.ai.mcp.transport.SseClientTransport
-import ruan.rikkahub.data.ai.mcp.transport.StreamableHttpClientTransport
+import ruan.rikkahub.data.ai.RequestLoggingInterceptor
 import ruan.rikkahub.data.datastore.SettingsStore
 import ruan.rikkahub.data.datastore.getAssistantById
 import ruan.rikkahub.data.datastore.getCurrentAssistant
@@ -54,9 +51,10 @@ class McpManager(
         .followSslRedirects(true)
         .followRedirects(true)
         .addInterceptor(ClientIdentityInterceptor())
+        .addInterceptor(RequestLoggingInterceptor(tag = "MCP"))
         .build()
 
-    private val client = HttpClient(OkHttp) {
+    private val httpClient = HttpClient(OkHttp) {
         engine {
             preconfigured = okHttpClient
         }
@@ -129,14 +127,16 @@ class McpManager(
         val tools = getAllAvailableTools(assistantId)
         val tool = tools.find { it.name == toolName }
             ?: return JsonPrimitive("Failed to execute tool, because no such tool")
-        val client =
+        val mcpClient =
             clients.entries.find { it.key.commonOptions.tools.any { it.name == toolName } }?.value
-        if (client == null) return JsonPrimitive("Failed to execute tool, because no such mcp client for the tool")
-        val config = clients.entries.first { it.value == client }.key
+        if (mcpClient == null) {
+            return JsonPrimitive("Failed to execute tool, because no such mcp client for the tool")
+        }
+        val config = clients.entries.first { it.value == mcpClient }.key
         Log.i(TAG, "callTool: $toolName / $args")
 
-        if (client.transport == null) client.connect(getTransport(config))
-        val result = client.callTool(
+        if (mcpClient.transport == null) mcpClient.connect(createTransport(config, httpClient))
+        val result = mcpClient.callTool(
             request = CallToolRequest(
                 params = CallToolRequestParams(
                     name = tool.name,
@@ -153,39 +153,9 @@ class McpManager(
         return callTool(settings.getCurrentAssistant().id, toolName, args)
     }
 
-    private fun getTransport(config: McpServerConfig): AbstractTransport = when (config) {
-        is McpServerConfig.SseTransportServer -> {
-            SseClientTransport(
-                urlString = config.url,
-                client = client,
-                requestBuilder = {
-                    headers.appendAll(StringValues.build {
-                        config.commonOptions.headers.forEach {
-                            append(it.first, it.second)
-                        }
-                    })
-                },
-            )
-        }
-
-        is McpServerConfig.StreamableHTTPServer -> {
-            StreamableHttpClientTransport(
-                url = config.url,
-                client = client,
-                requestBuilder = {
-                    headers.appendAll(StringValues.build {
-                        config.commonOptions.headers.forEach {
-                            append(it.first, it.second)
-                        }
-                    })
-                }
-            )
-        }
-    }
-
     suspend fun addClient(config: McpServerConfig) = withContext(Dispatchers.IO) {
         removeClient(config) // Remove first
-        val transport = getTransport(config)
+        val transport = createTransport(config, httpClient)
         val client = Client(
             clientInfo = Implementation(
                 name = config.commonOptions.name,
@@ -212,7 +182,7 @@ class McpManager(
 
         // Update tools
         if (client.transport == null) {
-            client.connect(getTransport(config))
+            client.connect(createTransport(config, httpClient))
         }
         val serverTools = client.listTools().tools ?: emptyList()
         Log.i(TAG, "sync: tools: $serverTools")

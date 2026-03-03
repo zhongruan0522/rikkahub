@@ -7,6 +7,12 @@ import okhttp3.Response
 import okio.Buffer
 
 class RequestLoggingInterceptor : Interceptor {
+    constructor(tag: String = DEFAULT_TAG) {
+        this.tag = tag
+    }
+
+    private val tag: String
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val startTime = System.currentTimeMillis()
@@ -24,10 +30,10 @@ class RequestLoggingInterceptor : Interceptor {
         try {
             response = chain.proceed(request)
         } catch (e: Exception) {
-            error = e.message
+            error = e.toLogString()
             Logging.logRequest(
                 LogEntry.RequestLog(
-                    tag = "HTTP",
+                    tag = tag,
                     url = request.url.toString(),
                     method = request.method,
                     requestHeaders = requestHeaders,
@@ -43,7 +49,7 @@ class RequestLoggingInterceptor : Interceptor {
 
         Logging.logRequest(
             LogEntry.RequestLog(
-                tag = "HTTP",
+                tag = tag,
                 url = request.url.toString(),
                 method = request.method,
                 requestHeaders = requestHeaders,
@@ -60,5 +66,15 @@ class RequestLoggingInterceptor : Interceptor {
 
     private fun okhttp3.Headers.toMap(): Map<String, String> {
         return names().associateWith { get(it) ?: "" }
+    }
+
+    private fun Exception.toLogString(): String {
+        val exceptionName = this::class.qualifiedName ?: javaClass.name
+        val message = message?.takeIf { it.isNotBlank() } ?: return exceptionName
+        return "$exceptionName: $message"
+    }
+
+    private companion object {
+        const val DEFAULT_TAG = "HTTP"
     }
 }

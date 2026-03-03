@@ -436,7 +436,7 @@ class ChatService(
         conversationId: Uuid,
         messageRange: ClosedRange<Int>? = null
     ) {
-        val settings = settingsStore.settingsFlow.first()
+        val settings = settingsStore.settingsFlow.first { !it.init }
         val conversation = getConversationFlow(conversationId).value
         val assistant = settings.getAssistantById(conversation.assistantId) ?: settings.getCurrentAssistant()
         val model = settings.findModelById(assistant.chatModelId ?: settings.chatModelId)
@@ -721,7 +721,7 @@ class ChatService(
         if (!shouldGenerate) return
 
         runCatching {
-            val settings = settingsStore.settingsFlow.first()
+            val settings = settingsStore.settingsFlow.first { !it.init }
             val model =
                 settings.findModelById(settings.titleModelId) ?: settings.getCurrentChatModel()
                 ?: return
@@ -758,7 +758,7 @@ class ChatService(
     // 生成建议
     suspend fun generateSuggestion(conversationId: Uuid, conversation: Conversation) {
         runCatching {
-            val settings = settingsStore.settingsFlow.first()
+            val settings = settingsStore.settingsFlow.first { !it.init }
             val model = settings.findModelById(settings.suggestionModelId) ?: return
             val provider = model.findProvider(settings.providers) ?: return
 
@@ -808,7 +808,7 @@ class ChatService(
         additionalPrompt: String,
         targetTokens: Int
     ): Result<Unit> = runCatching {
-        val settings = settingsStore.settingsFlow.first()
+        val settings = settingsStore.settingsFlow.first { !it.init }
         val model = settings.findModelById(settings.compressModelId)
             ?: settings.getCurrentChatModel()
             ?: throw IllegalStateException("No model available for compression")
@@ -935,7 +935,7 @@ class ChatService(
     ) {
         appScope.launch(Dispatchers.IO) {
             try {
-                val settings = settingsStore.settingsFlow.first()
+                val settings = settingsStore.settingsFlow.first { !it.init }
 
                 val messageText = message.parts.filterIsInstance<UIMessagePart.Text>()
                     .joinToString("\n\n") { it.text }

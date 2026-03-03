@@ -113,7 +113,7 @@ class ImgGenVM(
                 _error.value = null
                 _currentGeneratedImages.value = emptyList()
 
-                val settings = settingsStore.settingsFlow.first()
+                val settings = settingsStore.settingsFlow.first { !it.init }
                 val model = settings.findModelById(settings.imageGenerationModelId)
                     ?: throw IllegalStateException("No model selected")
 

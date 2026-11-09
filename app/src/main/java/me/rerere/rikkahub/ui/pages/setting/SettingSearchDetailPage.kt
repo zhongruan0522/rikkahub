@@ -226,6 +226,9 @@ private fun SearchServiceOptionsEditor(
         is SearchServiceOptions.DeepSeekOptions -> {
             DeepSeekOptions(options) { onUpdateOptions(it) }
         }
+        is SearchServiceOptions.AnySearchOptions -> {
+            AnySearchOptions(options) { onUpdateOptions(it) }
+        }
         is SearchServiceOptions.CustomJsOptions -> {
             CustomJsOptions(options) { onUpdateOptions(it) }
         }
@@ -983,6 +986,26 @@ internal fun GrokOptions(
                 onUpdateOptions(options.copy(systemPrompt = it))
             },
             minLines = 3,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+internal fun AnySearchOptions(
+    options: SearchServiceOptions.AnySearchOptions,
+    onUpdateOptions: (SearchServiceOptions.AnySearchOptions) -> Unit
+) {
+    FormItem(
+        label = {
+            Text(stringResource(R.string.search_detail_api_key))
+        }
+    ) {
+        OutlinedTextField(
+            value = options.apiKey,
+            onValueChange = {
+                onUpdateOptions(options.copy(apiKey = it))
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }

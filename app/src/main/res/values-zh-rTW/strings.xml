@@ -306,7 +306,6 @@
   <string name="donate_page_afdian_desc">適用於🇨🇳用戶</string>
   <string name="donate_page_donation_methods">贊助方式</string>
   <string name="donate_page_kofi_desc">供全球用戶使用</string>
-  <string name="donate_page_sponsor_list">贊助用戶列表</string>
   <string name="donate_page_title">贊助</string>
   <string name="edit">編輯</string>
   <string name="editing">編輯中</string>
@@ -801,10 +800,6 @@
   <string name="setting_page_share">分享</string>
   <string name="setting_page_share_desc">分享本APP給朋友</string>
   <string name="setting_page_share_text">RikkaHub - 開源安卓AI助手\n\n官網: https://rikka-ai.com/</string>
-  <string name="setting_page_sponsor_alert_confirm">捐款</string>
-  <string name="setting_page_sponsor_alert_desc">您已啟動應用程式超過 100 次！如果您喜歡使用它，請考慮支持開發者。</string>
-  <string name="setting_page_sponsor_alert_dismiss">稍後再說</string>
-  <string name="setting_page_sponsor_alert_title">支援開發者</string>
   <string name="setting_page_theme_setting">主題</string>
   <string name="setting_page_theme_setting_desc">自訂應用配色方案</string>
   <string name="setting_theme_page_preset_themes">預設主題</string>

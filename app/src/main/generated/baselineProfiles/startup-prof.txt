@@ -49409,7 +49409,6 @@ SPLme/rerere/rikkahub/data/datastore/Settings;->getSearchServiceSelected()I
 SPLme/rerere/rikkahub/data/datastore/Settings;->getSearchServices()Ljava/util/List;
 SPLme/rerere/rikkahub/data/datastore/Settings;->getSelectedASRProviderId()Lkotlin/uuid/Uuid;
 SPLme/rerere/rikkahub/data/datastore/Settings;->getSelectedTTSProviderId()Lkotlin/uuid/Uuid;
-SPLme/rerere/rikkahub/data/datastore/Settings;->getSponsorAlertDismissedAt()I
 SPLme/rerere/rikkahub/data/datastore/Settings;->getSuggestionPrompt()Ljava/lang/String;
 SPLme/rerere/rikkahub/data/datastore/Settings;->getThemeId()Ljava/lang/String;
 SPLme/rerere/rikkahub/data/datastore/Settings;->getTitlePrompt()Ljava/lang/String;
@@ -51388,7 +51387,6 @@ SPLme/rerere/rikkahub/data/remote/SettingsProxySelector;->select(Ljava/net/URI;)
 Lme/rerere/rikkahub/data/remote/SettingsSocks5Authenticator;
 SPLme/rerere/rikkahub/data/remote/SettingsSocks5Authenticator;-><clinit>()V
 SPLme/rerere/rikkahub/data/remote/SettingsSocks5Authenticator;-><init>(Lme/rerere/rikkahub/data/datastore/SettingsStore;)V
-Lme/rerere/rikkahub/data/remote/SponsorAPI;
 Lme/rerere/rikkahub/data/repository/ConversationRepository;
 SPLme/rerere/rikkahub/data/repository/ConversationRepository;-><clinit>()V
 SPLme/rerere/rikkahub/data/repository/ConversationRepository;-><init>(Lme/rerere/rikkahub/data/db/dao/ConversationDAO;Lme/rerere/rikkahub/data/db/dao/MessageNodeDAO;Lme/rerere/rikkahub/data/db/dao/FavoriteDAO;Lme/rerere/rikkahub/data/db/AppDatabase;Lme/rerere/rikkahub/data/files/FilesManager;Lme/rerere/rikkahub/data/db/fts/MessageFtsManager;)V

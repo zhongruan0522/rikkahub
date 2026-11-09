@@ -1664,9 +1664,6 @@
   <string name="workspace_ssh_editor_save_anyway">Trotzdem speichern</string>
   <string name="workspace_ssh_editor_connecting">Verbindung wird hergestellt…</string>
   <string name="skills_page_clear_search">Löschen</string>
-  <string name="skills_page_builtin_tag">Integriert</string>
-  <string name="skill_detail_page_close">Schließen</string>
-  <string name="skill_detail_page_builtin_readonly">Integrierte Skills können nicht geändert werden</string>
   <string name="skill_detail_page_name_change_error">Der Skill-Name kann nicht geändert werden. Das Namensfeld muss %1$s sein</string>
   <string name="skill_detail_page_save_failed">Speichern fehlgeschlagen</string>
   <string name="skills_page_import_error_github_list_failed">GitHub-Verzeichnis konnte nicht gelesen werden</string>

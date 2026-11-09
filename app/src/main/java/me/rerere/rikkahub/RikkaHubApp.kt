@@ -103,8 +103,8 @@ class RikkaHubApp : Application() {
         // sync upload files to DB
         syncManagedFiles()
 
-        // Extract builtin skills from assets after install/update
-        extractBuiltinSkills()
+        // Seed bundled default skills into the skills directory on first launch
+        seedDefaultSkills()
 
         // Load models.dev data for model capability matching, then refresh it in background
         updateModelsDev()
@@ -199,9 +199,9 @@ class RikkaHubApp : Application() {
         }
     }
 
-    private fun extractBuiltinSkills() {
+    private fun seedDefaultSkills() {
         get<AppScope>().launch(Dispatchers.IO) {
-            get<SkillManager>().ensureBuiltinSkillsExtracted()
+            get<SkillManager>().seedDefaultSkillsIfNeeded()
         }
     }
 

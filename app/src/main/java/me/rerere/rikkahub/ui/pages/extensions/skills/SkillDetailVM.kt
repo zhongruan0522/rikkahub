@@ -38,9 +38,6 @@ class SkillDetailVM(
     private val _tree = MutableStateFlow<List<SkillFileNode>>(emptyList())
     val tree = _tree.asStateFlow()
 
-    private val _readOnly = MutableStateFlow(false)
-    val readOnly = _readOnly.asStateFlow()
-
     private var skillName = ""
     private var skill: SkillMetadata? = null
 
@@ -54,7 +51,6 @@ class SkillDetailVM(
         viewModelScope.launch(Dispatchers.IO) {
             val skill = skillManager.findSkill(skillName) ?: return@launch
             this@SkillDetailVM.skill = skill
-            _readOnly.value = skill.builtin
             val files = skill.skillDir.walkTopDown()
                 .filter { it.isFile }
                 .map { SkillFile(it.relativeTo(skill.skillDir).invariantSeparatorsPath, it.length()) }
@@ -89,12 +85,6 @@ class SkillDetailVM(
     // Returns null on success, error message on failure
     fun saveFile(relativePath: String, content: String, onResult: (String?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_readOnly.value) {
-                withContext(
-                    Dispatchers.Main
-                ) { onResult(context.getString(R.string.skill_detail_page_builtin_readonly)) }
-                return@launch
-            }
             if (relativePath == "SKILL.md") {
                 val name = SkillFrontmatterParser.parse(content)["name"]
                 if (name != skillName) {
@@ -114,7 +104,7 @@ class SkillDetailVM(
 
     fun deleteFile(skillFile: SkillFile, onResult: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = !_readOnly.value && skillManager.deleteSkillFile(skillName, skillFile.relativePath)
+            val success = skillManager.deleteSkillFile(skillName, skillFile.relativePath)
             if (success) loadFiles()
             withContext(Dispatchers.Main) { onResult(success) }
         }

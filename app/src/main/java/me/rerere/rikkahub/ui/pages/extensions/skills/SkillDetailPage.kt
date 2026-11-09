@@ -76,7 +76,6 @@ fun SkillDetailPage(skillName: String) {
     LaunchedEffect(skillName) { vm.init(skillName) }
 
     val tree by vm.tree.collectAsStateWithLifecycle()
-    val readOnly by vm.readOnly.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val toaster = LocalToaster.current
 
@@ -106,7 +105,7 @@ fun SkillDetailPage(skillName: String) {
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = fabVisible && !readOnly,
+                visible = fabVisible,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut(),
             ) {
@@ -135,7 +134,6 @@ fun SkillDetailPage(skillName: String) {
                         FileTree(
                             nodes = tree,
                             depth = 0,
-                            readOnly = readOnly,
                             onEdit = { editingFile = it },
                             onDelete = { deleteTarget = it },
                         )
@@ -148,7 +146,6 @@ fun SkillDetailPage(skillName: String) {
     editingFile?.let { skillFile ->
         EditFileDialog(
             skillFile = skillFile,
-            readOnly = readOnly,
             initialContent = remember(skillFile.relativePath) { vm.readFile(skillFile) },
             onDismiss = { editingFile = null },
             onConfirm = { content ->
@@ -195,7 +192,6 @@ fun SkillDetailPage(skillName: String) {
 private fun FileTree(
     nodes: List<SkillFileNode>,
     depth: Int,
-    readOnly: Boolean,
     onEdit: (SkillFile) -> Unit,
     onDelete: (SkillFile) -> Unit,
 ) {
@@ -204,7 +200,6 @@ private fun FileTree(
             is SkillFileNode.FileNode -> FileItem(
                 skillFile = node.skillFile,
                 depth = depth,
-                readOnly = readOnly,
                 onEdit = { onEdit(node.skillFile) },
                 onDelete = { onDelete(node.skillFile) },
             )
@@ -212,7 +207,6 @@ private fun FileTree(
             is SkillFileNode.DirNode -> DirItem(
                 node = node,
                 depth = depth,
-                readOnly = readOnly,
                 onEdit = onEdit,
                 onDelete = onDelete,
             )
@@ -227,12 +221,11 @@ private val TreeIndent = 24.dp
 private fun FileItem(
     skillFile: SkillFile,
     depth: Int,
-    readOnly: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
     // SKILL.md 是技能的入口文件，不能删
-    val deletable = !readOnly && skillFile.relativePath != "SKILL.md"
+    val deletable = skillFile.relativePath != "SKILL.md"
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -280,7 +273,6 @@ private fun FileItem(
 private fun DirItem(
     node: SkillFileNode.DirNode,
     depth: Int,
-    readOnly: Boolean,
     onEdit: (SkillFile) -> Unit,
     onDelete: (SkillFile) -> Unit,
 ) {
@@ -328,7 +320,6 @@ private fun DirItem(
                 FileTree(
                     nodes = node.children,
                     depth = depth + 1,
-                    readOnly = readOnly,
                     onEdit = onEdit,
                     onDelete = onDelete,
                 )
@@ -340,7 +331,6 @@ private fun DirItem(
 @Composable
 private fun EditFileDialog(
     skillFile: SkillFile,
-    readOnly: Boolean,
     initialContent: String,
     onDismiss: () -> Unit,
     onConfirm: (content: String) -> Unit,
@@ -354,7 +344,6 @@ private fun EditFileDialog(
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
-                readOnly = readOnly,
                 label = { Text(stringResource(R.string.skill_detail_page_content)) },
                 minLines = 10,
                 maxLines = 20,
@@ -363,16 +352,10 @@ private fun EditFileDialog(
             )
         },
         confirmButton = {
-            if (readOnly) {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.skill_detail_page_close)) }
-            } else {
-                TextButton(onClick = { onConfirm(content) }) { Text(stringResource(R.string.skill_detail_page_save)) }
-            }
+            TextButton(onClick = { onConfirm(content) }) { Text(stringResource(R.string.skill_detail_page_save)) }
         },
         dismissButton = {
-            if (!readOnly) {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-            }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         },
     )
 }

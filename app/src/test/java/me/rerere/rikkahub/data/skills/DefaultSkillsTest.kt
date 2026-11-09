@@ -5,28 +5,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class BuiltinSkillsTest {
+class DefaultSkillsTest {
     @Test
-    fun `local skill overrides builtin skill with same name`() {
-        val local = SkillMetadata(name = "shared", description = "local", skillDir = File("skills/shared"))
-        val merged = mergeWithBuiltinSkills(
-            local = listOf(local),
-            builtin = listOf(
-                SkillMetadata(name = "shared", description = "builtin", skillDir = File("builtin/shared"), builtin = true),
-                SkillMetadata(name = "only-builtin", description = "builtin", skillDir = File("builtin/only"), builtin = true),
-            ),
-        )
-
-        assertEquals(listOf("shared", "only-builtin"), merged.map { it.name })
-        assertEquals(local, merged.first())
-    }
-
-    @Test
-    fun `builtin skills in assets are valid`() {
+    fun `default skills in assets are valid`() {
         // Android 单元测试的工作目录是模块根目录
-        val root = File("src/main/assets/builtin_skills")
+        val root = File("src/main/assets/default_skills")
         val skillDirs = root.listFiles()?.filter { it.isDirectory }.orEmpty()
-        assertTrue("No builtin skills found in ${root.absolutePath}", skillDirs.isNotEmpty())
+        assertTrue("No default skills found in ${root.absolutePath}", skillDirs.isNotEmpty())
 
         skillDirs.forEach { dir ->
             val skillFile = dir.resolve("SKILL.md")

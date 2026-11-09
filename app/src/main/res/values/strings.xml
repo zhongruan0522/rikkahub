@@ -1722,9 +1722,6 @@
   <string name="skills_page_import_error_save_failed">Failed to save skill: %1$s</string>
   <string name="skills_page_skill_body_placeholder">Instructions...</string>
   <string name="skills_page_clear_search">Clear</string>
-  <string name="skills_page_builtin_tag">Built-in</string>
-  <string name="skill_detail_page_close">Close</string>
-  <string name="skill_detail_page_builtin_readonly">Built-in skills cannot be modified</string>
   <string name="skill_detail_page_name_change_error">The skill name cannot be changed. The name field must be %1$s</string>
   <string name="skill_detail_page_save_failed">Save failed</string>
   <string name="setting_page_preferences_notification_background_generation">Background generation</string>

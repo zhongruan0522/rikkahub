@@ -1724,9 +1724,6 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="skills_page_import_error_save_failed">保存技能失败：%1$s</string>
   <string name="skills_page_skill_body_placeholder">指令内容...</string>
   <string name="skills_page_clear_search">清除</string>
-  <string name="skills_page_builtin_tag">内置</string>
-  <string name="skill_detail_page_close">关闭</string>
-  <string name="skill_detail_page_builtin_readonly">内置技能不可修改</string>
   <string name="skill_detail_page_name_change_error">技能名称无法更改。name 字段必须为 %1$s</string>
   <string name="skill_detail_page_save_failed">保存失败</string>
   <string name="setting_page_preferences_notification_background_generation">后台生成</string>

@@ -1713,9 +1713,6 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="skills_page_import_error_save_failed">スキルの保存に失敗しました: %1$s</string>
   <string name="skills_page_skill_body_placeholder">指示を入力...</string>
   <string name="skills_page_clear_search">クリア</string>
-  <string name="skills_page_builtin_tag">組み込み</string>
-  <string name="skill_detail_page_close">閉じる</string>
-  <string name="skill_detail_page_builtin_readonly">組み込みスキルは変更できません</string>
   <string name="skill_detail_page_name_change_error">スキル名は変更できません。name フィールドは%1$sである必要があります。</string>
   <string name="skill_detail_page_save_failed">保存に失敗しました</string>
   <string name="setting_page_preferences_notification_background_generation">バックグラウンド生成</string>

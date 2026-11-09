@@ -16,10 +16,10 @@ class SkillManager(
         private const val TAG = "SkillManager"
     }
 
-    private val builtinLock = Any()
+    private val seedLock = Any()
 
     @Volatile
-    private var builtinExtracted = false
+    private var seeded = false
 
     fun getSkillsDir(): File {
         val dir = context.filesDir.resolve(FileFolders.SKILLS)
@@ -27,45 +27,34 @@ class SkillManager(
         return dir
     }
 
-    fun getBuiltinSkillsDir(): File {
-        val dir = context.filesDir.resolve(FileFolders.BUILTIN_SKILLS)
-        if (!dir.exists()) dir.mkdirs()
-        return dir
-    }
-
     /**
-     * 确保内置技能已从 assets 解压到 [getBuiltinSkillsDir]，每个进程只检查一次。
+     * 确保随 APK 发布的默认技能已播种到 [getSkillsDir]，每个进程只检查一次。
      */
-    fun ensureBuiltinSkillsExtracted() {
-        if (builtinExtracted) return
-        synchronized(builtinLock) {
-            if (builtinExtracted) return
+    fun seedDefaultSkillsIfNeeded() {
+        if (seeded) return
+        synchronized(seedLock) {
+            if (seeded) return
             runCatching {
-                BuiltinSkills.extractIfNeeded(context, getBuiltinSkillsDir())
+                DefaultSkills.seedIfNeeded(context, getSkillsDir())
             }.onFailure {
-                Log.w(TAG, "ensureBuiltinSkillsExtracted: Failed to extract builtin skills", it)
+                Log.w(TAG, "seedDefaultSkillsIfNeeded: Failed to seed default skills", it)
             }
-            builtinExtracted = true
+            seeded = true
         }
     }
 
     /**
-     * 列出所有可用技能：用户技能 + 内置技能，同名时用户技能覆盖内置技能。
+     * 列出所有可用技能。首次使用前会先把随 APK 发布的默认技能播种到技能目录。
      */
-    fun listSkills(): List<SkillMetadata> = mergeWithBuiltinSkills(
-        local = listSkillsIn(getSkillsDir(), builtin = false),
-        builtin = listBuiltinSkills(),
-    )
+    fun listSkills(): List<SkillMetadata> {
+        seedDefaultSkillsIfNeeded()
+        return listSkillsIn(getSkillsDir())
+    }
 
     fun findSkill(name: String): SkillMetadata? = listSkills().firstOrNull { it.name == name }
 
-    private fun listBuiltinSkills(): List<SkillMetadata> {
-        ensureBuiltinSkillsExtracted()
-        return listSkillsIn(getBuiltinSkillsDir(), builtin = true)
-    }
-
-    private fun listSkillsIn(root: File, builtin: Boolean): List<SkillMetadata> =
-        skillDirsIn(root).mapNotNull { parseSkillDir(it, builtin).getOrNull() }
+    private fun listSkillsIn(root: File): List<SkillMetadata> =
+        skillDirsIn(root).mapNotNull { parseSkillDir(it).getOrNull() }
 
     /**
      * 列出用户技能目录下无法识别为技能的目录，如空目录、缺少 SKILL.md 或 frontmatter 不完整。
@@ -73,7 +62,7 @@ class SkillManager(
      */
     fun listInvalidSkillDirs(): List<InvalidSkillDir> = skillDirsIn(getSkillsDir())
         .mapNotNull { dir ->
-            val reason = when (val error = parseSkillDir(dir, builtin = false).exceptionOrNull()) {
+            val reason = when (val error = parseSkillDir(dir).exceptionOrNull()) {
                 null -> return@mapNotNull null
                 is InvalidSkillException -> error.reason
                 else -> InvalidSkillReason.ReadFailed
@@ -86,7 +75,7 @@ class SkillManager(
         val dir = SkillPaths.resolveSkillDir(getSkillsDir(), dirName) ?: return@withContext false
         if (!dir.isDirectory) return@withContext false
         // 列表展示期间目录可能已在工作区里补全成有效技能，删除前再确认一次
-        if (parseSkillDir(dir, builtin = false).isSuccess) return@withContext false
+        if (parseSkillDir(dir).isSuccess) return@withContext false
         dir.deleteRecursively()
     }
 
@@ -101,11 +90,10 @@ class SkillManager(
             return null
         }
         val skillDir = resolveSkillDir(name) ?: return null
-        return parseSkillDir(skillDir, builtin = false).getOrNull()
+        return parseSkillDir(skillDir).getOrNull()
     }
 
     suspend fun deleteSkill(skill: SkillMetadata): Boolean = withContext(Dispatchers.IO) {
-        if (skill.builtin) return@withContext false
         val name = skill.name
         // 按技能实际所在的目录删除：在工作区里直接创建、复制或改过 name 的技能，
         // 目录名可能和 frontmatter 的 name 不一致，按 name 拼路径会找不到目录
@@ -113,7 +101,7 @@ class SkillManager(
         // 目录不存在时 deleteRecursively 也返回 true，需提前拦截，避免误清理启用状态
         if (!skillDir.exists()) return@withContext false
         val deleted = skillDir.deleteRecursively()
-        // 还有同名技能（被覆盖的内置技能或另一个同名用户技能）会继续生效，保留启用状态
+        // 还有同名技能会继续生效，保留启用状态
         if (deleted && listSkills().none { it.name == name }) {
             settingsStore.update { settings ->
                 settings.copy(
@@ -246,7 +234,7 @@ class SkillManager(
     }
 
     /** 解析技能目录；无法识别时为 [InvalidSkillException]，读文件失败时为 IO 异常 */
-    private fun parseSkillDir(skillDir: File, builtin: Boolean): Result<SkillMetadata> = runCatching {
+    private fun parseSkillDir(skillDir: File): Result<SkillMetadata> = runCatching {
         val skillFile = skillDir.resolve("SKILL.md")
         if (!skillFile.isFile) throw InvalidSkillException(InvalidSkillReason.MissingSkillMd)
         val frontmatter = SkillFrontmatterParser.parse(skillFile.readText())
@@ -259,7 +247,6 @@ class SkillManager(
             description = description,
             compatibility = frontmatter["compatibility"],
             skillDir = skillDir,
-            builtin = builtin,
         )
     }
 }
@@ -284,8 +271,6 @@ data class SkillMetadata(
     val description: String,
     val compatibility: String? = null,
     val skillDir: File,
-    /** 内置技能，来自 assets 解压，只读 */
-    val builtin: Boolean = false,
 ) {
     val skillFile: File get() = skillDir.resolve("SKILL.md")
 }

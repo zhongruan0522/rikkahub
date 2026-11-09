@@ -1711,9 +1711,6 @@
   <string name="skills_page_import_error_save_failed">تعذّر حفظ المهارة: %1$s</string>
   <string name="skills_page_skill_body_placeholder">التعليمات...</string>
   <string name="skills_page_clear_search">مسح</string>
-  <string name="skills_page_builtin_tag">مدمج</string>
-  <string name="skill_detail_page_close">إغلاق</string>
-  <string name="skill_detail_page_builtin_readonly">لا يمكن تعديل المهارات المدمجة</string>
   <string name="skill_detail_page_name_change_error">لا يمكن تغيير اسم المهارة. يجب أن يكون حقل name %1$s</string>
   <string name="skill_detail_page_save_failed">فشل الحفظ</string>
   <string name="setting_page_preferences_notification_background_generation">التوليد في الخلفية</string>

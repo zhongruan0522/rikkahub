@@ -11,8 +11,7 @@ A skill is a directory with a `SKILL.md` file (YAML frontmatter + Markdown instr
 
 ## Where skills live
 
-- User skills: `/skills/<name>/` in the workspace. This directory is writable; create and edit files there directly with `workspace_write_file` / `workspace_edit_file`.
-- Built-in skills: `/builtin_skills/<name>/`, read-only. To customize one, copy it to `/skills/<same-name>/` and edit the copy; a user skill overrides a built-in skill with the same name.
+- Skills: `/skills/<name>/` in the workspace. This directory is writable; create and edit files there directly with `workspace_write_file` / `workspace_edit_file`.
 - A new skill shows up in the app's skill list automatically, but is disabled by default. Always tell the user to enable it for their assistant (Skills tab of the extensions panel in the chat input, or the assistant's extension settings).
 
 ## Workflow
@@ -88,4 +87,4 @@ If workspace tools are unavailable, you cannot write files. Instead, output the 
 - [ ] `description` says what the skill does and when to use it, in at most 1024 characters.
 - [ ] Every file linked from `SKILL.md` exists at that relative path.
 - [ ] Every script is executable, has been run successfully, and its requirements are listed in `compatibility`.
-- [ ] Nothing in the skill conflicts with or duplicates an existing skill in `/skills` or `/builtin_skills`.
+- [ ] Nothing in the skill conflicts with or duplicates an existing skill in `/skills`.

@@ -1711,9 +1711,6 @@
   <string name="skills_page_import_error_save_failed">儲存技能失敗：%1$s</string>
   <string name="skills_page_skill_body_placeholder">指令...</string>
   <string name="skills_page_clear_search">清除</string>
-  <string name="skills_page_builtin_tag">內建</string>
-  <string name="skill_detail_page_close">關閉</string>
-  <string name="skill_detail_page_builtin_readonly">內建技能無法修改</string>
   <string name="skill_detail_page_name_change_error">技能名稱無法變更。name 欄位必須為 %1$s</string>
   <string name="skill_detail_page_save_failed">儲存失敗</string>
   <string name="setting_page_preferences_notification_background_generation">背景生成</string>

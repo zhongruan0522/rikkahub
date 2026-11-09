@@ -67,7 +67,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.rerere.ai.core.MessageRole
 import me.rerere.ai.provider.Model
-import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessageAnnotation
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.ai.ui.isEmptyUIMessage
@@ -100,7 +99,6 @@ import me.rerere.rikkahub.utils.urlDecode
 import me.rerere.ui.charts.ChartCard
 import me.rerere.ui.charts.ChartSpec
 import me.rerere.ui.webview.WebViewContentCache
-import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -119,8 +117,6 @@ fun ChatMessage(
     onUpdate: (MessageNode) -> Unit,
     isFavorite: Boolean = false,
     onToggleFavorite: (() -> Unit)? = null,
-    onTranslate: ((UIMessage, Locale) -> Unit)? = null,
-    onClearTranslation: (UIMessage) -> Unit = {},
     onToolApproval: ((toolCallId: String, approved: Boolean, reason: String) -> Unit)? = null,
     onToolAnswer: ((toolCallId: String, answer: String) -> Unit)? = null,
 ) {
@@ -200,12 +196,6 @@ fun ChatMessage(
                 onUserMessageClick = if (message.role == MessageRole.USER) onEdit else null,
             )
 
-            message.translation?.let { translation ->
-                CollapsibleTranslationText(
-                    content = translation,
-                    onClickCitation = {}
-                )
-            }
         }
 
         val showActions = if (lastMessage) {
@@ -233,8 +223,6 @@ fun ChatMessage(
                     onOpenActionSheet = {
                         showActionsSheet = true
                     },
-                    onTranslate = onTranslate,
-                    onClearTranslation = onClearTranslation
                 )
             }
         }

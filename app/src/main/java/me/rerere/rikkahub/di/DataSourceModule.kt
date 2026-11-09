@@ -19,7 +19,6 @@ import me.rerere.rikkahub.data.ai.ConversationMetaGenerator
 import me.rerere.rikkahub.data.ai.MemoryConsolidationScheduler
 import me.rerere.rikkahub.data.ai.MemoryConsolidator
 import me.rerere.rikkahub.data.ai.RequestLoggingInterceptor
-import me.rerere.rikkahub.data.ai.TranslationHandler
 import me.rerere.rikkahub.data.ai.UsageRecorder
 import me.rerere.rikkahub.data.ai.account.ProviderAccountManager
 import me.rerere.rikkahub.data.ai.mcp.McpManager
@@ -121,10 +120,6 @@ val dataSourceModule = module {
     }
 
     single {
-        get<AppDatabase>().translationHistoryDao()
-    }
-
-    single {
         get<AppDatabase>().usageRecordDao()
     }
 
@@ -156,10 +151,6 @@ val dataSourceModule = module {
             keepAlive = memoryDreamKeepAlive(get<Context>()),
             isAppVisible = { ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) },
         )
-    }
-
-    single {
-        TranslationHandler(providerManager = get(), usageRecorder = get())
     }
 
     single {

@@ -135,7 +135,6 @@ import me.rerere.rikkahub.ui.pages.setting.SettingSpeechPage
 import me.rerere.rikkahub.ui.pages.setting.SettingWebPage
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage
 import me.rerere.rikkahub.ui.pages.stats.StatsPage
-import me.rerere.rikkahub.ui.pages.translator.TranslatorPage
 import me.rerere.rikkahub.ui.pages.webview.WebViewPage
 import me.rerere.rikkahub.ui.theme.RikkahubTheme
 import me.rerere.rikkahub.utils.CrashHandler
@@ -146,7 +145,6 @@ import org.koin.compose.koinInject
 import kotlin.uuid.Uuid
 
 private const val TAG = "RouteActivity"
-private const val ACTION_TRANSLATE = "me.rerere.rikkahub.action.TRANSLATE"
 private const val ACTION_MEDIA_CREATION = "me.rerere.rikkahub.action.MEDIA_CREATION"
 private const val EXTRA_CONVERSATION_ID = "conversationId"
 
@@ -237,7 +235,6 @@ class RouteActivity : ComponentActivity() {
             return
         }
         val destination = when (intent.action) {
-            ACTION_TRANSLATE -> Screen.Translator
             ACTION_MEDIA_CREATION -> {
                 openNewMediaCreation(backStack)
                 null
@@ -416,10 +413,6 @@ class RouteActivity : ComponentActivity() {
 
                             entry<Screen.AssistantInjections> { key ->
                                 AssistantExtensionsPage(key.id)
-                            }
-
-                            entry<Screen.Translator> {
-                                TranslatorPage()
                             }
 
                             entry<Screen.Setting> {
@@ -698,9 +691,6 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data class AssistantInjections(val id: String) : Screen
-
-    @Serializable
-    data object Translator : Screen
 
     @Serializable
     data object Setting : Screen

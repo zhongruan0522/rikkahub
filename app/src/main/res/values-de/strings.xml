@@ -256,7 +256,6 @@
   <string name="chat_page_export_share_via">Teilen über</string>
   <string name="chat_page_export_success">Exportiert nach %1$s</string>
   <string name="chat_page_history">Chat-Verlauf</string>
-  <string name="chat_page_menu_ai_translator">KI-Übersetzer</string>
   <string name="chat_page_menu_image_generation">Bildgenerierung</string>
   <string name="chat_page_message_count">%d Nachrichten</string>
   <string name="chat_page_move_to_assistant">Zum Assistenten verschieben</string>
@@ -285,7 +284,6 @@
   <string name="code_block_copy">Code kopieren</string>
   <string name="code_block_expand">Ausklappen</string>
   <string name="code_block_preview">Vorschau</string>
-  <string name="collapse_translation">Übersetzung einklappen</string>
   <string name="confirm">Bestätigen</string>
   <string name="confirm_delete">Löschen bestätigen</string>
   <string name="copied">Kopiert</string>
@@ -373,15 +371,6 @@
   <string name="imggen_page_save_failed">Speichern fehlgeschlagen: %1$s</string>
   <string name="imggen_page_settings_title">Einstellungen für die Bildgenerierung</string>
   <string name="imggen_page_title">Bildgenerierung</string>
-  <string name="language_english">🇺🇸 English</string>
-  <string name="language_french">🇫🇷 Français</string>
-  <string name="language_german">🇩🇪 Deutsch</string>
-  <string name="language_italian">🇮🇹 Italiano</string>
-  <string name="language_japanese">🇯🇵 日本語</string>
-  <string name="language_korean">🇰🇷 한국어</string>
-  <string name="language_simplified_chinese">🇨🇳 简体中文</string>
-  <string name="language_spanish">🇪🇸 Español</string>
-  <string name="language_traditional_chinese">🇨🇳 繁體中文</string>
   <string name="mcp_picker_syncing">MCP-Server werden synchronisiert...</string>
   <string name="mcp_picker_title">MCP-Server</string>
   <string name="menu">Menü</string>
@@ -412,8 +401,6 @@
   <string name="error_title_tool_approval">Tool-Aufruf konnte nicht verarbeitet werden</string>
   <string name="error_title_tool_unavailable">Tool nicht verfügbar</string>
   <string name="error_mcp_invalid_server_name">Ungültiger MCP-Servername (nur alphanumerische Zeichen erlaubt): %1$s</string>
-  <string name="error_title_translate_message">Nachricht konnte nicht übersetzt werden</string>
-  <string name="expand_translation">Übersetzung ausklappen</string>
   <string name="export_cancel">Abbrechen</string>
   <string name="export_image_warning">\"Der obige Inhalt wurde durch künstliche Intelligenz erzeugt und kann Ungenauigkeiten enthalten. \"</string>
   <string name="export_import_failed">Import fehlgeschlagen: %s</string>
@@ -780,9 +767,6 @@
   <string name="setting_model_page_title">Modell-Einstellungen</string>
   <string name="setting_model_page_title_model">Modell für Titelzusammenfassung</string>
   <string name="setting_model_page_title_model_desc">Modell zum Zusammenfassen von Gesprächsttiteln. Wenn nicht festgelegt, wird das schnelle Modell verwendet</string>
-  <string name="setting_model_page_translate_model">Übersetzungsmodell</string>
-  <string name="setting_model_page_translate_model_desc">Das für Übersetzungsfunktionen verwendete Modell</string>
-  <string name="setting_model_page_translate_prompt_vars">Variablen: Quelltext: {source_text}, Zielsprache: {target_lang}</string>
   <string name="setting_page_about">Über</string>
   <string name="setting_page_about_desc">Über diese App</string>
   <string name="setting_page_assistant">Assistent</string>
@@ -1084,8 +1068,6 @@
   <string name="skills_page_repo_url_label">Repository-URL</string>
   <string name="skills_page_save">Speichern</string>
   <string name="skills_page_save_failed">Speichern fehlgeschlagen, bitte das Skill-Format prüfen</string>
-  <string name="translator_page_title">Übersetzer</string>
-  <string name="translator_page_translate">Übersetzen</string>
   <string name="tts">TTS</string>
   <string name="unpin_chat">Chat loslösen</string>
   <string name="update_card_check_failed">Updateprüfung fehlgeschlagen</string>
@@ -1124,14 +1106,6 @@
   <string name="theme_name_spring">Wiesengrün</string>
   <string name="title_activity_safe_mode">Sicherer Modus</string>
   <string name="tools_warning">Das aktuelle Modell hat Tool-Aufrufe nicht aktiviert. Bitte aktiviere die Tool-Fähigkeiten des Modells in den Einstellungen, um Funktionen wie Suche/MCP zu nutzen.</string>
-  <string name="translate">Übersetzen</string>
-  <string name="translating">Wird übersetzt...</string>
-  <string name="translation_clear">Übersetzung löschen</string>
-  <string name="translation_language_selection_title">Übersetzungssprache auswählen</string>
-  <string name="translation_text">Übersetzung</string>
-  <string name="translator_page_cancel">Abbrechen</string>
-  <string name="translator_page_input_placeholder">Text zum Übersetzen eingeben...</string>
-  <string name="translator_page_result_placeholder">Das Übersetzungsergebnis wird hier angezeigt</string>
   <string name="workspace_detail_tool_read_file">Datei lesen</string>
   <string name="workspace_detail_tool_write_file">Datei schreiben</string>
   <string name="workspace_detail_tool_edit_file">Datei bearbeiten</string>
@@ -1193,7 +1167,6 @@
   <string name="common_rename">Umbenennen</string>
   <string name="common_export">Exportieren</string>
   <string name="setting_model_page_tab_prompt">Prompts</string>
-  <string name="setting_model_page_prompt_translation">Übersetzung</string>
   <string name="setting_model_page_prompt_title">Titelgenerierung</string>
   <string name="setting_model_page_prompt_suggestion">Chat-Antwortvorschläge</string>
   <string name="setting_model_page_prompt_ocr">OCR-Erkennung</string>
@@ -1526,16 +1499,6 @@
   <string name="setting_provider_page_context_length">Kontextlänge</string>
   <string name="setting_provider_page_context_length_custom">Benutzerdefiniert</string>
   <string name="setting_media_page_asset_storage">Asset-Speicher</string>
-  <string name="translator_page_error">Übersetzung fehlgeschlagen</string>
-  <string name="translator_page_model_missing">Kein Übersetzungsmodell ausgewählt. Tippe oben rechts, um eines auszuwählen.</string>
-  <string name="translator_page_char_count">%1$d Zeichen</string>
-  <string name="translator_page_clear_input">Eingabe löschen</string>
-  <string name="translator_page_paste">Einfügen</string>
-  <string name="translator_page_use_as_input">Als Eingabe verwenden</string>
-  <string name="translator_page_history">Übersetzungsverlauf</string>
-  <string name="translator_page_clear_history">Leeren</string>
-  <string name="translator_page_clear_history_title">Übersetzungsverlauf leeren</string>
-  <string name="translator_page_clear_history_message">Alle Übersetzungseinträge werden gelöscht. Dies kann nicht rückgängig gemacht werden.</string>
   <string name="setting_display_page_enable_quote_highlight_title">Zitierten Text hervorheben</string>
   <string name="setting_display_page_enable_quote_highlight_desc">Text in Anführungszeichen mit der Themenfarbe einfärben, damit Dialoge von Figuren besser auffallen</string>
   <string name="workspace_detail_copy_path">Pfad kopieren</string>
@@ -1597,7 +1560,6 @@
   <string name="stats_page_source_compression">Komprimierung</string>
   <string name="stats_page_source_title">Titel</string>
   <string name="stats_page_source_suggestion">Vorschläge</string>
-  <string name="stats_page_source_translation">Übersetzung</string>
   <string name="stats_page_source_memory">Erinnerung</string>
   <string name="stats_page_source_ocr">OCR</string>
   <string name="image_preview_saving">Wird gespeichert…</string>

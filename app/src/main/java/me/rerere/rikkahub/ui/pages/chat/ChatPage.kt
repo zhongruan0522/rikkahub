@@ -498,12 +498,6 @@ private fun ChatPageContent(
                     inputState.editingMessage = null
                     inputState.setMessageText(suggestion)
                 },
-                onTranslate = { message, locale ->
-                    vm.translateMessage(message, locale)
-                },
-                onClearTranslation = { message ->
-                    vm.clearTranslationField(message.id)
-                },
                 onJumpToMessage = { index ->
                     previewMode = false
                     scope.launch {

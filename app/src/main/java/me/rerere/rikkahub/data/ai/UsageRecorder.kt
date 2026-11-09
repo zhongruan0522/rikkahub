@@ -25,7 +25,6 @@ enum class UsageSource {
     COMPRESSION,
     TITLE,
     SUGGESTION,
-    TRANSLATION,
     MEMORY,
     OCR,
 }

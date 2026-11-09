@@ -64,7 +64,6 @@ import me.rerere.hugeicons.stroke.FolderAdd
 import me.rerere.hugeicons.stroke.Image02
 import me.rerere.hugeicons.stroke.ImageToVideo
 import me.rerere.hugeicons.stroke.InLove
-import me.rerere.hugeicons.stroke.LanguageCircle
 import me.rerere.hugeicons.stroke.LookTop
 import me.rerere.hugeicons.stroke.PencilEdit01
 import me.rerere.hugeicons.stroke.Search01
@@ -756,12 +755,6 @@ private fun DrawerActions(navController: Navigator) {
             onClick = { navController.navigate(Screen.MediaCreationSessions) },
         )
 
-        // 翻译入口
-        DrawerEntry(
-            icon = HugeIcons.LanguageCircle,
-            text = stringResource(R.string.chat_page_menu_ai_translator),
-            onClick = { navController.navigate(Screen.Translator) },
-        )
     }
 }
 

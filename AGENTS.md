@@ -106,3 +106,34 @@ App 有一个 `distribution` 维度的 product flavor：`github`（默认）和 
 - If the user does not explicitly request localization, prioritize implementing functionality without considering
   localization. (e.g `Text("Hello world")`)
 - Add, translate or clean up strings with the `tools/i18n` CLI (Bun); see the `i18n-localization` skill.
+
+## 行为反模式警示：拒绝纠错残留
+
+严厉禁止以下“纠偏后残留历史痕迹与自我辩解”的行为模式：
+
+> 用户让做一盘“番茄炒蛋”，Agent 擅自加了“东坡肉”；被指出后虽然去掉了，但提交/PR 时写着「番茄炒蛋（无东坡肉）」，并在注释中大篇幅解释为什么本道菜不需要加东坡肉。
+
+**交付要求**：任何代码、注释、文档、提交信息及回复，都必须直接呈现对齐后的**干净终态设计**（Clean final-state design），严禁包含任何前序错误、自我辩解或“在此删掉某逻辑”的纠错痕迹。
+
+## 提交规范
+
+使用Conventional Commits（`feat:` / `fix:` / `docs:` …），描述用中文；变更同步记录到 CHANGELOG.md（Keep a Changelog）。
+
+凡使用了 AI 辅助生成或修改的代码，必须在 **commit 信息结尾**（以及对应 **PR 描述**中）按以下格式注明所使用的工具环境和模型：
+
+```
+assisted-by：{agent_name}：{model}
+```
+
+- `{agent_name}`：使用的 AI 编码工具/环境，如 `opencode`、`codex`、`cursor`
+- `{model}`：实际使用的模型（含供应商，格式可参考 `供应商/模型`），如 `Zhipu/GLM-5.3[Max]`
+
+示例：
+
+```bash
+git commit -m "feat(channel): support batch model pulling
+
+assisted-by：opencode：Zhipu/GLM-5.3[Max]"
+```
+
+多个模型/工具参与时逐行列出。纯人工改动无需此声明，但需在 PR 描述中说明。

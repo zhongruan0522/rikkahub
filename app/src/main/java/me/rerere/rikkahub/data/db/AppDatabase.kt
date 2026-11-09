@@ -33,6 +33,7 @@ import me.rerere.rikkahub.data.db.entity.WorkspaceEntity
 import me.rerere.rikkahub.data.db.migrations.Migration_16_17
 import me.rerere.rikkahub.data.db.migrations.Migration_22_23
 import me.rerere.rikkahub.data.db.migrations.Migration_28_29
+import me.rerere.rikkahub.data.db.migrations.Migration_32_33
 import me.rerere.rikkahub.data.db.migrations.Migration_8_9
 import me.rerere.rikkahub.utils.JsonInstant
 
@@ -78,7 +79,7 @@ import me.rerere.rikkahub.utils.JsonInstant
         AutoMigration(from = 28, to = 29, spec = Migration_28_29::class),
         AutoMigration(from = 29, to = 30),
         AutoMigration(from = 31, to = 32),
-        AutoMigration(from = 32, to = 33),
+        AutoMigration(from = 32, to = 33, spec = Migration_32_33::class),
     ]
 )
 @TypeConverters(TokenUsageConverter::class)

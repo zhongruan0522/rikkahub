@@ -147,6 +147,7 @@ fun ColumnScope.ChatMessageActionButtons(
                     )
                 }
             }
+        }
 
         ChatMessageActionButton(
             icon = HugeIcons.MoreVertical,

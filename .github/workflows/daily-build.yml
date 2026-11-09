@@ -1,47 +1,25 @@
-name: Daily Build
+name: Latest Build
 
 on:
-  # 每天 UTC 09:00、18:00 触发（北京时间 17:00、次日 02:00）
-  schedule:
-    - cron: '0 9,18 * * *'
+  # 主分支每次 push 都构建
+  push:
+    branches: [master]
   # 也支持手动触发
   workflow_dispatch:
 
-jobs:
-  # 检查过去 24 小时内是否有新提交，没有则跳过构建，避免重复打包
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      should_build: ${{ steps.check.outputs.should_build }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Check for recent commits
-        id: check
-        run: |
-          # 手动触发时无条件构建
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_build=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          # 定时触发：仅当过去 24 小时内有新提交才构建
-          if [ -n "$(git log --since='24 hours ago' --oneline)" ]; then
-            echo "should_build=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_build=false" >> "$GITHUB_OUTPUT"
-            echo "过去 24 小时无新提交，跳过构建"
-          fi
+# 连续 push 时取消仍在运行的旧构建，只保留最新一次
+concurrency:
+  group: latest-build
+  cancel-in-progress: true
 
+jobs:
   build:
-    needs: check
-    if: needs.check.outputs.should_build == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write   # 发布 Release 需要写权限
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       # 与 Android Studio 自带的 JetBrains Runtime 21 保持一致
       - name: Set up JDK
@@ -95,16 +73,29 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleGithubRelease
 
-      # 把 APK 直接发布为 Prerelease，用户点链接即可下载单个 apk，无需登录、无需解压
-      - name: Publish nightly prerelease
+      # 记录构建时间（北京时间），用作 Release 正文
+      - name: Get build time
+        id: build_time
+        run: echo "time=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_OUTPUT"
+
+      # 删除上一次的 Latest Release 及其 tag，实现 Release 和产物的完全覆盖
+      - name: Delete old release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete Latest --yes --cleanup-tag || true
+
+      # 重新创建 Latest Prerelease，tag 指向本次 commit
+      - name: Publish Latest prerelease
         uses: softprops/action-gh-release@v2
         if: success()
         with:
-          tag_name: nightly            # 固定 tag，每晚覆盖同一个「最新每日构建」
-          name: Nightly Build
+          tag_name: Latest
+          name: Latest
           prerelease: true
           body: |
-            自动每日构建（commit `${{ github.sha }}`）
+            构建时间：${{ steps.build_time.outputs.time }}
 
             > ⚠️ 开发版本，可能不稳定，仅供测试。
           # mapping.txt 用于还原混淆后的崩溃堆栈，所有 ABI 的 APK 共用这一份

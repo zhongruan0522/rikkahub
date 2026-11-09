@@ -4,6 +4,15 @@
 
 一个原生Android LLM 聊天客户端，支持切换不同的供应商进行聊天
 
+> 本项目并非官方版本，请仔细鉴别
+>
+> 本项目主要做来如下修改
+>
+> 1. 优化了OpenAI、Google、Anthropic等请求，使其更遵循官方规范
+> 2. 移除了所谓的赞助商、AI翻译
+> 3. 修复了内部服务不可移除掉的逻辑
+> 4. 增加了更多的内置官方提供商（不包含中转站）、搜索渠道（anysearch）
+
 </div>
 
 ## ✨ 功能特色
@@ -24,9 +33,6 @@
 - 🌐 自定义HTTP请求头和请求体
 
 ## ✨ 开发
-
-> [!IMPORTANT]
-> 本项目不接受 Pull Request（PR）。
 
 本项目使用[Android Studio](https://developer.android.com/studio)开发。
 

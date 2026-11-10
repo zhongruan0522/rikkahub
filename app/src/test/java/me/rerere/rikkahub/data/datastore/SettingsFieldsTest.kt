@@ -18,6 +18,7 @@ import me.rerere.rikkahub.data.sync.s3.S3Config
 import me.rerere.rikkahub.ui.theme.CustomTheme
 import me.rerere.search.SearchCommonOptions
 import me.rerere.search.SearchServiceOptions
+import me.rerere.tts.provider.TTSProviderSetting
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -58,6 +59,8 @@ class SettingsFieldsTest {
         assertEquals("title", stored["title_prompt"])
         assertEquals("00000000-0000-0000-0000-000000000001", stored["chat_model"])
         assertEquals("LOW", stored["fast_model_reasoning_level"])
+        assertEquals(false, stored["request_logging_enabled"])
+        assertEquals(true, stored["request_logging_detailed"])
         assertEquals("""[{"id":"00000000-0000-0000-0000-000000000007","name":"tag"}]""", stored["assistant_tags"])
         assertEquals("""{"resultSize":3}""", stored["search_common"])
     }
@@ -145,7 +148,7 @@ private val SAMPLE = Settings(
     s3Config = S3Config(bucket = "backup"),
     uploadS3Config = S3Config(bucket = "upload"),
     mediaGenerationProviders = listOf(MediaGenerationProviderSetting.OpenAI(id = id(9))),
-    ttsProviders = DEFAULT_TTS_PROVIDERS.take(1),
+    ttsProviders = listOf(TTSProviderSetting.OpenAI(id = id(15), name = "TTS")),
     selectedTTSProviderId = id(10),
     defaultTTSPlaybackSpeed = 1.5f,
     asrProviders = listOf(ASRProviderSetting.OpenAIRealtime(id = id(11))),
@@ -159,6 +162,8 @@ private val SAMPLE = Settings(
     webServerAccessPassword = "secret",
     webServerLocalhostOnly = true,
     backupReminderConfig = BackupReminderConfig(enabled = true),
+    requestLoggingEnabled = false,
+    requestLoggingDetailed = true,
 )
 
 private val STORED_KEYS = setOf(
@@ -168,6 +173,8 @@ private val STORED_KEYS = setOf(
     "display_setting",
     "network_setting",
     "developer_mode",
+    "request_logging_enabled",
+    "request_logging_detailed",
     "favorite_models",
     "chat_model",
     "fast_model",

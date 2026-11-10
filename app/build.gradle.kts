@@ -62,7 +62,8 @@ android {
                 if (storeFilePath != null && storePasswordValue != null &&
                     keyAliasValue != null && keyPasswordValue != null
                 ) {
-                    storeFile = file(storeFilePath)
+                    // storeFile 按仓库根目录解析（CI 中密钥写到 app/app.key）
+                    storeFile = rootProject.file(storeFilePath)
                     storePassword = storePasswordValue
                     keyAlias = keyAliasValue
                     keyPassword = keyPasswordValue

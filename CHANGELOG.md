@@ -14,8 +14,11 @@
 - 应用安装包名（applicationId）由 `me.rerere.rikkahub` 改为 `rikka.hub`
 - 切换类按钮（`ToggleButton` / `IconToggleButton`）选中后只变色，保持原有形状，不再做方角/圆角切换动画
 - web-ui 前端依赖升级至范围内最新版本：react-router 7.18.5、react 19.3.1、radix-ui 1.8.1、tailwindcss 4.3.5 等，并同步刷新 browserslist、js-yaml、baseline-browser-mapping 等传递依赖
+- 每日构建（Latest Build 工作流）同时产出 GitHub 渠道的 debug 与 release APK，一并上传到 Latest Prerelease
 
 ### Fixed
+
+- 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败
 - 修复 `ChatMessageActions.kt` 中缺失的闭合括号

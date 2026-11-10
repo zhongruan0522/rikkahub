@@ -71,7 +71,7 @@ jobs:
       - name: Gradle Build
         run: |
           chmod +x gradlew
-          ./gradlew assembleGithubRelease
+          ./gradlew assembleGithubDebug assembleGithubRelease
 
       # 记录构建时间（北京时间），用作 Release 正文
       - name: Get build time
@@ -100,5 +100,6 @@ jobs:
             > ⚠️ 开发版本，可能不稳定，仅供测试。
           # mapping.txt 用于还原混淆后的崩溃堆栈，所有 ABI 的 APK 共用这一份
           files: |
+            app/build/outputs/apk/github/debug/*.apk
             app/build/outputs/apk/github/release/*.apk
             app/build/outputs/mapping/githubRelease/mapping.txt

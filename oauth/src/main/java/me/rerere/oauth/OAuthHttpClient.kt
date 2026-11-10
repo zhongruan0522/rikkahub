@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -67,9 +66,6 @@ class OAuthHttpClient(
         @SerialName("id_token") val idToken: String? = null,
         val scope: String? = null,
     )
-
-    /** 令牌端点请求体的编码方式。标准 OAuth 用表单，部分厂商（如 ChatGPT 的刷新）只认 JSON。 */
-    enum class TokenEncoding { FORM, JSON }
 
     data class Pkce(val verifier: String, val challenge: String)
 
@@ -131,7 +127,6 @@ class OAuthHttpClient(
         val scope: String? = null,
         val resources: List<String> = emptyList(),
         val additionalParameters: Map<String, String> = emptyMap(),
-        val encoding: TokenEncoding = TokenEncoding.FORM,
     )
 
     suspend fun registerClient(
@@ -209,16 +204,9 @@ class OAuthHttpClient(
                 request.resources.forEach { add("resource" to it) }
                 request.additionalParameters.forEach { (name, value) -> add(name to value) }
             }
-            val body = when (request.encoding) {
-                TokenEncoding.FORM -> FormBody.Builder()
-                    .apply { parameters.forEach { (name, value) -> add(name, value) } }
-                    .build()
-
-                // JSON 对象不能有重复键，多个 resource 只保留最后一个
-                TokenEncoding.JSON -> buildJsonObject {
-                    parameters.forEach { (name, value) -> put(name, value) }
-                }.toString().toRequestBody(JSON_MEDIA_TYPE)
-            }
+            val body = FormBody.Builder()
+                .apply { parameters.forEach { (name, value) -> add(name, value) } }
+                .build()
             postToken(request.tokenEndpoint, body)
         }
 

@@ -458,8 +458,6 @@ private fun AddButton(onAdd: (ProviderSetting) -> Unit) {
             ProviderSetting.OpenAI(),
             ProviderSetting.Google(),
             ProviderSetting.Claude(),
-            ProviderSetting.ChatGPT(),
-            ProviderSetting.Grok(),
         )
     }
 
@@ -532,8 +530,6 @@ private fun ProviderSetting.typeName(): String = when (this) {
     is ProviderSetting.OpenAI -> "OpenAI"
     is ProviderSetting.Google -> "Google"
     is ProviderSetting.Claude -> "Claude"
-    is ProviderSetting.ChatGPT -> stringResource(R.string.setting_provider_page_type_subscription, "ChatGPT")
-    is ProviderSetting.Grok -> stringResource(R.string.setting_provider_page_type_subscription, "Grok")
 }
 
 @Composable

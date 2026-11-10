@@ -14,23 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import me.rerere.ai.provider.ProviderManager
 import me.rerere.ai.provider.ProviderQuota
 import me.rerere.ai.provider.ProviderSetting
-import me.rerere.ai.provider.UsageWindow
 import me.rerere.ai.provider.supportsQuota
 import me.rerere.hugeicons.HugeIcons
-import me.rerere.hugeicons.stroke.DashboardSpeed02
 import me.rerere.hugeicons.stroke.MoneyBag02
-import me.rerere.rikkahub.R
 import me.rerere.rikkahub.utils.SimpleCache
 import me.rerere.rikkahub.utils.toDp
 import org.koin.compose.koinInject
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 private val cache = SimpleCache.builder<String, ProviderQuota>()
     .expireAfterWrite(2, TimeUnit.MINUTES)
@@ -44,10 +39,9 @@ private val cache = SimpleCache.builder<String, ProviderQuota>()
 @Composable
 fun rememberProviderQuota(providerSetting: ProviderSetting): Result<ProviderQuota>? {
     val providerManager = koinInject<ProviderManager>()
-    // 查询配置或登录的账号变了要重新查
-    val cacheKey = "${providerSetting.id}," + when (providerSetting) {
-        is ProviderSetting.ApiKey -> providerSetting.quotaQuery.hashCode()
-        is ProviderSetting.Account -> providerSetting.credential?.accountId
+    // 查询配置变了要重新查；只有 ApiKey 类提供商有额度可查
+    val cacheKey = when (providerSetting) {
+        is ProviderSetting.ApiKey -> "${providerSetting.id},${providerSetting.quotaQuery.hashCode()}"
     }
     val quota by produceState(
         initialValue = cache.getIfPresent(cacheKey)?.let { Result.success(it) },
@@ -82,12 +76,7 @@ fun ProviderQuotaText(
     val text = when {
         result == null -> "~"
         quota == null -> "Error: ${result.exceptionOrNull()?.message}"
-        else -> when (quota) {
-            is ProviderQuota.Balance -> quota.value
-            is ProviderQuota.UsageLimits -> quota.windows.joinToString(" · ") { window ->
-                "${window.shortLabel()} ${window.usedPercent.roundToInt()}%".trim()
-            }
-        }
+        else -> (quota as ProviderQuota.Balance).value
     }
 
     Row(
@@ -96,7 +85,7 @@ fun ProviderQuotaText(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Icon(
-            imageVector = if (quota is ProviderQuota.UsageLimits) HugeIcons.DashboardSpeed02 else HugeIcons.MoneyBag02,
+            imageVector = HugeIcons.MoneyBag02,
             contentDescription = null,
             modifier = Modifier.size(style.fontSize.toDp()),
             tint = color.takeOrElse { LocalContentColor.current }
@@ -107,47 +96,5 @@ fun ProviderQuotaText(
             maxLines = 1,
             color = color
         )
-    }
-}
-
-private enum class WindowUnit(val minutes: Int, val suffix: String) {
-    WEEK(7 * 24 * 60, "w"),
-    DAY(24 * 60, "d"),
-    HOUR(60, "h"),
-    MINUTE(1, "m"),
-}
-
-// 按能整除的最大单位拆分窗口长度：300 -> 5 小时，10080 -> 1 周
-private fun Int.toWindowSpan(): Pair<Int, WindowUnit> {
-    val unit = WindowUnit.entries.first { this % it.minutes == 0 }
-    return this / unit.minutes to unit
-}
-
-// 300 -> 5h，10080 -> 1w，未知时为空
-internal fun UsageWindow.shortLabel(): String {
-    val (count, unit) = windowMinutes?.toWindowSpan() ?: return ""
-    return "$count${unit.suffix}"
-}
-
-// 5 小时 -> 5-hour limit，一周 -> Weekly limit
-@Composable
-internal fun UsageWindow.longLabel(): String {
-    val (count, unit) = windowMinutes?.toWindowSpan()
-        ?: return stringResource(R.string.setting_provider_page_usage_limit)
-    return when (unit) {
-        WindowUnit.WEEK -> if (count == 1) {
-            stringResource(R.string.setting_provider_page_usage_limit_weekly)
-        } else {
-            stringResource(R.string.setting_provider_page_usage_limit_weeks, count)
-        }
-
-        WindowUnit.DAY -> if (count == 1) {
-            stringResource(R.string.setting_provider_page_usage_limit_daily)
-        } else {
-            stringResource(R.string.setting_provider_page_usage_limit_days, count)
-        }
-
-        WindowUnit.HOUR -> stringResource(R.string.setting_provider_page_usage_limit_hours, count)
-        WindowUnit.MINUTE -> stringResource(R.string.setting_provider_page_usage_limit_minutes, count)
     }
 }

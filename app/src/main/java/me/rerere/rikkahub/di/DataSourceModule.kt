@@ -20,7 +20,6 @@ import me.rerere.rikkahub.data.ai.MemoryConsolidationScheduler
 import me.rerere.rikkahub.data.ai.MemoryConsolidator
 import me.rerere.rikkahub.data.ai.RequestLoggingInterceptor
 import me.rerere.rikkahub.data.ai.UsageRecorder
-import me.rerere.rikkahub.data.ai.account.ProviderAccountManager
 import me.rerere.rikkahub.data.ai.mcp.McpManager
 import me.rerere.rikkahub.data.ai.transformers.AssistantTemplateLoader
 import me.rerere.rikkahub.data.ai.transformers.TemplateTransformer
@@ -236,15 +235,7 @@ val dataSourceModule = module {
     }
 
     single {
-        ProviderAccountManager(
-            settingsStore = get(),
-            appScope = get(),
-            client = get(),
-        )
-    }
-
-    single {
-        ProviderManager(client = get(), context = get(), accountCredentials = get<ProviderAccountManager>())
+        ProviderManager(client = get(), context = get())
     }
 
     single { BackupManager(context = get(), database = get(), settingsStore = get(), json = get()) }

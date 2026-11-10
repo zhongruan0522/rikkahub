@@ -6,26 +6,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.uuid.Uuid
 
-/** 账号登录得到的 OAuth 凭据 */
-@Serializable
-data class OAuthCredential(
-    val accessToken: String,
-    val refreshToken: String? = null,
-    // access token 过期时间（毫秒时间戳），0 表示未知
-    val expiresAt: Long = 0L,
-    // 厂商侧的账号/工作区 ID，ChatGPT 请求需要带上
-    val accountId: String? = null,
-    // 以下仅用于界面展示
-    val email: String? = null,
-    val plan: String? = null,
-) {
-    override fun toString(): String =
-        "OAuthCredential(accessToken=${accessToken.masked()}, refreshToken=${refreshToken?.masked()}, " +
-            "expiresAt=$expiresAt, accountId=$accountId, email=$email, plan=$plan)"
-
-    private fun String.masked(): String = if (length <= 8) "***" else "${take(4)}***${takeLast(4)}"
-}
-
 @Serializable
 enum class ClaudePromptCacheTtl(val apiValue: String?) {
     @SerialName("5m")
@@ -45,7 +25,6 @@ val ProviderSetting.supportsBuiltInSearch: Boolean
         is ProviderSetting.OpenAI -> useResponseApi
         is ProviderSetting.Google -> true
         is ProviderSetting.Claude -> true
-        is ProviderSetting.Account -> true
     }
 
 @Serializable
@@ -229,96 +208,6 @@ sealed class ProviderSetting {
         abstract val quotaQuery: QuotaQuery
 
         abstract fun withQuotaQuery(query: QuotaQuery): ApiKey
-    }
-
-    /**
-     * 绑定官方账号的提供商。
-     *
-     * 没有 baseUrl 和 apiKey：请求地址由具体类型写死，凭据只能通过账号登录获得，保证 token
-     * 不会被发到第三方地址。凭据由 app 层的账号管理负责登录、刷新和写回，界面编辑不应改动它。
-     */
-    @Serializable
-    sealed class Account : ProviderSetting() {
-        /** 未登录时为 null */
-        abstract val credential: OAuthCredential?
-
-        abstract fun withCredential(credential: OAuthCredential?): Account
-    }
-
-    @Serializable
-    @SerialName("chatgpt")
-    data class ChatGPT(
-        override val id: Uuid = Uuid.random(),
-        override val enabled: Boolean = true,
-        override val name: String = "ChatGPT",
-        override val models: List<Model> = emptyList(),
-        override val customHeaders: List<CustomHeader> = emptyList(),
-        @Transient override val builtIn: Boolean = false,
-        @Transient override val description: @Composable (() -> Unit) = {},
-        @Transient override val shortDescription: @Composable (() -> Unit) = {},
-        override val credential: OAuthCredential? = null,
-    ) : Account() {
-        override fun withCredential(credential: OAuthCredential?): Account = copy(credential = credential)
-
-        override fun copyProvider(
-            id: Uuid,
-            enabled: Boolean,
-            name: String,
-            models: List<Model>,
-            customHeaders: List<CustomHeader>,
-            builtIn: Boolean,
-            description: @Composable (() -> Unit),
-            shortDescription: @Composable (() -> Unit),
-        ): ProviderSetting {
-            return this.copy(
-                id = id,
-                enabled = enabled,
-                name = name,
-                models = models,
-                customHeaders = customHeaders,
-                builtIn = builtIn,
-                description = description,
-                shortDescription = shortDescription,
-            )
-        }
-    }
-
-    @Serializable
-    @SerialName("grok")
-    data class Grok(
-        override val id: Uuid = Uuid.random(),
-        override val enabled: Boolean = true,
-        override val name: String = "Grok",
-        override val models: List<Model> = emptyList(),
-        override val customHeaders: List<CustomHeader> = emptyList(),
-        @Transient override val builtIn: Boolean = false,
-        @Transient override val description: @Composable (() -> Unit) = {},
-        @Transient override val shortDescription: @Composable (() -> Unit) = {},
-        override val credential: OAuthCredential? = null,
-    ) : Account() {
-        override fun withCredential(credential: OAuthCredential?): Account = copy(credential = credential)
-
-        override fun copyProvider(
-            id: Uuid,
-            enabled: Boolean,
-            name: String,
-            models: List<Model>,
-            customHeaders: List<CustomHeader>,
-            builtIn: Boolean,
-            description: @Composable (() -> Unit),
-            shortDescription: @Composable (() -> Unit),
-        ): ProviderSetting {
-            return this.copy(
-                id = id,
-                enabled = enabled,
-                name = name,
-                models = models,
-                customHeaders = customHeaders,
-                builtIn = builtIn,
-                description = description,
-                shortDescription = shortDescription,
-            )
-        }
     }
 
     companion object {

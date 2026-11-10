@@ -16,8 +16,7 @@
 
 // 抄自 okhttp-sse 5.5.0 的 okhttp3.sse.internal.RealEventSource / EventSources，
 // 以及 okhttp 5.5.0 的 okhttp3.internal.UnreadableResponseBody。改动：
-// - 响应没有 Content-Type 时按事件流处理（ChatGPT 的 Codex 后端不带这个头）；
-//   明确声明了其他类型（比如 200 但返回 JSON 错误体）时仍然判失败
+// - 响应没有 Content-Type 时按事件流处理；明确声明了其他类型（比如 200 但返回 JSON 错误体）时仍然判失败
 // - 不再依赖 OkHttp 的内部 API
 package me.rerere.common.http.sse
 

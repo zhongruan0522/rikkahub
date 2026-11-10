@@ -76,6 +76,13 @@ object SettingsJsonMigrator {
                 root["providers"] = JsonArray(providers.map(::migrateProviderQuotaQuery))
             }
 
+            // V6: 移除已下线的 ChatGPT/Grok 订阅提供商，它们会让整份设置反序列化失败
+            (root["providers"] as? JsonArray)?.let { providers ->
+                root["providers"] = JsonInstant.parseToJsonElement(
+                    migrateProvidersRemoveSubscription(JsonInstant.encodeToString(providers))
+                )
+            }
+
             JsonInstant.encodeToString(JsonObject(root))
         }.onFailure {
             Log.e(TAG, "migrate: Failed to migrate settings JSON, using original", it)

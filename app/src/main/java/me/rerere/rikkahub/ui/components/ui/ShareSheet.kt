@@ -93,14 +93,10 @@ fun ProviderSetting.encodeForShare(): String {
         append("ai-provider:")
         append("v1:")
 
-        val value = JsonInstant.encodeToString(this@encodeForShare.copyProvider(models = emptyList()).withoutCredential())
+        val value = JsonInstant.encodeToString(this@encodeForShare.copyProvider(models = emptyList()))
         append(Base64.encode(value.encodeToByteArray()))
     }
 }
-
-// 账号凭据等于账号本身，不随分享带出，导入时也不接受
-private fun ProviderSetting.withoutCredential(): ProviderSetting =
-    if (this is ProviderSetting.Account) withCredential(null) else this
 
 fun decodeProviderSetting(value: String): ProviderSetting {
     require(value.startsWith("ai-provider:v1:")) { "Invalid provider setting string" }
@@ -114,7 +110,7 @@ fun decodeProviderSetting(value: String): ProviderSetting {
 
     // 旧版本分享的配置可能还带着 balanceOption
     val element = migrateProviderQuotaQuery(JsonInstant.parseToJsonElement(jsonStr))
-    return JsonInstant.decodeFromJsonElement<ProviderSetting>(element).withoutCredential()
+    return JsonInstant.decodeFromJsonElement<ProviderSetting>(element)
 }
 
 class ShareSheetState {

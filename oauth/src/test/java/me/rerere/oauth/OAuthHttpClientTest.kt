@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -60,29 +59,6 @@ class OAuthHttpClientTest {
 
         assertEquals("application/x-www-form-urlencoded", request!!.body!!.contentType().toString())
         assertEquals("grant_type=refresh_token&refresh_token=refresh&client_id=client", request!!.bodyString())
-    }
-
-    @Test
-    fun `refresh token can use json encoding`() = runBlocking {
-        var request: Request? = null
-        val token = capturingClient { request = it }.refreshToken(
-            OAuthHttpClient.RefreshTokenRequest(
-                tokenEndpoint = "https://auth.example.com/token",
-                clientId = "client",
-                refreshToken = "refresh",
-                encoding = OAuthHttpClient.TokenEncoding.JSON,
-            )
-        )
-
-        assertEquals("application", request!!.body!!.contentType()!!.type)
-        assertEquals("json", request!!.body!!.contentType()!!.subtype)
-        val body = Json.parseToJsonElement(request!!.bodyString()).jsonObject
-        assertEquals("refresh_token", body["grant_type"]!!.jsonPrimitive.content)
-        assertEquals("refresh", body["refresh_token"]!!.jsonPrimitive.content)
-        assertEquals("client", body["client_id"]!!.jsonPrimitive.content)
-        assertEquals("new-access", token.accessToken)
-        assertEquals("new-refresh", token.refreshToken)
-        assertEquals("id", token.idToken)
     }
 
     @Test

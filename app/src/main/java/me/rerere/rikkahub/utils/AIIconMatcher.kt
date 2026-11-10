@@ -74,8 +74,6 @@ fun computeProviderTypeIcon(provider: ProviderSetting): String = when (provider)
     is ProviderSetting.OpenAI -> "openai.svg"
     is ProviderSetting.Google -> "google-color.svg"
     is ProviderSetting.Claude -> "claude-color.svg"
-    is ProviderSetting.ChatGPT -> "openai.svg"
-    is ProviderSetting.Grok -> "xai.svg"
 }
 
 private val PATTERN_RIKKAHUB = Regex("rikka|auto")

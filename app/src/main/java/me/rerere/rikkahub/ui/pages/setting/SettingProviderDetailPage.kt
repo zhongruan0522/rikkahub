@@ -108,7 +108,6 @@ import me.rerere.hugeicons.stroke.Share01
 import me.rerere.hugeicons.stroke.Tick01
 import me.rerere.hugeicons.stroke.Tools
 import me.rerere.rikkahub.R
-import me.rerere.rikkahub.data.ai.account.preserveCredential
 import me.rerere.rikkahub.ui.components.ai.ExtensionEmptyState
 import me.rerere.rikkahub.ui.components.ai.ModelAbilityTag
 import me.rerere.rikkahub.ui.components.ai.ModelModalityTag
@@ -189,11 +188,7 @@ fun SettingProviderDetailPage(id: Uuid, vm: SettingVM = koinViewModel()) {
         vm.updateSettings { latest ->
             latest.copy(
                 providers = latest.providers.map {
-                    if (newProvider.id == it.id) {
-                        newProvider.preserveCredential(it)
-                    } else {
-                        it
-                    }
+                    if (newProvider.id == it.id) newProvider else it
                 }
             )
         }
@@ -223,17 +218,14 @@ fun SettingProviderDetailPage(id: Uuid, vm: SettingVM = koinViewModel()) {
                     }
                 },
                 actions = {
-                    // 账号型提供商离开账号就没法用，不提供分享
-                    if (provider !is ProviderSetting.Account) {
-                        val shareSheetState = rememberShareSheetState()
-                        ShareSheet(shareSheetState)
-                        IconButton(
-                            onClick = {
-                                shareSheetState.show(provider)
-                            }
-                        ) {
-                            Icon(HugeIcons.Share01, null)
+                    val shareSheetState = rememberShareSheetState()
+                    ShareSheet(shareSheetState)
+                    IconButton(
+                        onClick = {
+                            shareSheetState.show(provider)
                         }
+                    ) {
+                        Icon(HugeIcons.Share01, null)
                     }
                 }
             )
@@ -676,16 +668,13 @@ private fun ModelSettingsForm(
                             .padding(vertical = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // 覆盖配置是提供商的独立副本，账号凭据不能复制出去，账号型提供商不支持覆盖
-                        if (parentProvider !is ProviderSetting.Account) {
-                            ProviderOverrideSettings(
-                                providerOverride = model.providerOverwrite,
-                                onUpdateProviderOverride = { providerOverride ->
-                                    onModelChange(model.copy(providerOverwrite = providerOverride))
-                                },
-                                parentProvider = parentProvider
-                            )
-                        }
+                        ProviderOverrideSettings(
+                            providerOverride = model.providerOverwrite,
+                            onUpdateProviderOverride = { providerOverride ->
+                                onModelChange(model.copy(providerOverwrite = providerOverride))
+                            },
+                            parentProvider = parentProvider
+                        )
 
                         CustomHeaders(
                             headers = model.customHeaders,

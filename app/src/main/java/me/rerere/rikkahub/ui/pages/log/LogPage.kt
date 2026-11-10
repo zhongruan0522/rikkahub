@@ -75,6 +75,7 @@ fun LogPage() {
         enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val sortedLogs = remember(logs) { logs.sortedByDescending { it.timestamp } }
 
     Scaffold(
         topBar = {
@@ -133,7 +134,6 @@ fun LogPage() {
                 }
             }
 
-            val sortedLogs = remember(logs) { logs.sortedByDescending { it.timestamp } }
             items(sortedLogs, key = { it.id }, contentType = { it.javaClass.simpleName }) { log ->
                 when (log) {
                     is LogEntry.RequestLog -> RequestLogCard(

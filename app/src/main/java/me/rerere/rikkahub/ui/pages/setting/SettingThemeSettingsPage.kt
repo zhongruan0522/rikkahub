@@ -89,7 +89,7 @@ fun SettingThemeSettingsPage(vm: SettingVM = koinViewModel()) {
                             },
                             supportingContent = {
                                 currentTheme?.name()
-                                    ?: Text(stringResource(R.string.setting_theme_settings_theme_missing))
+                                    ?: Text(stringResource(R.string.setting_theme_settings_theme_unknown))
                             },
                         )
                         item(

@@ -73,10 +73,10 @@
   <string name="assistant_page_local_tools_tts_title">Text-to-Speech</string>
   <string name="assistant_page_manage_memory_title">Erinnerungen verwalten</string>
   <string name="assistant_page_max_tokens">Max. Tokens</string>
-  <string name="assistant_page_max_tokens_desc">Maximale Anzahl der zu generierenden Tokens. Leer lassen für kein Limit.</string>
+  <string name="assistant_page_max_tokens_desc">Maximale Anzahl der zu generierenden Tokens. Leer lassen, um die Modelleinstellung zu verwenden.</string>
   <string name="assistant_page_max_tokens_limit">Limit: %d Tokens</string>
-  <string name="assistant_page_max_tokens_no_limit">Kein Limit</string>
-  <string name="assistant_page_max_tokens_no_token_limit">Kein Token-Limit</string>
+  <string name="assistant_page_max_tokens_no_limit">Wie Modelleinstellung</string>
+  <string name="assistant_page_max_tokens_no_token_limit">Modelleinstellung wird verwendet</string>
   <string name="assistant_page_memory">Erinnerung</string>
   <string name="assistant_page_memory_count">Erinnerungen: %d</string>
   <string name="assistant_page_remove_background">Hintergrund entfernen</string>
@@ -1484,6 +1484,7 @@
   <string name="memory_file_page_edit_warning">Versuche, Erinnerungen nicht von Hand zu bearbeiten. Bitte die KI im Chat, sich Dinge zu merken oder sie für dich zu ändern.</string>
   <string name="setting_provider_page_context_length">Kontextlänge</string>
   <string name="setting_provider_page_context_length_custom">Benutzerdefiniert</string>
+  <string name="setting_provider_page_max_output">Max. Ausgabe</string>
   <string name="setting_media_page_asset_storage">Asset-Speicher</string>
   <string name="setting_display_page_enable_quote_highlight_title">Zitierten Text hervorheben</string>
   <string name="setting_display_page_enable_quote_highlight_desc">Text in Anführungszeichen mit der Themenfarbe einfärben, damit Dialoge von Figuren besser auffallen</string>

@@ -547,6 +547,14 @@ private fun ModelList(
     }
 }
 
+// 按模型目录补齐能力、上下文窗口和输出上限，用户之后仍可在表单里手改
+private fun Model.withRegistryMetadata(): Model = copy(
+    inputModalities = ModelRegistry.MODEL_INPUT_MODALITIES.getData(modelId),
+    outputModalities = ModelRegistry.MODEL_OUTPUT_MODALITIES.getData(modelId),
+    abilities = ModelRegistry.MODEL_ABILITIES.getData(modelId),
+    maxTokens = ModelRegistry.MODEL_MAX_TOKENS.getData(modelId),
+)
+
 @Composable
 private fun ModelSettingsForm(
     model: Model,
@@ -557,17 +565,8 @@ private fun ModelSettingsForm(
     val pagerState = rememberPagerState { ModelFormTab.entries.size }
 
     fun setModelId(id: String) {
-        val inputModality = ModelRegistry.MODEL_INPUT_MODALITIES.getData(id)
-        val outputModality = ModelRegistry.MODEL_OUTPUT_MODALITIES.getData(id)
-        val abilities = ModelRegistry.MODEL_ABILITIES.getData(id)
         onModelChange(
-            model.copy(
-                modelId = id,
-                displayName = id,
-                inputModalities = inputModality,
-                outputModalities = outputModality,
-                abilities = abilities
-            )
+            model.copy(modelId = id, displayName = id).withRegistryMetadata()
         )
     }
 
@@ -655,6 +654,13 @@ private fun ModelSettingsForm(
                                     onModelChange(model.copy(contextLength = it))
                                 }
                             )
+
+                            ModelMaxOutputSelector(
+                                maxTokens = model.maxTokens,
+                                onUpdateMaxTokens = {
+                                    onModelChange(model.copy(maxTokens = it))
+                                }
+                            )
                         }
                     }
                 }
@@ -729,16 +735,7 @@ private fun AddModelButton(
             models = models,
             selectedModels = selectedModels,
             onModelSelected = { model ->
-                val inputModalities = ModelRegistry.MODEL_INPUT_MODALITIES.getData(model.modelId)
-                val outputModalities = ModelRegistry.MODEL_OUTPUT_MODALITIES.getData(model.modelId)
-                val abilities = ModelRegistry.MODEL_ABILITIES.getData(model.modelId)
-                onAddModel(
-                    model.copy(
-                        inputModalities = inputModalities,
-                        outputModalities = outputModalities,
-                        abilities = abilities
-                    )
-                )
+                onAddModel(model.withRegistryMetadata())
             },
             onModelDeselected = { model ->
                 onRemoveModel(model)
@@ -748,13 +745,7 @@ private fun AddModelButton(
                     parentProvider.copyProvider(
                         models = parentProvider.models + it.filter { model ->
                             parentProvider.models.none { existing -> existing.modelId == model.modelId }
-                        }.map { model ->
-                            model.copy(
-                                inputModalities = ModelRegistry.MODEL_INPUT_MODALITIES.getData(model.modelId),
-                                outputModalities = ModelRegistry.MODEL_OUTPUT_MODALITIES.getData(model.modelId),
-                                abilities = ModelRegistry.MODEL_ABILITIES.getData(model.modelId)
-                            )
-                        }
+                        }.map { model -> model.withRegistryMetadata() }
                     )
                 )
             },
@@ -1195,6 +1186,53 @@ private fun ModelContextLengthSelector(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             singleLine = true,
             isError = (customText.toIntOrNull() ?: 0) <= 0,
+        )
+    }
+}
+
+// 常见的单次输出上限，其余的走自定义输入
+private val MaxOutputPresets = listOf(8_192, 32_768, 64_000, 128_000)
+
+@Composable
+private fun ModelMaxOutputSelector(
+    maxTokens: Int?,
+    onUpdateMaxTokens: (Int?) -> Unit
+) {
+    var custom by remember { mutableStateOf(maxTokens == null || maxTokens !in MaxOutputPresets) }
+    var customText by remember { mutableStateOf(maxTokens?.toString().orEmpty()) }
+
+    Text(
+        stringResource(R.string.setting_provider_page_max_output),
+        style = MaterialTheme.typography.titleSmall
+    )
+    // null 表示自定义；上限未知时也走这里，留空即不在请求里指定
+    ConnectedChoiceButtons(
+        options = MaxOutputPresets + null,
+        selected = if (custom) null else maxTokens,
+        onSelect = { preset ->
+            custom = preset == null
+            if (preset != null) {
+                customText = preset.toString()
+                onUpdateMaxTokens(preset)
+            }
+        },
+    ) { preset, selected ->
+        ConnectedChoiceLabel(
+            text = preset?.formatNumber() ?: stringResource(R.string.setting_provider_page_context_length_custom),
+            selected = selected,
+        )
+    }
+    AnimatedVisibility(visible = custom) {
+        OutlinedTextField(
+            value = customText,
+            onValueChange = { value ->
+                customText = value.filter { it.isDigit() }
+                onUpdateMaxTokens(customText.toIntOrNull()?.takeIf { it > 0 })
+            },
+            modifier = Modifier.fillMaxWidth(),
+            suffix = { Text("tokens") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
         )
     }
 }

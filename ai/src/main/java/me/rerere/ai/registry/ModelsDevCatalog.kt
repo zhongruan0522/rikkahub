@@ -16,6 +16,7 @@ class ModelInfo(
     val outputModalities: Set<Modality>,
     val abilities: Set<ModelAbility>,
     val contextLength: Int?,
+    val maxTokens: Int?,
 )
 
 /**
@@ -85,7 +86,7 @@ private data class ModelsDevModel(
             input = modalities.input.filter { it in USED_MODALITIES },
             output = modalities.output.filter { it in USED_MODALITIES },
         ),
-        limit = limit?.takeIf { it.context != null },
+        limit = limit?.takeIf { it.context != null || it.output != null },
     )
 }
 
@@ -98,6 +99,8 @@ private data class ModelsDevModalities(
 @Serializable
 private data class ModelsDevLimit(
     val context: Int? = null,
+    // 单次响应的最大输出 token
+    val output: Int? = null,
 )
 
 private val USED_MODALITIES = setOf("text", "image")
@@ -109,6 +112,7 @@ private class Votes {
     var tool = 0
     var reasoning = 0
     val contexts = HashMap<Int, Int>()
+    val outputs = HashMap<Int, Int>()
 
     fun add(model: ModelsDevModel) {
         total += 1
@@ -117,6 +121,7 @@ private class Votes {
         if (model.toolCall) tool += 1
         if (model.reasoning) reasoning += 1
         model.limit?.context?.takeIf { it > 0 }?.let { contexts.merge(it, 1, Int::plus) }
+        model.limit?.output?.takeIf { it > 0 }?.let { outputs.merge(it, 1, Int::plus) }
     }
 
     // 各家数据出错多是漏标能力，所以票数持平时算支持
@@ -129,9 +134,14 @@ private class Votes {
             if (majority(tool)) add(ModelAbility.TOOL)
             if (majority(reasoning)) add(ModelAbility.REASONING)
         },
-        contextLength = contexts.maxWithOrNull(compareBy({ it.value }, { it.key }))?.key,
+        contextLength = contexts.mostVoted(),
+        maxTokens = outputs.mostVoted(),
     )
 }
+
+// 票数相同时取较大的值
+private fun Map<Int, Int>.mostVoted(): Int? =
+    maxWithOrNull(compareBy({ it.value }, { it.key }))?.key
 
 private fun buildIndex(providers: Map<String, ModelsDevProvider>): Map<String, ModelInfo> {
     val votes = HashMap<String, Votes>()

@@ -110,9 +110,10 @@ private fun Model.claudeGeneration(): ClaudeGeneration {
 }
 
 /**
- * 从 modelId 推断模型最大输出 token 数, 用于 clamp max_tokens.
+ * 模型的最大输出 token 数, 用于 clamp max_tokens：优先用模型设置, 没有时按 modelId 推断.
  */
 private fun Model.maxOutputTokens(): Int {
+    maxTokens?.let { return it }
     val id = modelId.lowercase()
     return when {
         // claude-3-5 / claude-3-7 系列: 8192

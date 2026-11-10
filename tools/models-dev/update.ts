@@ -9,7 +9,7 @@ type Model = {
   modalities?: { input?: string[]; output?: string[] };
   tool_call?: boolean | null;
   reasoning?: boolean | null;
-  limit?: { context?: number | null };
+  limit?: { context?: number | null; output?: number | null };
   canonical_model_id?: string | null;
 };
 
@@ -29,7 +29,14 @@ for (const [providerId, provider] of Object.entries(api)) {
       },
       ...(model.tool_call ? { tool_call: true } : {}),
       ...(model.reasoning ? { reasoning: true } : {}),
-      ...(model.limit?.context ? { limit: { context: model.limit.context } } : {}),
+      ...(model.limit?.context || model.limit?.output
+        ? {
+            limit: {
+              ...(model.limit.context ? { context: model.limit.context } : {}),
+              ...(model.limit.output ? { output: model.limit.output } : {}),
+            },
+          }
+        : {}),
       ...(model.canonical_model_id ? { canonical_model_id: model.canonical_model_id } : {}),
     };
     count += 1;

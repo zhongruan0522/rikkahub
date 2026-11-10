@@ -118,6 +118,7 @@ class ModelsDevCatalogTest {
         val sonnet = catalog.find("claude-sonnet-4-5")!!
         assertEquals(visionInput, sonnet.inputModalities)
         assertEquals(toolReasoning, sonnet.abilities)
+        assertEquals(64_000, sonnet.maxTokens)
 
         // 带前缀的完整 id、大小写不同、只给最后一段名称都能查到
         assertEquals(164000, catalog.find("Pro/deepseek-ai/DeepSeek-V3")!!.contextLength)
@@ -139,6 +140,9 @@ class ModelsDevCatalogTest {
         // openrouter 的记录 canonical 指向 claude-sonnet-4-5，两票的上下文长度持平时取较大值
         assertEquals(1_000_000, catalog.find("claude-sonnet-4-5")!!.contextLength)
         assertEquals(1_000_000, catalog.find("anthropic/claude-sonnet-4-5")!!.contextLength)
+        // 只有 anthropic 那条标了输出上限，另一票缺数据不参与计算
+        assertEquals(64_000, catalog.find("claude-sonnet-4-5")!!.maxTokens)
+        assertNull(catalog.find("anthropic/claude-sonnet-4.5")!!.maxTokens)
     }
 
     @Test
@@ -168,6 +172,7 @@ class ModelsDevCatalogTest {
         assertEquals(catalog.size, decoded.size)
         assertEquals(visionInput, decoded.find("kimi-k3")!!.inputModalities)
         assertEquals(1_000_000, decoded.find("claude-sonnet-4-5")!!.contextLength)
+        assertEquals(64_000, decoded.find("claude-sonnet-4-5")!!.maxTokens)
         assertEquals(visionInput, decoded.find("gemini-2.5-flash-image")!!.outputModalities)
     }
 
@@ -193,8 +198,10 @@ class ModelsDevCatalogTest {
                 ModelRegistry.MODEL_ABILITIES.getData("muse-spark")
             )
             assertEquals(1_000_000, ModelRegistry.MODEL_CONTEXT_LENGTH.getData("deepseek-v4-flash"))
+            assertEquals(64_000, ModelRegistry.MODEL_MAX_TOKENS.getData("claude-sonnet-4-5"))
             // 目录里有但缺上下文长度时，上下文长度回落到 token 规则
             assertNull(ModelRegistry.MODEL_CONTEXT_LENGTH.getData("kimi-k3"))
+            assertNull(ModelRegistry.MODEL_MAX_TOKENS.getData("kimi-k3"))
         } finally {
             ModelRegistry.installCatalog(null)
         }

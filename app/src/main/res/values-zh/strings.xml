@@ -83,10 +83,10 @@
   <string name="assistant_page_local_tools_tts_title">文字转语音</string>
   <string name="assistant_page_manage_memory_title">管理记忆</string>
   <string name="assistant_page_max_tokens">最大Token数</string>
-  <string name="assistant_page_max_tokens_desc">最大生成Token数量。留空表示无限制。</string>
+  <string name="assistant_page_max_tokens_desc">最大生成Token数量。留空时使用模型设置。</string>
   <string name="assistant_page_max_tokens_limit">限制：%d 个Token</string>
-  <string name="assistant_page_max_tokens_no_limit">无限制</string>
-  <string name="assistant_page_max_tokens_no_token_limit">无Token限制</string>
+  <string name="assistant_page_max_tokens_no_limit">跟随模型</string>
+  <string name="assistant_page_max_tokens_no_token_limit">由模型设置决定</string>
   <string name="assistant_page_memory">记忆</string>
   <string name="assistant_page_memory_count">记忆: %d</string>
   <string name="assistant_page_memory_desc">启用记忆后，助手会记住你告诉它的内容，并在之后的对话中使用。对话停下来后，记忆会在后台自动整理。此功能需要模型支持工具调用才能正常工作</string>
@@ -1527,6 +1527,7 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="memory_file_page_edit_warning">尽量避免手动编辑记忆，推荐在聊天界面让 AI 替你记住或者更改记忆</string>
   <string name="setting_provider_page_context_length">上下文长度</string>
   <string name="setting_provider_page_context_length_custom">自定义</string>
+  <string name="setting_provider_page_max_output">最大输出</string>
   <string name="setting_media_page_asset_storage">素材存储</string>
   <string name="setting_display_page_enable_quote_highlight_title">引号内文字高亮</string>
   <string name="setting_display_page_enable_quote_highlight_desc">使用主题色为引号内的文本着色，让角色对话更加醒目</string>

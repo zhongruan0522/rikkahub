@@ -190,7 +190,7 @@ class ChatRequestFactory(
             ).generateText(
                 providerSetting = turn.providerSetting,
                 messages = requestMessages + UIMessage.user(compressPrompt),
-                // 助手的输出上限是给聊天回复定的，结构化摘要写不完会被截断；max_tokens 不属于请求前缀，改了不影响缓存
+                // 结构化摘要写不完会被截断，不指定输出上限；max_tokens 不属于请求前缀，改了不影响缓存
                 params = params.copy(maxTokens = null),
             )
         }
@@ -246,7 +246,8 @@ class ChatRequestFactory(
             model = turn.model,
             temperature = assistant.temperature,
             topP = assistant.topP,
-            maxTokens = assistant.maxTokens,
+            // 助手没单独设置时用模型的最大输出
+            maxTokens = assistant.maxTokens ?: turn.model.maxTokens,
             tools = turn.tools,
             reasoningLevel = assistant.reasoningLevel,
             customHeaders = buildList {

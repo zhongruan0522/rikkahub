@@ -83,10 +83,10 @@
   <string name="assistant_page_local_tools_tts_title">Преобразование текста в речь</string>
   <string name="assistant_page_manage_memory_title">Управление памятью</string>
   <string name="assistant_page_max_tokens">Макс. токенов</string>
-  <string name="assistant_page_max_tokens_desc">Максимальное количество токенов для генерации. Оставьте пустым, чтобы не ограничивать.</string>
+  <string name="assistant_page_max_tokens_desc">Максимальное количество токенов для генерации. Оставьте пустым, чтобы использовать настройку модели.</string>
   <string name="assistant_page_max_tokens_limit">Ограничение: %d токенов</string>
-  <string name="assistant_page_max_tokens_no_limit">Без ограничений</string>
-  <string name="assistant_page_max_tokens_no_token_limit">Без ограничения токенов</string>
+  <string name="assistant_page_max_tokens_no_limit">Как в настройках модели</string>
+  <string name="assistant_page_max_tokens_no_token_limit">Используется настройка модели</string>
   <string name="assistant_page_memory">Память</string>
   <string name="assistant_page_memory_count">Память: %d</string>
   <string name="assistant_page_memory_desc">Когда память включена, ассистент запоминает, что вы ему сообщаете, и использует это в последующих диалогах. Воспоминания упорядочиваются в фоновом режиме, когда чат приостанавливается. Для корректной работы этой функции модель должна поддерживать вызовы инструментов.</string>
@@ -1524,6 +1524,7 @@
   <string name="memory_file_page_edit_warning">Постарайтесь не редактировать воспоминания вручную. Вместо этого попросите ИИ в чате запомнить или изменить что-то для вас.</string>
   <string name="setting_provider_page_context_length">Длина контекста</string>
   <string name="setting_provider_page_context_length_custom">Пользовательский</string>
+  <string name="setting_provider_page_max_output">Макс. вывод</string>
   <string name="setting_media_page_asset_storage">Хранилище ресурсов</string>
   <string name="setting_display_page_enable_quote_highlight_title">Подсветка цитируемого текста</string>
   <string name="setting_display_page_enable_quote_highlight_desc">Окрашивать текст в кавычках в цвет темы, чтобы реплики персонажей выделялись</string>

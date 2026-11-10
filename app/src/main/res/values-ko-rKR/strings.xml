@@ -83,10 +83,10 @@
   <string name="assistant_page_local_tools_tts_title">텍스트 음성 변환</string>
   <string name="assistant_page_manage_memory_title">기억 관리</string>
   <string name="assistant_page_max_tokens">최대 토큰</string>
-  <string name="assistant_page_max_tokens_desc">생성할 최대 토큰 수. 제한 없음은 비워두세요.</string>
+  <string name="assistant_page_max_tokens_desc">생성할 최대 토큰 수. 비워두면 모델 설정을 따릅니다.</string>
   <string name="assistant_page_max_tokens_limit">%d 토큰 제한</string>
-  <string name="assistant_page_max_tokens_no_limit">제한 없음</string>
-  <string name="assistant_page_max_tokens_no_token_limit">토큰 제한 없음</string>
+  <string name="assistant_page_max_tokens_no_limit">모델 설정 따르기</string>
+  <string name="assistant_page_max_tokens_no_token_limit">모델 설정을 따릅니다</string>
   <string name="assistant_page_memory">기억 기능</string>
   <string name="assistant_page_memory_count">기억: %d</string>
   <string name="assistant_page_memory_desc">기억 기능이 활성화되면 어시스턴트가 사용자가 알려준 내용을 기억하고 이후 대화에서 활용합니다. 채팅이 잠시 멈추면 기억이 백그라운드에서 정리됩니다. 이 기능이 제대로 작동하려면 모델이 도구 호출을 지원해야 합니다</string>
@@ -1524,6 +1524,7 @@ mDNS 주소: .local 호스트네임을 사용하며, IP를 몰라도 같은 네�
   <string name="memory_file_page_edit_warning">기억을 직접 편집하지 않는 것이 좋습니다. 대신 채팅에서 AI에게 기억하거나 변경해 달라고 요청하세요.</string>
   <string name="setting_provider_page_context_length">컨텍스트 길이</string>
   <string name="setting_provider_page_context_length_custom">사용자 지정</string>
+  <string name="setting_provider_page_max_output">최대 출력</string>
   <string name="setting_media_page_asset_storage">에셋 저장소</string>
   <string name="setting_display_page_enable_quote_highlight_title">인용된 텍스트 강조</string>
   <string name="setting_display_page_enable_quote_highlight_desc">따옴표 안의 텍스트에 테마 색상을 적용하여 캐릭터 대화를 돋보이게 합니다</string>

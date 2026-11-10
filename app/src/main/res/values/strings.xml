@@ -83,10 +83,10 @@
   <string name="assistant_page_local_tools_tts_title">Text to Speech</string>
   <string name="assistant_page_manage_memory_title">Manage Memory</string>
   <string name="assistant_page_max_tokens">Max Tokens</string>
-  <string name="assistant_page_max_tokens_desc">Maximum number of tokens to generate. Leave empty for no limit.</string>
+  <string name="assistant_page_max_tokens_desc">Maximum number of tokens to generate. Leave empty to use the model setting.</string>
   <string name="assistant_page_max_tokens_limit">Limit: %d tokens</string>
-  <string name="assistant_page_max_tokens_no_limit">No limit</string>
-  <string name="assistant_page_max_tokens_no_token_limit">No token limit</string>
+  <string name="assistant_page_max_tokens_no_limit">Use model setting</string>
+  <string name="assistant_page_max_tokens_no_token_limit">Using the model setting</string>
   <string name="assistant_page_memory">Memory</string>
   <string name="assistant_page_memory_count">Memory: %d</string>
   <string name="assistant_page_memory_desc">When memory is enabled, the assistant remembers what you tell it and uses it in later conversations. Memories are organized in the background once a chat pauses. This feature requires the model to support tool calls to work properly</string>
@@ -1534,6 +1534,7 @@
   <string name="memory_file_page_edit_warning">Try not to edit memories by hand. Ask the AI in chat to remember or change things for you instead.</string>
   <string name="setting_provider_page_context_length">Context Length</string>
   <string name="setting_provider_page_context_length_custom">Custom</string>
+  <string name="setting_provider_page_max_output">Max Output</string>
   <string name="setting_media_page_asset_storage">Asset Storage</string>
   <string name="setting_display_page_enable_quote_highlight_title">Highlight Quoted Text</string>
   <string name="setting_display_page_enable_quote_highlight_desc">Color text inside quotation marks with the theme color to make character dialogue stand out</string>

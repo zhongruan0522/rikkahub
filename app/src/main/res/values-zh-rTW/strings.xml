@@ -83,10 +83,10 @@
   <string name="assistant_page_local_tools_tts_title">文字轉語音</string>
   <string name="assistant_page_manage_memory_title">管理記憶</string>
   <string name="assistant_page_max_tokens">最大Token數</string>
-  <string name="assistant_page_max_tokens_desc">最大生成Token數量。留空表示無限制。</string>
+  <string name="assistant_page_max_tokens_desc">最大生成Token數量。留空時使用模型設定。</string>
   <string name="assistant_page_max_tokens_limit">限制：%d 個Token</string>
-  <string name="assistant_page_max_tokens_no_limit">無限制</string>
-  <string name="assistant_page_max_tokens_no_token_limit">無Token限制</string>
+  <string name="assistant_page_max_tokens_no_limit">跟隨模型</string>
+  <string name="assistant_page_max_tokens_no_token_limit">由模型設定決定</string>
   <string name="assistant_page_memory">記憶</string>
   <string name="assistant_page_memory_count">記憶: %d</string>
   <string name="assistant_page_memory_desc">啟用記憶後，助手會記住你告訴它的內容，並在之後的對話中使用。對話停下來後，記憶會在背景自動整理。此功能需要模型支援工具調用才能正常工作</string>
@@ -1522,6 +1522,7 @@
   <string name="memory_file_page_edit_warning">盡量避免手動編輯記憶，建議在聊天介面讓 AI 替你記住或更改記憶</string>
   <string name="setting_provider_page_context_length">上下文長度</string>
   <string name="setting_provider_page_context_length_custom">自訂</string>
+  <string name="setting_provider_page_max_output">最大輸出</string>
   <string name="setting_media_page_asset_storage">素材儲存</string>
   <string name="setting_display_page_enable_quote_highlight_title">引號內文字醒目顯示</string>
   <string name="setting_display_page_enable_quote_highlight_desc">將引號內的文字以主題顏色標示，讓角色對話更突出</string>

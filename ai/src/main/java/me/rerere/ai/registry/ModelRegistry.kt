@@ -765,6 +765,11 @@ object ModelRegistry {
             ?: resolveModels(modelId).firstNotNullOfOrNull { it.contextLength }
     }
 
+    val MODEL_MAX_TOKENS = ModelData { modelId ->
+        catalog?.find(modelId)?.maxTokens
+            ?: resolveModels(modelId).firstNotNullOfOrNull { it.maxTokens }
+    }
+
     private fun resolveModels(modelId: String): List<ModelDefinition> {
         val tokens = tokenize(modelId)
         var bestScore: Int? = null

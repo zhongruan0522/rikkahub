@@ -12,7 +12,8 @@ class ModelDefinition(
     val inputModalities: Set<Modality>,
     val outputModalities: Set<Modality>,
     val abilities: Set<ModelAbility>,
-    val contextLength: Int? = null
+    val contextLength: Int? = null,
+    val maxTokens: Int? = null,
 ) : ModelSelector {
     override fun match(modelId: String): Boolean {
         val tokens = tokenize(modelId)
@@ -43,6 +44,7 @@ class ModelDefinitionBuilder {
     private val outputModalities = mutableSetOf(Modality.TEXT)
     private val abilities = mutableSetOf<ModelAbility>()
     private var contextLength: Int? = null
+    private var maxTokens: Int? = null
 
     fun tokens(vararg specs: String) {
         matchers += TokenSequenceMatcher(specs.map(::parseTokenSpec))
@@ -82,6 +84,10 @@ class ModelDefinitionBuilder {
         contextLength = tokens
     }
 
+    fun maxTokens(tokens: Int) {
+        maxTokens = tokens
+    }
+
     fun build(): ModelDefinition {
         val matcher = when {
             matchers.isEmpty() -> MatchNone
@@ -93,7 +99,8 @@ class ModelDefinitionBuilder {
             inputModalities = inputModalities.toSet(),
             outputModalities = outputModalities.toSet(),
             abilities = abilities.toSet(),
-            contextLength = contextLength
+            contextLength = contextLength,
+            maxTokens = maxTokens,
         )
     }
 }

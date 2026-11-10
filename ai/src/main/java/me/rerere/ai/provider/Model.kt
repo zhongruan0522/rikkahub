@@ -19,6 +19,8 @@ data class Model(
     val providerOverwrite: ProviderSetting? = null,
     // 上下文窗口大小(token)
     val contextLength: Int = 1_000_000,
+    // 单次响应的最大输出(token), null 表示未知
+    val maxTokens: Int? = null,
 )
 
 /**

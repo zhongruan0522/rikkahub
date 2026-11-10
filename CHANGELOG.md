@@ -28,6 +28,7 @@
 - web-ui 前端依赖升级至范围内最新版本：react-router 7.18.5、react 19.3.1、radix-ui 1.8.1、tailwindcss 4.3.5 等，并同步刷新 browserslist、js-yaml、baseline-browser-mapping 等传递依赖
 - 每日构建（Latest Build 工作流）同时产出 GitHub 渠道的 debug 与 release APK，一并上传到 Latest Prerelease
 - 每日构建拆分 debug / release 两个并行 job，由 publish job 汇总产物发布；所用 actions 升级至最新主版本（checkout v7、setup-java v6、setup-node v7、pnpm/action-setup v6、gh-release v3 等），Gradle 缓存改用 `gradle/actions/setup-gradle` 并启用 build cache 提速
+- 压缩机制对齐 SillyTavern（酒馆）摘要形态：压缩提示词 1:1 采用其默认摘要提示词（自由文本摘要、以上一份摘要为基础增量扩展），压缩对话框新增摘要词数上限设置（25–1000、步进 25、默认 200 与酒馆一致）；压缩范围对齐酒馆策略，手动压缩总是保留最后一条消息，上下文放不下压缩请求时按 token 预算（预留 64）丢弃较新的消息、留给下次增量压缩
 
 ### Fixed
 

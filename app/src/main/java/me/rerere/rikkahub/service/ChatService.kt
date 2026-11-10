@@ -46,6 +46,7 @@ import me.rerere.rikkahub.data.ai.ChatTurnContext
 import me.rerere.rikkahub.data.ai.ConversationMetaGenerator
 import me.rerere.rikkahub.data.ai.MemoryConsolidationScheduler
 import me.rerere.rikkahub.data.ai.mcp.McpManager
+import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUMMARY_WORDS
 import me.rerere.rikkahub.data.ai.prompts.buildCompressPrompt
 import me.rerere.rikkahub.data.ai.tools.InvalidMcpServerNamesException
 import me.rerere.rikkahub.data.ai.tools.shouldUseExternalWebSearch
@@ -58,6 +59,7 @@ import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.Conversation
 import me.rerere.rikkahub.data.model.bindConfig
 import me.rerere.rikkahub.data.model.cancelInterruptedTools
+import me.rerere.rikkahub.data.model.clampEndIndexByTokenBudget
 import me.rerere.rikkahub.data.model.deleteMessage
 import me.rerere.rikkahub.data.model.editMessage
 import me.rerere.rikkahub.data.model.fillModelSnapshots
@@ -85,11 +87,13 @@ import java.net.ConnectException
 import java.net.NoRouteToHostException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.uuid.Uuid
 
 private const val TAG = "ChatService"
+
+/** 压缩请求给摘要响应预留的 token，与 SillyTavern 的 PADDING 一致 */
+private const val COMPRESS_TOKEN_PADDING = 64
 
 data class ChatError(
     val id: Uuid = Uuid.random(),
@@ -943,6 +947,7 @@ class ChatService(
         conversationId: Uuid,
         additionalPrompt: String,
         keepRecentMessages: Int = 0,
+        summaryWords: Int = DEFAULT_SUMMARY_WORDS,
     ): Result<Unit> = runCatching {
         withLoadedSession<Unit>(conversationId) { session ->
             val result = CompletableDeferred<Unit>()
@@ -954,6 +959,7 @@ class ChatService(
                     session = session,
                     additionalPrompt = additionalPrompt,
                     keepRecentMessages = keepRecentMessages,
+                    summaryWords = summaryWords,
                     clearSuggestions = true,
                     onResult = result::completeWith,
                 )
@@ -1012,6 +1018,7 @@ class ChatService(
         session: ConversationSession,
         additionalPrompt: String,
         keepRecentMessages: Int,
+        summaryWords: Int = DEFAULT_SUMMARY_WORDS,
         clearSuggestions: Boolean,
         onResult: (Result<Unit>) -> Unit,
     ): Job {
@@ -1021,7 +1028,13 @@ class ChatService(
         val job = launchGenerationJob(conversationId = session.id, activity = SessionActivity.Compressing) {
             session.processingStatus.value = context.getString(R.string.chat_page_compressing)
             try {
-                insertCompressionCheckpoint(session, additionalPrompt, keepRecentMessages, clearSuggestions)
+                insertCompressionCheckpoint(
+                    session,
+                    additionalPrompt,
+                    keepRecentMessages,
+                    summaryWords,
+                    clearSuggestions
+                )
                 deliver(Result.success(Unit))
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
@@ -1060,6 +1073,7 @@ class ChatService(
                 session = session,
                 additionalPrompt = "",
                 keepRecentMessages = 0,
+                summaryWords = DEFAULT_SUMMARY_WORDS,
                 clearSuggestions = false,
                 midTurn = true,
             )
@@ -1084,14 +1098,18 @@ class ChatService(
         session: ConversationSession,
         additionalPrompt: String,
         keepRecentMessages: Int,
+        summaryWords: Int,
         clearSuggestions: Boolean,
         midTurn: Boolean = false,
     ) {
         val conversation = session.state.value
         val nodes = conversation.messageNodes
         val checkpointIndex = nodes.indexOfLast { it.currentMessage.isContextCheckpoint }
+        // 酒馆式范围：总是排除最后一条消息，它不参与本次压缩、留在检查点之后；
+        // mid-turn 时它就是刚执行完工具的回复，是"当前进度"的素材，必须参与压缩
+        val keep = if (midTurn) keepRecentMessages.coerceAtLeast(0) else maxOf(keepRecentMessages, 1)
         // 压缩范围是 (checkpointIndex, endIndex)，之后的节点原样保留
-        val endIndex = nodes.size - keepRecentMessages.coerceAtLeast(0)
+        val endIndex = nodes.size - keep
         // 上一个检查点之后没有可压缩的消息
         if (endIndex <= checkpointIndex + 1) {
             throw IllegalStateException(
@@ -1112,12 +1130,19 @@ class ChatService(
 
         // 必须和对话用同一个模型、同一套请求组装，才能命中提示词缓存
         val turn = requestFactory.createContext(settingsStore.awaitLoaded(), conversation)
+        // 上下文放不进压缩请求时丢弃较新的消息：它们不参与本次压缩、留在检查点之后，留给下次增量压缩
+        val clampedEndIndex = clampEndIndexByTokenBudget(
+            nodes = nodes,
+            checkpointIndex = checkpointIndex,
+            endIndex = endIndex,
+            tokenBudget = turn.model.contextLength - COMPRESS_TOKEN_PADDING,
+        )
         val summary = requestFactory.generateCompressionSummary(
             turn = turn,
-            messages = conversation.currentMessages.take(endIndex),
+            messages = conversation.currentMessages.take(clampedEndIndex),
             compressPrompt = buildCompressPrompt(
                 additionalPrompt = additionalPrompt,
-                locale = Locale.getDefault().displayName,
+                summaryWords = summaryWords,
                 midTurn = midTurn,
             ),
         )
@@ -1126,7 +1151,7 @@ class ChatService(
         // 因此按节点定位插入到最新状态。
         session.update { latest ->
             val updated = latest.insertContextCheckpoint(
-                afterNodeId = nodes[endIndex - 1].id,
+                afterNodeId = nodes[clampedEndIndex - 1].id,
                 summary = summary,
             ) ?: throw IllegalStateException(
                 context.getString(R.string.chat_page_compress_conversation_changed)

@@ -38,13 +38,21 @@ import me.rerere.hugeicons.HugeIcons
 import me.rerere.hugeicons.stroke.Add01
 import me.rerere.hugeicons.stroke.Remove01
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.data.ai.prompts.DEFAULT_SUMMARY_WORDS
+
+private const val SUMMARY_WORDS_MIN = 25
+private const val SUMMARY_WORDS_MAX = 1000
+private const val SUMMARY_WORDS_STEP = 25
 
 @Composable
 fun CompressContextDialog(
     onDismiss: () -> Unit,
-    onConfirm: (additionalPrompt: String, keepRecentMessages: Int) -> Job
+    onConfirm: (additionalPrompt: String, keepRecentMessages: Int, summaryWords: Int) -> Job
 ) {
     var additionalPrompt by remember { mutableStateOf("") }
+    var summaryWordsText by remember { mutableStateOf(DEFAULT_SUMMARY_WORDS.toString()) }
+    val summaryWords = (summaryWordsText.toIntOrNull() ?: DEFAULT_SUMMARY_WORDS)
+        .coerceIn(SUMMARY_WORDS_MIN, SUMMARY_WORDS_MAX)
     // 默认全部压缩，请求前缀与对话一致，缓存命中最好
     var keepRecentText by remember { mutableStateOf("0") }
     val keepRecentMessages = keepRecentText.toIntOrNull() ?: 0
@@ -102,6 +110,54 @@ fun CompressContextDialog(
                         modifier = Modifier.fillMaxWidth(),
                         maxLines = 4,
                     )
+
+                    // Summary word limit
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.chat_page_compress_summary_words),
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.weight(1f),
+                            )
+                            FilledTonalIconButton(
+                                onClick = { summaryWordsText = (summaryWords - SUMMARY_WORDS_STEP).toString() },
+                                enabled = summaryWords > SUMMARY_WORDS_MIN,
+                            ) {
+                                Icon(HugeIcons.Remove01, contentDescription = "Decrease")
+                            }
+                            BasicTextField(
+                                value = summaryWordsText,
+                                onValueChange = { input ->
+                                    val digits = input.filter { it.isDigit() }.take(4)
+                                    summaryWordsText = digits.trimStart('0').ifEmpty { digits.take(1) }
+                                },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                textStyle = MaterialTheme.typography.titleMediumEmphasized.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
+                                    .width(56.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                        shape = RoundedCornerShape(12.dp),
+                                    )
+                                    .padding(vertical = 8.dp),
+                            )
+                            FilledTonalIconButton(
+                                onClick = { summaryWordsText = (summaryWords + SUMMARY_WORDS_STEP).toString() },
+                                enabled = summaryWords < SUMMARY_WORDS_MAX,
+                            ) {
+                                Icon(HugeIcons.Add01, contentDescription = "Increase")
+                            }
+                        }
+                    }
 
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Row(
@@ -164,7 +220,7 @@ fun CompressContextDialog(
                 }
             } else {
                 TextButton(onClick = {
-                    currentJob = onConfirm(additionalPrompt, keepRecentMessages)
+                    currentJob = onConfirm(additionalPrompt, keepRecentMessages, summaryWords)
                 }) {
                     Text(stringResource(R.string.confirm))
                 }

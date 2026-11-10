@@ -175,6 +175,30 @@ internal fun Conversation.insertContextCheckpoint(afterNodeId: Uuid, summary: St
     )
 }
 
+/**
+ * 用历史消息记录的上下文占用把压缩范围终点 [endIndex] 收缩到 [tokenBudget] 内。
+ *
+ * 助手消息上的 usage 是"该消息发出请求时的总占用"，含检查点之前的前缀；第一个超预算的锚点
+ * 之后的消息发不进压缩请求，按酒馆的策略丢弃较新的（不参与本次压缩、留在检查点之后，留给下次增量压缩）。
+ * 收缩后至少要剩一条可压缩消息，连一条都放不下时保持原范围，让请求发出后暴露真实错误。
+ */
+internal fun clampEndIndexByTokenBudget(
+    nodes: List<MessageNode>,
+    checkpointIndex: Int,
+    endIndex: Int,
+    tokenBudget: Int,
+): Int {
+    if (tokenBudget <= 0) return endIndex
+    val overflow = nodes.asSequence()
+        .drop(checkpointIndex + 1)
+        .take(endIndex - checkpointIndex - 1)
+        .indexOfFirst { (it.currentMessage.contextTokens() ?: 0) > tokenBudget }
+    if (overflow < 0) return endIndex
+    // 收缩后至少剩一条可压缩消息；连一条都放不下时保持原范围，让请求发出后暴露真实错误
+    val target = checkpointIndex + 1 + overflow
+    return if (target > checkpointIndex + 1) target else endIndex
+}
+
 /** 有工具调用在等待用户审批：这一轮还没结束，排队的消息要等审批完成后再发 */
 internal val Conversation.isAwaitingToolApproval: Boolean
     get() = currentMessages.any { message -> message.getTools().any { it.isPending } }

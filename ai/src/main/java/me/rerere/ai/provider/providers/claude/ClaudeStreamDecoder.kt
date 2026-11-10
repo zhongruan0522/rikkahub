@@ -2,7 +2,6 @@ package me.rerere.ai.provider.providers.claude
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -124,19 +123,12 @@ internal class ClaudeStreamDecoder : StreamChunkDecoder {
                         block.metadata,
                     ))
                     "signature_delta" -> {
-                        // signature_delta 是增量片段, 需累加到已有签名上而非覆盖
-                        val fragment = delta["signature"]?.jsonPrimitive?.contentOrNull
-                        val prevSignature = block.metadata?.let {
-                            runCatching { json.decodeFromJsonElement<ClaudeReasoningMetadata>(it) }
-                                .getOrNull()?.signature
+                        // 签名可能分成多个 delta 到达，要接在这一块已收到的签名后面
+                        val metadata = delta["signature"]?.jsonPrimitive?.contentOrNull?.let {
+                            val received = block.metadata?.get("signature")?.jsonPrimitive?.contentOrNull.orEmpty()
+                            ClaudeReasoningMetadata(signature = received + it).toMetadata()
                         }
-                        val accumulated = (prevSignature ?: "") + (fragment ?: "")
-                        val metadata = if (accumulated.isNotEmpty()) {
-                            ClaudeReasoningMetadata(signature = accumulated).toMetadata()
-                        } else {
-                            block.metadata
-                        }
-                        blocks[index] = block.copy(metadata = metadata)
+                        blocks[index] = block.copy(metadata = metadata ?: block.metadata)
                         add(StreamChunk.ReasoningDelta(block.id, "", metadata))
                     }
                     "input_json_delta" -> {

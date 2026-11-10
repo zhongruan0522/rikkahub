@@ -387,28 +387,9 @@ private fun UIMessage.appendMessage(delta: UIMessage): UIMessage {
             is UIMessagePart.Image -> acc + deltaPart
 
             is UIMessagePart.Reasoning -> {
-                if (deltaPart.reasoning.isEmpty() && deltaPart.metadata == null) {
-                    acc
-                } else {
-                    val lastPart = acc.lastOrNull()
-                    // 仅当 delta 是同一思考块的纯文本延续（不携带自身签名）时才拼接.
-                    // delta 携带 metadata/signature 时是一个独立的签名思考块,
-                    // 拼接会使合并内容绑定到单一签名, 触发 Claude 的 prefix-binding 校验失败.
-                    if (lastPart is UIMessagePart.Reasoning &&
-                        lastPart.reasoningType == deltaPart.reasoningType &&
-                        deltaPart.metadata == null
-                    ) {
-                        acc.dropLast(1) + UIMessagePart.Reasoning(
-                            reasoning = lastPart.reasoning + deltaPart.reasoning,
-                            createdAt = lastPart.createdAt,
-                            finishedAt = null,
-                            metadata = lastPart.metadata,
-                            reasoningType = lastPart.reasoningType,
-                        )
-                    } else {
-                        acc + deltaPart
-                    }
-                }
+                // 非流式结果里每个推理块都是完整的，签名等 metadata 只对自己那一块有效，
+                // 拼到相邻的块上回传时会校验失败。
+                if (deltaPart.reasoning.isEmpty() && deltaPart.metadata == null) acc else acc + deltaPart
             }
 
             is UIMessagePart.Tool -> {

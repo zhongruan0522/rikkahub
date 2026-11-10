@@ -830,20 +830,16 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
             }
         }
 
-        is UIMessagePart.Reasoning -> {
-            val reasoningMetadata = metadataAs<ClaudeReasoningMetadata>()
-            val redactedData = reasoningMetadata?.redactedData
+        is UIMessagePart.Reasoning -> buildJsonObject {
+            val claudeMetadata = metadataAs<ClaudeReasoningMetadata>()
+            val redactedData = claudeMetadata?.redactedData
             if (redactedData != null) {
-                buildJsonObject {
-                    put("type", "redacted_thinking")
-                    put("data", redactedData)
-                }
+                put("type", "redacted_thinking")
+                put("data", redactedData)
             } else {
-                buildJsonObject {
-                    put("type", "thinking")
-                    put("thinking", reasoning)
-                    reasoningMetadata?.signature?.let { put("signature", it) }
-                }
+                put("type", "thinking")
+                put("thinking", reasoning)
+                claudeMetadata?.signature?.let { put("signature", it) }
             }
         }
 
@@ -898,14 +894,15 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
                 }
 
                 "redacted_thinking" -> {
-                    val data = block["data"]?.jsonPrimitiveOrNull?.contentOrNull
-                    if (data != null) {
-                        parts.add(UIMessagePart.Reasoning(
-                            reasoning = "",
-                            createdAt = Clock.System.now(),
-                            finishedAt = null,
-                            metadata = ClaudeReasoningMetadata(redactedData = data).toMetadata(),
-                        ))
+                    block["data"]?.jsonPrimitiveOrNull?.contentOrNull?.let { data ->
+                        parts.add(
+                            UIMessagePart.Reasoning(
+                                reasoning = "",
+                                createdAt = Clock.System.now(),
+                                finishedAt = null,
+                                metadata = ClaudeReasoningMetadata(redactedData = data).toMetadata(),
+                            )
+                        )
                     }
                 }
 

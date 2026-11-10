@@ -79,9 +79,9 @@ import me.rerere.rikkahub.R
 import me.rerere.rikkahub.ui.components.ui.QRCodeScannerDialog
 import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.ui.components.nav.BackButton
-import me.rerere.rikkahub.ui.components.ui.AutoAIIcon
 import me.rerere.rikkahub.ui.components.ui.ItemAction
 import me.rerere.rikkahub.ui.components.ui.ItemActionMenu
+import me.rerere.rikkahub.ui.components.ui.ProviderIcon
 import me.rerere.rikkahub.ui.components.ui.Tag
 import me.rerere.rikkahub.ui.components.ui.TagType
 import me.rerere.rikkahub.ui.components.ui.cardGroupItemShape
@@ -507,8 +507,8 @@ private fun AddButton(onAdd: (ProviderSetting) -> Unit) {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 val typeName = template.typeName()
-                                AutoAIIcon(
-                                    name = typeName,
+                                ProviderIcon(
+                                    provider = template,
                                     modifier = Modifier.size(40.dp)
                                 )
                                 Text(
@@ -560,8 +560,8 @@ private fun ProviderItem(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AutoAIIcon(
-                name = provider.name,
+            ProviderIcon(
+                provider = provider,
                 modifier = Modifier.size(40.dp)
             )
             Column(

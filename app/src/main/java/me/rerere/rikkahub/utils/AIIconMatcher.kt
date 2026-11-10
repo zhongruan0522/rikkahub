@@ -1,5 +1,7 @@
 package me.rerere.rikkahub.utils
 
+import me.rerere.ai.provider.ProviderSetting
+
 private val iconCache = mutableMapOf<String, String>()
 
 // https://lobehub.com/zh/icons
@@ -65,6 +67,15 @@ fun computeAIIconByName(name: String): String? {
 
     result?.let { iconCache[name] = it }
     return result
+}
+
+// 渠道类型对应的图标：渠道名称识别不出图标时，统一使用自己类型的图标
+fun computeProviderTypeIcon(provider: ProviderSetting): String = when (provider) {
+    is ProviderSetting.OpenAI -> "openai.svg"
+    is ProviderSetting.Google -> "google-color.svg"
+    is ProviderSetting.Claude -> "claude-color.svg"
+    is ProviderSetting.ChatGPT -> "openai.svg"
+    is ProviderSetting.Grok -> "xai.svg"
 }
 
 private val PATTERN_RIKKAHUB = Regex("rikka|auto")

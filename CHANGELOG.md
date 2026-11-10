@@ -20,6 +20,7 @@
 
 ### Fixed
 
+- 渠道 LOGO 名称识别不出时不再显示文字头像，统一改用渠道类型对应的图标（OpenAI / Google / Claude / ChatGPT / Grok）
 - 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败

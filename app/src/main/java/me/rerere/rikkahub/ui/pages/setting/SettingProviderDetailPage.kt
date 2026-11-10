@@ -125,6 +125,7 @@ import me.rerere.rikkahub.ui.components.ui.ItemAction
 import me.rerere.rikkahub.ui.components.ui.ItemActionMenu
 import me.rerere.rikkahub.ui.components.ui.PagerTab
 import me.rerere.rikkahub.ui.components.ui.PagerTabs
+import me.rerere.rikkahub.ui.components.ui.ProviderIcon
 import me.rerere.rikkahub.ui.components.ui.ShareSheet
 import me.rerere.rikkahub.ui.components.ui.SiliconFlowPowerByIcon
 import me.rerere.rikkahub.ui.components.ui.Tag
@@ -217,7 +218,7 @@ fun SettingProviderDetailPage(id: Uuid, vm: SettingVM = koinViewModel()) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        AutoAIIcon(provider.name, modifier = Modifier.size(22.dp))
+                        ProviderIcon(provider, modifier = Modifier.size(22.dp))
                         Text(text = provider.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 },
@@ -1481,8 +1482,8 @@ private fun ProviderOverrideSettings(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AutoAIIcon(
-                            providerOverride.name,
+                        ProviderIcon(
+                            providerOverride,
                             modifier = Modifier.size(24.dp)
                         )
                         Text(

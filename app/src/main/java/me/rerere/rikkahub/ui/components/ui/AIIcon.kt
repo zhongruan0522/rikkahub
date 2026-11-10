@@ -16,10 +16,12 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.svg.css
+import me.rerere.ai.provider.ProviderSetting
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.ui.hooks.rememberAvatarShape
 import me.rerere.rikkahub.ui.theme.LocalDarkMode
 import me.rerere.rikkahub.utils.computeAIIconByName
+import me.rerere.rikkahub.utils.computeProviderTypeIcon
 import me.rerere.rikkahub.utils.toCssHex
 
 @Composable
@@ -71,6 +73,26 @@ fun AutoAIIcon(
     AIIcon(
         path = path,
         name = name,
+        modifier = modifier,
+        loading = loading,
+        color = color,
+    )
+}
+
+/** 渠道的图标：优先按名称识别，识别不出时统一使用渠道类型对应的图标 */
+@Composable
+fun ProviderIcon(
+    provider: ProviderSetting,
+    modifier: Modifier = Modifier,
+    loading: Boolean = false,
+    color: Color = MaterialTheme.colorScheme.secondaryContainer,
+) {
+    val path = remember(provider.name) {
+        computeAIIconByName(provider.name) ?: computeProviderTypeIcon(provider)
+    }
+    AIIcon(
+        path = path,
+        name = provider.name,
         modifier = modifier,
         loading = loading,
         color = color,

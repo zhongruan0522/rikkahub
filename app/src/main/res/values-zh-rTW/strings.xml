@@ -1763,4 +1763,13 @@
   <string name="chat_page_select_all">全選</string>
   <string name="chat_page_deselect_all">取消全選</string>
   <string name="chat_page_clear_selection">清除選取</string>
+  <string name="setting_theme_settings_title">主題設定</string>
+  <string name="setting_theme_settings_desc">主題配色與顏色模式</string>
+  <string name="setting_theme_settings_theme">主題配色</string>
+  <string name="setting_theme_settings_color_mode">顏色模式</string>
+  <string name="setting_theme_settings_theme_unknown">未知</string>
+  <string name="theme_name_default">預設</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">單色</string>
+  <string name="theme_name_bubblegum">泡泡糖</string>
 </resources>

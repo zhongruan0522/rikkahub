@@ -1766,4 +1766,13 @@
   <string name="chat_page_select_all">Alle auswählen</string>
   <string name="chat_page_deselect_all">Alle abwählen</string>
   <string name="chat_page_clear_selection">Auswahl aufheben</string>
+  <string name="setting_theme_settings_title">Design-Einstellungen</string>
+  <string name="setting_theme_settings_desc">Designfarbe und Farbmodus</string>
+  <string name="setting_theme_settings_theme">Designfarbe</string>
+  <string name="setting_theme_settings_color_mode">Farbmodus</string>
+  <string name="setting_theme_settings_theme_unknown">Unbekannt</string>
+  <string name="theme_name_default">Standard</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">Mono</string>
+  <string name="theme_name_bubblegum">Bubblegum</string>
 </resources>

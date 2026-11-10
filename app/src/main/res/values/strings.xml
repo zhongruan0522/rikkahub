@@ -1774,4 +1774,13 @@
   <string name="chat_page_select_all">Select all</string>
   <string name="chat_page_deselect_all">Deselect all</string>
   <string name="chat_page_clear_selection">Clear selection</string>
+  <string name="setting_theme_settings_title">Theme Settings</string>
+  <string name="setting_theme_settings_desc">Theme color and color mode</string>
+  <string name="setting_theme_settings_theme">Theme Color</string>
+  <string name="setting_theme_settings_color_mode">Color Mode</string>
+  <string name="setting_theme_settings_theme_unknown">Unknown</string>
+  <string name="theme_name_default">Default</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">Mono</string>
+  <string name="theme_name_bubblegum">Bubblegum</string>
 </resources>

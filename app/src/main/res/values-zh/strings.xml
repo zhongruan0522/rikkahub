@@ -1776,4 +1776,13 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="chat_page_select_all">全选</string>
   <string name="chat_page_deselect_all">取消全选</string>
   <string name="chat_page_clear_selection">清除选择</string>
+  <string name="setting_theme_settings_title">主题设置</string>
+  <string name="setting_theme_settings_desc">主题配色与颜色模式</string>
+  <string name="setting_theme_settings_theme">主题配色</string>
+  <string name="setting_theme_settings_color_mode">颜色模式</string>
+  <string name="setting_theme_settings_theme_unknown">未知</string>
+  <string name="theme_name_default">默认</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">单色</string>
+  <string name="theme_name_bubblegum">泡泡糖</string>
 </resources>

@@ -58,13 +58,11 @@ import me.rerere.hugeicons.stroke.InLove
 import me.rerere.hugeicons.stroke.LookTop
 import me.rerere.hugeicons.stroke.McpServer
 import me.rerere.hugeicons.stroke.Megaphone01
-import me.rerere.hugeicons.stroke.Moon02
 import me.rerere.hugeicons.stroke.Package
+import me.rerere.hugeicons.stroke.Palette
 import me.rerere.hugeicons.stroke.ServerStack01
 import me.rerere.hugeicons.stroke.Settings03
 import me.rerere.hugeicons.stroke.Share04
-import me.rerere.hugeicons.stroke.SmartPhone01
-import me.rerere.hugeicons.stroke.Sun01
 import me.rerere.hugeicons.stroke.Tiktok
 import me.rerere.rikkahub.R
 import me.rerere.rikkahub.Screen
@@ -73,13 +71,9 @@ import me.rerere.rikkahub.data.files.FilesManager
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.CardGroup
 import me.rerere.rikkahub.ui.components.ui.CardGroupIcon
-import me.rerere.rikkahub.ui.components.ui.ConnectedChoiceButtons
-import me.rerere.rikkahub.ui.components.ui.ConnectedChoiceLabel
 import me.rerere.rikkahub.ui.components.ui.permission.LocalNetworkPermissionCard
 import me.rerere.rikkahub.ui.components.ui.permission.rememberLocalNetworkPermissionState
 import me.rerere.rikkahub.ui.context.LocalNavController
-import me.rerere.rikkahub.ui.hooks.rememberColorMode
-import me.rerere.rikkahub.ui.theme.ColorMode
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.joinQQGroup
 import me.rerere.rikkahub.utils.openUrl
@@ -134,43 +128,17 @@ fun SettingPage(vm: SettingVM = koinViewModel()) {
             }
 
             item("generalSettings") {
-                var colorMode by rememberColorMode()
                 val containerColor = MaterialTheme.colorScheme.primaryContainer
                 val contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 CardGroup(
                     title = { Text(stringResource(R.string.setting_page_general_settings)) },
                 ) {
-                    formItem {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        ) {
-                            CardGroupIcon(colorMode.icon(), containerColor = containerColor, contentColor = contentColor)
-                            Text(stringResource(R.string.setting_page_color_mode))
-                        }
-                        ConnectedChoiceButtons(
-                            options = ColorMode.entries,
-                            selected = colorMode,
-                            onSelect = {
-                                colorMode = it
-                                navController.navigate(Screen.Setting) {
-                                    popUpTo(Screen.Setting) {
-                                        inclusive = true
-                                    }
-                                }
-                            },
-                        ) { mode, selected ->
-                            ConnectedChoiceLabel(
-                                text = when (mode) {
-                                    ColorMode.SYSTEM -> stringResource(R.string.setting_page_color_mode_system)
-                                    ColorMode.LIGHT -> stringResource(R.string.setting_page_color_mode_light)
-                                    ColorMode.DARK -> stringResource(R.string.setting_page_color_mode_dark)
-                                },
-                                selected = selected,
-                                icon = mode.icon(),
-                            )
-                        }
-                    }
+                    item(
+                        onClick = { navController.navigate(Screen.SettingThemeSettings) },
+                        leadingContent = { CardGroupIcon(HugeIcons.Palette, containerColor = containerColor, contentColor = contentColor) },
+                        supportingContent = { Text(stringResource(R.string.setting_theme_settings_desc)) },
+                        headlineContent = { Text(stringResource(R.string.setting_theme_settings_title)) },
+                    )
                     item(
                         onClick = { navController.navigate(Screen.SettingPreferences) },
                         leadingContent = { CardGroupIcon(HugeIcons.Settings03, containerColor = containerColor, contentColor = contentColor) },
@@ -372,12 +340,6 @@ fun SettingPage(vm: SettingVM = koinViewModel()) {
             }
         }
     }
-}
-
-private fun ColorMode.icon(): ImageVector = when (this) {
-    ColorMode.SYSTEM -> HugeIcons.SmartPhone01
-    ColorMode.LIGHT -> HugeIcons.Sun01
-    ColorMode.DARK -> HugeIcons.Moon02
 }
 
 @Composable

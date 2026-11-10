@@ -9,6 +9,7 @@
 
 ### Changed
 
+- 设置主页「通用设置」中的颜色模式改为「主题设置」子页：下拉选择主题配色（默认、Claude、T3 Chat、Mono、泡泡糖，与 Web UI 配色对齐，新增 4 套预设主题）和颜色模式（浅色、深色、跟随系统）
 - 移除内置渠道 AiHubMix、APIMart、302.AI、随想AI网关、MaruCode、STA1N API 及相关资源（图标、请求头特例、TTS 预设）
 - 移除提供商页面右上角的推荐提供商入口及推荐列表
 - 应用安装包名（applicationId）由 `me.rerere.rikkahub` 改为 `rikka.hub`

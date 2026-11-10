@@ -4,11 +4,15 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import me.rerere.rikkahub.ui.theme.presets.AutumnThemePreset
 import me.rerere.rikkahub.ui.theme.presets.BlackThemePreset
+import me.rerere.rikkahub.ui.theme.presets.BubblegumThemePreset
 import me.rerere.rikkahub.ui.theme.presets.ClaudeThemePreset
+import me.rerere.rikkahub.ui.theme.presets.DefaultThemePreset
 import me.rerere.rikkahub.ui.theme.presets.MinimalThemePreset
+import me.rerere.rikkahub.ui.theme.presets.MonoThemePreset
 import me.rerere.rikkahub.ui.theme.presets.OceanThemePreset
 import me.rerere.rikkahub.ui.theme.presets.SakuraThemePreset
 import me.rerere.rikkahub.ui.theme.presets.SpringThemePreset
+import me.rerere.rikkahub.ui.theme.presets.T3ChatThemePreset
 
 data class PresetTheme(
     val id: String,
@@ -30,6 +34,10 @@ val PresetThemes by lazy {
         BlackThemePreset,
         MinimalThemePreset,
         ClaudeThemePreset,
+        DefaultThemePreset,
+        T3ChatThemePreset,
+        MonoThemePreset,
+        BubblegumThemePreset,
     )
 }
 

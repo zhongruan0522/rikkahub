@@ -1763,4 +1763,13 @@
   <string name="chat_page_select_all">تحديد الكل</string>
   <string name="chat_page_deselect_all">إلغاء تحديد الكل</string>
   <string name="chat_page_clear_selection">إلغاء التحديد</string>
+  <string name="setting_theme_settings_title">إعدادات السمة</string>
+  <string name="setting_theme_settings_desc">لون السمة ووضع الألوان</string>
+  <string name="setting_theme_settings_theme">لون السمة</string>
+  <string name="setting_theme_settings_color_mode">وضع الألوان</string>
+  <string name="setting_theme_settings_theme_unknown">غير معروف</string>
+  <string name="theme_name_default">افتراضي</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">Mono</string>
+  <string name="theme_name_bubblegum">Bubblegum</string>
 </resources>

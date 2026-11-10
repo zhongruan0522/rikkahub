@@ -1765,4 +1765,13 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="chat_page_select_all">すべて選択</string>
   <string name="chat_page_deselect_all">すべて選択解除</string>
   <string name="chat_page_clear_selection">選択を解除</string>
+  <string name="setting_theme_settings_title">テーマ設定</string>
+  <string name="setting_theme_settings_desc">テーマカラーとカラーモード</string>
+  <string name="setting_theme_settings_theme">テーマカラー</string>
+  <string name="setting_theme_settings_color_mode">カラーモード</string>
+  <string name="setting_theme_settings_theme_unknown">不明</string>
+  <string name="theme_name_default">デフォルト</string>
+  <string name="theme_name_t3chat">T3 Chat</string>
+  <string name="theme_name_mono">モノクロ</string>
+  <string name="theme_name_bubblegum">バブルガム</string>
 </resources>

@@ -37,6 +37,7 @@
 - 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
 - 修复后台 shell 前台服务被系统回收：前台服务类型由 `dataSync` 改为 `specialUse` 并声明 subtype，避免 Android 15+ 的 24 小时 6 小时额度与其他 dataSync 服务共享
 - 修复 Web 端消息统计的输入 token 与 App 端上下文占用不一致：多步工具调用时改为显示最后一次请求的输入与缓存值，输出与速度仍按累计值计算，多步时显示步数，累计输入放在悬停提示里
+- 修复长对话的对话地图（概览）滑动卡顿：卡片正文显示前先截断到 300 字符（搜索仍匹配全文），正则清洗移到后台线程，生成中只计算最新的节点列表，列表 key 改为随卡片保存
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败
 - 修复 `ChatMessageActions.kt` 中缺失的闭合括号

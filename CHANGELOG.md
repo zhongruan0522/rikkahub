@@ -14,6 +14,8 @@
 - 设置首页在未授予通知权限时显示通知权限提示卡片，原本地网络权限卡片抽出为通用的权限请求卡片复用
 - 信任 Android 用户自行安装的 CA 证书（`network_security_config`），便于抓包与自签网关调试
 - 调试页新增创建约 500k token 对话的按钮，用于测试上下文压缩
+- 聊天消息中的 Phone Use 工具卡片按动作显示标题与图标（读取屏幕、截图、点击、长按、滑动、文本输入等）
+- 可用模型面板支持手动刷新：面板右上角新增刷新按钮，远端模型列表请求以提供商配置为 key（增删、排序已添加的模型不重复请求），加载中显示进度条，失败时保留上次成功列表并显示错误提示
 
 ### Changed
 
@@ -29,6 +31,9 @@
 - 每日构建（Latest Build 工作流）同时产出 GitHub 渠道的 debug 与 release APK，一并上传到 Latest Prerelease
 - 每日构建拆分 debug / release 两个并行 job，由 publish job 汇总产物发布；所用 actions 升级至最新主版本（checkout v7、setup-java v6、setup-node v7、pnpm/action-setup v6、gh-release v3 等），Gradle 缓存改用 `gradle/actions/setup-gradle` 并启用 build cache 提速
 - 压缩机制对齐 SillyTavern（酒馆）摘要形态：压缩提示词 1:1 采用其默认摘要提示词（自由文本摘要、以上一份摘要为基础增量扩展），压缩对话框新增摘要词数上限设置（25–1000、步进 25、默认 200 与酒馆一致）；压缩范围对齐酒馆策略，手动压缩总是保留最后一条消息，上下文放不下压缩请求时按 token 预算（预留 64）丢弃较新的消息、留给下次增量压缩
+- 快捷消息短按追加到输入框末尾（已有内容且不以换行结尾时自动补换行），长按替换输入框全部内容
+- Phone Use 无障碍服务关闭提示补充开启自启动的建议
+- 版本升级至 3.2.0（versionCode 196）
 
 ### Fixed
 
@@ -39,6 +44,7 @@
 - 修复后台 shell 前台服务被系统回收：前台服务类型由 `dataSync` 改为 `specialUse` 并声明 subtype，避免 Android 15+ 的 24 小时 6 小时额度与其他 dataSync 服务共享
 - 修复 Web 端消息统计的输入 token 与 App 端上下文占用不一致：多步工具调用时改为显示最后一次请求的输入与缓存值，输出与速度仍按累计值计算，多步时显示步数，累计输入放在悬停提示里
 - 修复长对话的对话地图（概览）滑动卡顿：卡片正文显示前先截断到 300 字符（搜索仍匹配全文），正则清洗移到后台线程，生成中只计算最新的节点列表，列表 key 改为随卡片保存
+- 修复 Mistral 推理模型多轮对话报 422：历史 assistant 消息的思考内容按 Mistral 的 content thinking 块格式回传（不再发 `reasoning_content` 字段），响应与流式 `content` 中的 thinking 块解析统一抽出 `parseChatCompletionsContent` 处理并遍历所有块
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败
 - 修复 `ChatMessageActions.kt` 中缺失的闭合括号

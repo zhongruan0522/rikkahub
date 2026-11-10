@@ -7,6 +7,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- 新增 Phone Use（仅 GitHub 渠道、Android 11+）：AI 通过无障碍服务读取屏幕元素、截图、点击、滑动与输入，坐标统一为 0-1000 网格；在助手的本地工具中开关，开启前要求后台悬浮窗已开启，悬浮窗在截图与执行手势时让出屏幕并显示当前动作；本应用在前台时不操作，支付与银行类应用可见时不可读取和操作；Play 渠道不声明该无障碍服务
+- 新增按上下文占用比例的自动压缩：回复结束后，或一轮回复中途工具调用之间，上下文达到聊天模型窗口的设定比例时自动把历史压缩成摘要继续，摘要后的检查点带上续写提示；设置-通用设置可开关并调整触发比例（50%–95%）
+- 设置首页在未授予通知权限时显示通知权限提示卡片，原本地网络权限卡片抽出为通用的权限请求卡片复用
+- 信任 Android 用户自行安装的 CA 证书（`network_security_config`），便于抓包与自签网关调试
+- 调试页新增创建约 500k token 对话的按钮，用于测试上下文压缩
+
 ### Changed
 
 - 模型支持独立的最大输出上限（token）：models.dev 数据补充 `limit.output` 并重新生成内置快照，添加或切换模型时自动回填，也可在提供商页的模型表单中修改；对话请求优先使用助手设置的「最大Token数」，助手未设置时使用模型的上限，压缩摘要请求仍不指定输出上限
@@ -27,6 +35,8 @@
 - 修复 Claude / OpenRouter 链路 400 与 403 报错（共 5 项）：OpenRouter 链路纯音视频/文档附件消息被序列化成空 `content` 数组触发 `invalid_prompt`（无可发送 Text/Image 时改用文字说明占位）；Claude 图片 `source.data` 收到非合法 base64（`http(s)` URL 改用 `type:"url"` source 直传，`data:` URL 解析出纯 base64 段与真实 mime 再填入）；OpenRouter guardrail 403 错误未提示命中原因（`parseErrorDetail` 提取 `metadata.patterns` 并附到错误信息，错误卡片展示命中注入检测模式）；OpenRouter 对 Claude 系模型拒绝 `reasoning.effort:"none"`（Claude OFF 档省略 `reasoning` 参数，思考为 opt-in 即不启用）；AT_DEPTH 注入深度溢出时插到 system 之前破坏消息序（溢出 clamp 到 system 之后，注入深度 UI 限制最小为 1）
 - 修复 Responses API 链路 400 报错（共 7 项）：`include` 强塞 `reasoning.encrypted_content` 被枚举不含该值的第三方网关拒绝（该值已是 legacy，移除并下线只服务它的能力位）；input message item 缺 `type:"message"`、单段文本压成裸字符串、system/developer 的 part 被写成 `output_text`（统一补 `type`、按 role 分派 part 类型、content 统一数组）；历史 TOOL 消息发出非法 `role:"tool"`（构建阶段按 user 文本回放）；回放的 reasoning item 带服务端 `id` 与明文 `content`（`store:false` 上游不认，改为仅回放 `encrypted_content`，无密文时不回放）；`input_image` 缺 `detail`（消息 content 与 `function_call_output.output` 统一补 `auto`）；`max_output_tokens` 可小于 16 且被采样参数开关连带丢弃（下限 clamp 到 16 并移出采样分支）；推理模型仍收到 `temperature`/`top_p`（改按 `ModelAbility.REASONING` 门控）
 - 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
+- 修复后台 shell 前台服务被系统回收：前台服务类型由 `dataSync` 改为 `specialUse` 并声明 subtype，避免 Android 15+ 的 24 小时 6 小时额度与其他 dataSync 服务共享
+- 修复 Web 端消息统计的输入 token 与 App 端上下文占用不一致：多步工具调用时改为显示最后一次请求的输入与缓存值，输出与速度仍按累计值计算，多步时显示步数，累计输入放在悬停提示里
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败
 - 修复 `ChatMessageActions.kt` 中缺失的闭合括号

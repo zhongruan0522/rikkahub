@@ -1742,4 +1742,24 @@
   <string name="theme_name_bubblegum">Bubblegum</string>
   <string name="log_page_detailed_mode">Detailmodus</string>
   <string name="log_page_detailed_mode_desc">Alle Anfragen mit Headern, Bodies und Metadaten aufzeichnen</string>
+  <string name="assistant_page_local_tools_phone_use_title">Telefonnutzung</string>
+  <string name="assistant_page_local_tools_phone_use_desc">Lass die KI den Bildschirm lesen und andere Apps auf diesem Telefon bedienen</string>
+  <string name="assistant_page_local_tools_phone_use_service_off">Der Bedienungshilfe-Dienst ist deaktiviert. Schalte diesen Schalter aus und wieder ein, um die Einstellungen zu öffnen. Wenn das System die Option ausgraut, erlaube zuerst eingeschränkte Einstellungen für diese App in den App-Infos.</string>
+  <string name="assistant_page_local_tools_phone_use_enable_service">Aktiviere \"RikkaHub Phone Use\" in den Bedienungshilfen-Einstellungen</string>
+  <string name="assistant_page_local_tools_phone_use_floating_window_required">Aktiviere zuerst das schwebende Hintergrundfenster</string>
+  <string name="phone_use_accessibility_description">Ermöglicht dem KI-Assistenten, den Bildschirm zu lesen und Tippen, Wischen und Texteingaben für dich auszuführen, wenn du das Phone-Use-Tool aktivierst. Es wird nichts ausgeführt, solange der Assistent keine von dir angeforderte Aufgabe ausführt.</string>
+  <string name="permission_notification_card_desc">Erlaube Benachrichtigungen, um den Fortschritt von Hintergrundaufgaben wie KI-Generierung und Webserver zu sehen</string>
+  <string name="workspace_ssh_editor_jump_host">Jump-Host</string>
+  <string name="workspace_ssh_editor_jump_host_enable">Über einen Jump-Host verbinden</string>
+  <string name="workspace_ssh_editor_jump_host_enable_desc">Zuerst mit einem Jump-Host verbinden und den Server darüber erreichen, wie ProxyJump in OpenSSH. Der oben angegebene Host wird vom Jump-Host aus aufgelöst</string>
+  <string name="workspace_ssh_editor_jump_host_key">Jump-Host-Schlüssel</string>
+  <string name="workspace_ssh_editor_target_host_key">Server-Hostschlüssel</string>
+  <string name="workspace_ssh_editor_jump_host_key_confirm">Jump-Host-Schlüssel bestätigen</string>
+  <string name="workspace_ssh_editor_jump_host_key_changed">Jump-Host-Schlüssel geändert</string>
+  <string name="workspace_ssh_editor_missing_jump_fields">Gib Host, Port und Benutzername des Jump-Hosts ein</string>
+  <string name="setting_display_page_auto_compress_title">Kontext automatisch komprimieren</string>
+  <string name="setting_display_page_auto_compress_desc">Komprimiert nach einer Antwort den Verlauf automatisch zu einer Zusammenfassung, wenn die Kontextauslastung den festgelegten Anteil überschreitet</string>
+  <string name="setting_display_page_auto_compress_threshold_title">Auslöseverhältnis</string>
+  <string name="setting_display_page_auto_compress_threshold_desc">Relativ zum Kontextfenster des Chatmodells</string>
+  <string name="error_title_auto_compress">Automatische Komprimierung fehlgeschlagen</string>
 </resources>

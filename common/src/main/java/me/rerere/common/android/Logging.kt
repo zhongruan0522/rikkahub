@@ -1,5 +1,6 @@
 package me.rerere.common.android
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.uuid.Uuid
 
@@ -12,14 +13,18 @@ sealed class LogEntry {
     abstract val tag: String
 
     @Serializable
+    @SerialName("text_log")
     data class TextLog(
         override val id: Uuid = Uuid.random(),
         override val timestamp: Long = System.currentTimeMillis(),
         override val tag: String,
-        val message: String
+        val message: String,
+        // 长内容（如堆栈）放这里，列表只展示 message，点开详情再看
+        val detail: String? = null,
     ) : LogEntry()
 
     @Serializable
+    @SerialName("request_log")
     data class RequestLog(
         override val id: Uuid = Uuid.random(),
         override val timestamp: Long = System.currentTimeMillis(),
@@ -37,22 +42,13 @@ sealed class LogEntry {
 
 object Logging {
     private val recentLogs = arrayListOf<LogEntry>()
-    @Volatile
-    private var requestLoggingEnabled = false
 
-    fun log(tag: String, message: String) {
-        addLog(LogEntry.TextLog(tag = tag, message = message))
+    fun log(tag: String, message: String, detail: String? = null) {
+        addLog(LogEntry.TextLog(tag = tag, message = message, detail = detail))
     }
 
     fun logRequest(entry: LogEntry.RequestLog) {
-        if (!requestLoggingEnabled) return
         addLog(entry)
-    }
-
-    fun isRequestLoggingEnabled(): Boolean = requestLoggingEnabled
-
-    fun setRequestLoggingEnabled(enabled: Boolean) {
-        requestLoggingEnabled = enabled
     }
 
     private fun addLog(entry: LogEntry) {

@@ -769,8 +769,8 @@ class ChatService(
             session.inbox.pause()
             e.printStackTrace()
             addError(e, conversationId, title = context.getString(R.string.error_title_generation))
-            Logging.log(TAG, "runTurn: $e")
-            Logging.log(TAG, e.stackTraceToString())
+            // 堆栈放 detail，日志列表只显示简短的错误摘要
+            Logging.log(TAG, "runTurn: $e", detail = e.stackTraceToString())
             return TurnResult.Failed
         }
     }

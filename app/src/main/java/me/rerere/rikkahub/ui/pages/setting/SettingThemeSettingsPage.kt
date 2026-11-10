@@ -23,10 +23,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.rerere.hugeicons.HugeIcons
+import me.rerere.hugeicons.stroke.ArrowRight01
 import me.rerere.hugeicons.stroke.Tick01
 import me.rerere.rikkahub.R
+import me.rerere.rikkahub.Screen
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.ui.CardGroup
+import me.rerere.rikkahub.ui.components.ui.switchItem
+import me.rerere.rikkahub.ui.context.LocalNavController
+import me.rerere.rikkahub.ui.hooks.rememberAmoledDarkMode
 import me.rerere.rikkahub.ui.hooks.rememberColorMode
 import me.rerere.rikkahub.ui.theme.ColorMode
 import me.rerere.rikkahub.ui.theme.CustomColors
@@ -52,7 +57,9 @@ private val ThemeOptions = listOf(
 fun SettingThemeSettingsPage(vm: SettingVM = koinViewModel()) {
     val settings by vm.settings.collectAsStateWithLifecycle()
     var colorMode by rememberColorMode()
+    var amoledDarkMode by rememberAmoledDarkMode()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val navController = LocalNavController.current
 
     Scaffold(
         topBar = {
@@ -75,7 +82,7 @@ fun SettingThemeSettingsPage(vm: SettingVM = koinViewModel()) {
             contentPadding = contentPadding + PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item("themeSettings") {
+            item("colorSettings") {
                 var themeMenuExpanded by remember { mutableStateOf(false) }
                 var colorModeMenuExpanded by remember { mutableStateOf(false) }
                 val currentTheme = findThemeById(settings.themeId, settings.customThemes)
@@ -116,7 +123,10 @@ fun SettingThemeSettingsPage(vm: SettingVM = koinViewModel()) {
                                     null
                                 },
                                 onClick = {
-                                    vm.updateSettings { latest -> latest.copy(themeId = theme.id) }
+                                    // 选中预设配色 = 使用固定主题，自动关闭动态颜色使其立即生效
+                                    vm.updateSettings { latest ->
+                                        latest.copy(themeId = theme.id, dynamicColor = false)
+                                    }
                                     themeMenuExpanded = false
                                 },
                             )
@@ -142,6 +152,34 @@ fun SettingThemeSettingsPage(vm: SettingVM = koinViewModel()) {
                             )
                         }
                     }
+                }
+            }
+
+            item("displayOptions") {
+                CardGroup {
+                    switchItem(
+                        checked = settings.dynamicColor,
+                        onCheckedChange = { vm.updateSettings { latest -> latest.copy(dynamicColor = it) } },
+                        supportingContent = { Text(stringResource(R.string.setting_page_dynamic_color_desc)) },
+                        headlineContent = { Text(stringResource(R.string.setting_page_dynamic_color)) },
+                    )
+                    switchItem(
+                        checked = amoledDarkMode,
+                        onCheckedChange = { amoledDarkMode = it },
+                        supportingContent = { Text(stringResource(R.string.setting_display_page_amoled_dark_mode_desc)) },
+                        headlineContent = { Text(stringResource(R.string.setting_display_page_amoled_dark_mode_title)) },
+                    )
+                }
+            }
+
+            item("themeManagement") {
+                CardGroup {
+                    item(
+                        onClick = { navController.navigate(Screen.SettingTheme) },
+                        headlineContent = { Text(stringResource(R.string.setting_page_theme_setting)) },
+                        supportingContent = { Text(stringResource(R.string.setting_page_theme_setting_desc)) },
+                        trailingContent = { Icon(HugeIcons.ArrowRight01, contentDescription = null) },
+                    )
                 }
             }
         }

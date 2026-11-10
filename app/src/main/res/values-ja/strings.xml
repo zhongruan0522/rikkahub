@@ -787,7 +787,7 @@
   <string name="setting_theme_page_tertiary_color">ターシャリカラー</string>
   <string name="setting_theme_page_preview">プレビュー</string>
   <string name="setting_theme_page_save">保存</string>
-  <string name="setting_theme_page_dynamic_color_hint">ダイナミックカラーが有効です。カスタムテーマを使用するには、設定 &gt; テーマで無効にしてください。</string>
+  <string name="setting_theme_page_dynamic_color_hint">ダイナミックカラーが有効です。カスタムテーマを使用するには、テーマ設定で無効にしてください。</string>
   <string name="setting_page_tts_service">音声サービス</string>
   <string name="setting_page_tts_service_desc">音声合成と音声認識のプロバイダーを設定</string>
   <string name="setting_page_tts_settings">TTS設定</string>
@@ -1031,9 +1031,7 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="setting_display_page_custom_font_remove">カスタムフォントを削除</string>
   <string name="setting_display_page_custom_font_title">カスタムフォント</string>
   <string name="setting_page_preferences">設定</string>
-  <string name="setting_page_preferences_desc">テーマ、通知、UI、全般設定</string>
-  <string name="setting_page_preferences_theme">テーマ</string>
-  <string name="setting_page_preferences_theme_desc">ダイナミックカラー、テーマ、AMOLEDダークモード</string>
+  <string name="setting_page_preferences_desc">通知、UI、全般、ネットワーク設定</string>
   <string name="setting_page_preferences_notification">通知</string>
   <string name="setting_page_preferences_notification_desc">アップデート通知、メッセージ生成通知、バックグラウンドのフローティングウィンドウ</string>
   <string name="setting_page_preferences_general">一般</string>
@@ -1178,7 +1176,7 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="setting_asr_configure_step_hotwords">ホットワード</string>
   <string name="setting_asr_configure_step_hotwords_desc">固有名詞や専門用語の認識精度を高める、カンマ区切りのホットワード一覧</string>
   <string name="log_page_record_requests">リクエスト記録</string>
-  <string name="log_page_record_requests_desc">リクエストヘッダー、ボディ、レスポンスメタデータをキャプチャします</string>
+  <string name="log_page_record_requests_desc">失敗したリクエストを記録します。詳細モードを有効にすると完全なリクエストデータを記録します</string>
   <string name="chat_message_tool_recent_chats">最近のチャットを表示</string>
   <string name="chat_message_tool_conversation_search">検索履歴: %1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">スクリーンタイム</string>
@@ -1755,7 +1753,7 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="chat_page_deselect_all">すべて選択解除</string>
   <string name="chat_page_clear_selection">選択を解除</string>
   <string name="setting_theme_settings_title">テーマ設定</string>
-  <string name="setting_theme_settings_desc">テーマカラーとカラーモード</string>
+  <string name="setting_theme_settings_desc">テーマカラー、カラーモード、ダイナミックカラー</string>
   <string name="setting_theme_settings_theme">テーマカラー</string>
   <string name="setting_theme_settings_color_mode">カラーモード</string>
   <string name="setting_theme_settings_theme_unknown">不明</string>
@@ -1763,4 +1761,6 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">モノクロ</string>
   <string name="theme_name_bubblegum">バブルガム</string>
+  <string name="log_page_detailed_mode">詳細モード</string>
+  <string name="log_page_detailed_mode_desc">すべてのリクエストのヘッダー、ボディ、メタデータを記録します</string>
 </resources>

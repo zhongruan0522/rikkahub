@@ -802,9 +802,7 @@
   <string name="setting_page_display_setting">Display Settings</string>
   <string name="setting_page_display_setting_desc">Manage display settings</string>
   <string name="setting_page_preferences">Preferences</string>
-  <string name="setting_page_preferences_desc">Theme, notifications, UI and general settings</string>
-  <string name="setting_page_preferences_theme">Theme</string>
-  <string name="setting_page_preferences_theme_desc">Dynamic color, theme, AMOLED dark mode</string>
+  <string name="setting_page_preferences_desc">Notifications, UI, general and network settings</string>
   <string name="setting_page_preferences_notification">Notifications</string>
   <string name="setting_page_preferences_notification_desc">Update alerts, message generation notifications, background floating window</string>
   <string name="setting_page_preferences_general">General</string>
@@ -864,7 +862,7 @@
   <string name="setting_theme_page_import_theme">Import</string>
   <string name="setting_theme_page_export_success">Theme JSON copied to clipboard</string>
   <string name="setting_theme_page_import_success">Theme imported successfully</string>
-  <string name="setting_theme_page_dynamic_color_hint">Dynamic color is enabled. Disable it in Preferences &gt; Theme to use custom themes.</string>
+  <string name="setting_theme_page_dynamic_color_hint">Dynamic color is enabled. Disable it in Theme Settings to use custom themes.</string>
   <string name="setting_page_tts_service">Speech Services</string>
   <string name="setting_page_tts_service_desc">Configure text-to-speech and speech recognition providers</string>
   <string name="setting_page_tts_settings">TTS Settings</string>
@@ -1219,7 +1217,7 @@
   <string name="workspace_page_name_duplicate">Name already exists</string>
   <string name="setting_mcp_page_name_invalid">Name can only contain English letters and numbers</string>
   <string name="log_page_record_requests">Record requests</string>
-  <string name="log_page_record_requests_desc">Capture request headers, bodies, and response metadata</string>
+  <string name="log_page_record_requests_desc">Record failed requests; enable detailed mode to log full request data</string>
   <string name="chat_message_tool_recent_chats">View recent chats</string>
   <string name="chat_message_tool_conversation_search">Search history: %1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">Screen Time</string>
@@ -1764,7 +1762,7 @@
   <string name="chat_page_deselect_all">Deselect all</string>
   <string name="chat_page_clear_selection">Clear selection</string>
   <string name="setting_theme_settings_title">Theme Settings</string>
-  <string name="setting_theme_settings_desc">Theme color and color mode</string>
+  <string name="setting_theme_settings_desc">Theme color, color mode and dynamic color</string>
   <string name="setting_theme_settings_theme">Theme Color</string>
   <string name="setting_theme_settings_color_mode">Color Mode</string>
   <string name="setting_theme_settings_theme_unknown">Unknown</string>
@@ -1772,4 +1770,6 @@
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>
   <string name="theme_name_bubblegum">Bubblegum</string>
+  <string name="log_page_detailed_mode">Detailed mode</string>
+  <string name="log_page_detailed_mode_desc">Record all requests with headers, bodies and metadata</string>
 </resources>

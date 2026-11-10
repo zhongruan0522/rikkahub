@@ -831,7 +831,7 @@
   <string name="setting_theme_page_tertiary_color">第三色</string>
   <string name="setting_theme_page_preview">预览</string>
   <string name="setting_theme_page_save">保存</string>
-  <string name="setting_theme_page_dynamic_color_hint">动态颜色已开启，请在偏好设置 &gt; 主题中关闭以使用自定义主题。</string>
+  <string name="setting_theme_page_dynamic_color_hint">动态颜色已开启，请在主题设置中关闭以使用自定义主题。</string>
   <string name="setting_page_tts_service">语音服务</string>
   <string name="setting_page_tts_service_desc">配置语音合成与语音识别服务提供商</string>
   <string name="setting_page_tts_settings">TTS设置</string>
@@ -1071,9 +1071,7 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="setting_theme_page_delete_theme_title">删除主题</string>
   <string name="setting_theme_page_delete_theme_message">确定要删除此主题吗？</string>
   <string name="setting_page_preferences">偏好设置</string>
-  <string name="setting_page_preferences_desc">主题、通知、界面和常规设置</string>
-  <string name="setting_page_preferences_theme">主题</string>
-  <string name="setting_page_preferences_theme_desc">动态配色、主题、AMOLED深色模式</string>
+  <string name="setting_page_preferences_desc">通知、界面、常规和网络设置</string>
   <string name="setting_page_preferences_notification">通知</string>
   <string name="setting_page_preferences_notification_desc">更新提醒、消息生成通知、后台悬浮窗</string>
   <string name="setting_page_preferences_general">常规</string>
@@ -1195,7 +1193,7 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="setting_mcp_page_name_invalid">名称只能包含英文字母和数字</string>
   <string name="error_mcp_invalid_server_name">无效的MCP服务器名称（仅允许字母数字字符）：%1$s</string>
   <string name="log_page_record_requests">记录请求</string>
-  <string name="log_page_record_requests_desc">捕获请求标头、正文和响应元数据</string>
+  <string name="log_page_record_requests_desc">记录失败的请求；开启详细模式以记录完整请求数据</string>
   <string name="chat_message_tool_recent_chats">查看最近的对话</string>
   <string name="chat_message_tool_conversation_search">搜索历史：%1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">屏幕时间</string>
@@ -1766,7 +1764,7 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="chat_page_deselect_all">取消全选</string>
   <string name="chat_page_clear_selection">清除选择</string>
   <string name="setting_theme_settings_title">主题设置</string>
-  <string name="setting_theme_settings_desc">主题配色与颜色模式</string>
+  <string name="setting_theme_settings_desc">主题配色、颜色模式与动态颜色</string>
   <string name="setting_theme_settings_theme">主题配色</string>
   <string name="setting_theme_settings_color_mode">颜色模式</string>
   <string name="setting_theme_settings_theme_unknown">未知</string>
@@ -1774,4 +1772,6 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">单色</string>
   <string name="theme_name_bubblegum">泡泡糖</string>
+  <string name="log_page_detailed_mode">详细模式</string>
+  <string name="log_page_detailed_mode_desc">记录所有请求的标头、正文和元数据</string>
 </resources>

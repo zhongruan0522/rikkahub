@@ -2,33 +2,45 @@ package me.rerere.rikkahub.data.ai
 
 import me.rerere.common.android.LogEntry
 import me.rerere.common.android.Logging
+import me.rerere.rikkahub.data.datastore.SettingsStore
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
 
-class RequestLoggingInterceptor : Interceptor {
+/**
+ * 请求日志拦截器。
+ *
+ * 记录请求开关关闭时不做任何事；开启后默认只记录失败的请求（网络异常或非 2xx 响应），
+ * 详细模式下记录所有请求的完整元数据（标头、正文、耗时）。
+ */
+class RequestLoggingInterceptor(
+    private val settingsStore: SettingsStore,
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        if (!Logging.isRequestLoggingEnabled()) {
+        val settings = settingsStore.settingsFlow.value
+        if (!settings.requestLoggingEnabled) {
             return chain.proceed(chain.request())
         }
+        val detailed = settings.requestLoggingDetailed
 
         val request = chain.request()
         val startTime = System.currentTimeMillis()
 
-        val requestHeaders = request.headers.toMap()
-        val requestBody = request.body?.let { body ->
-            val buffer = Buffer()
-            body.writeTo(buffer)
-            buffer.readUtf8()
+        val requestHeaders = if (detailed) request.headers.toMap() else emptyMap()
+        val requestBody = if (detailed) {
+            request.body?.let { body ->
+                val buffer = Buffer()
+                body.writeTo(buffer)
+                buffer.readUtf8()
+            }
+        } else {
+            null
         }
 
         val response: Response
-        var error: String? = null
-
         try {
             response = chain.proceed(request)
         } catch (e: Exception) {
-            error = e.message
             Logging.logRequest(
                 LogEntry.RequestLog(
                     tag = "HTTP",
@@ -36,14 +48,15 @@ class RequestLoggingInterceptor : Interceptor {
                     method = request.method,
                     requestHeaders = requestHeaders,
                     requestBody = requestBody,
-                    error = error
+                    error = e.message ?: e.toString()
                 )
             )
             throw e
         }
 
-        val durationMs = System.currentTimeMillis() - startTime
-        val responseHeaders = response.headers.toMap()
+        if (!detailed && response.isSuccessful) {
+            return response
+        }
 
         Logging.logRequest(
             LogEntry.RequestLog(
@@ -53,9 +66,8 @@ class RequestLoggingInterceptor : Interceptor {
                 requestHeaders = requestHeaders,
                 requestBody = requestBody,
                 responseCode = response.code,
-                responseHeaders = responseHeaders,
-                durationMs = durationMs,
-                error = error
+                responseHeaders = if (detailed) response.headers.toMap() else emptyMap(),
+                durationMs = System.currentTimeMillis() - startTime,
             )
         )
 

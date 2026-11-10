@@ -800,9 +800,7 @@
   <string name="setting_page_display_setting">Anzeigeeinstellungen</string>
   <string name="setting_page_display_setting_desc">Anzeigeeinstellungen verwalten</string>
   <string name="setting_page_preferences">Einstellungen</string>
-  <string name="setting_page_preferences_desc">Design, Benachrichtigungen, Oberfläche und allgemeine Einstellungen</string>
-  <string name="setting_page_preferences_theme">Design</string>
-  <string name="setting_page_preferences_theme_desc">Dynamische Farben, Design, AMOLED-Dunkelmodus</string>
+  <string name="setting_page_preferences_desc">Benachrichtigungen, Oberfläche, Allgemein und Netzwerk</string>
   <string name="setting_page_preferences_notification">Benachrichtigungen</string>
   <string name="setting_page_preferences_notification_desc">Update-Hinweise, Benachrichtigungen zur Nachrichtengenerierung, schwebendes Hintergrundfenster</string>
   <string name="setting_page_color_mode">Farbmodus</string>
@@ -924,7 +922,7 @@
   <string name="setting_theme_page_import_theme">Importieren</string>
   <string name="setting_theme_page_export_success">Theme-JSON in die Zwischenablage kopiert</string>
   <string name="setting_theme_page_import_success">Theme erfolgreich importiert</string>
-  <string name="setting_theme_page_dynamic_color_hint">Dynamische Farbe ist aktiviert. Deaktiviere sie unter Einstellungen &gt; Theme, um benutzerdefinierte Themes zu verwenden.</string>
+  <string name="setting_theme_page_dynamic_color_hint">Dynamische Farbe ist aktiviert. Deaktiviere sie unter Design-Einstellungen, um benutzerdefinierte Themes zu verwenden.</string>
   <string name="setting_page_tts_service">Sprachdienste</string>
   <string name="setting_page_tts_service_desc">Konfiguriere Anbieter für Sprachausgabe und Spracherkennung</string>
   <string name="setting_provider_page_save">Speichern</string>
@@ -1179,7 +1177,7 @@
   <string name="workspace_page_name_duplicate">Name existiert bereits</string>
   <string name="setting_mcp_page_name_invalid">Name darf nur englische Buchstaben und Zahlen enthalten</string>
   <string name="log_page_record_requests">Anfragen aufzeichnen</string>
-  <string name="log_page_record_requests_desc">Anfrage-Header, Bodies und Antwort-Metadaten erfassen</string>
+  <string name="log_page_record_requests_desc">Fehlgeschlagene Anfragen aufzeichnen; Detailmodus für vollständige Anfragedaten aktivieren</string>
   <string name="chat_message_tool_recent_chats">Letzte Chats anzeigen</string>
   <string name="chat_message_tool_conversation_search">Verlauf durchsuchen: %1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">Bildschirmzeit</string>
@@ -1756,7 +1754,7 @@
   <string name="chat_page_deselect_all">Alle abwählen</string>
   <string name="chat_page_clear_selection">Auswahl aufheben</string>
   <string name="setting_theme_settings_title">Design-Einstellungen</string>
-  <string name="setting_theme_settings_desc">Designfarbe und Farbmodus</string>
+  <string name="setting_theme_settings_desc">Designfarbe, Farbmodus und dynamische Farbe</string>
   <string name="setting_theme_settings_theme">Designfarbe</string>
   <string name="setting_theme_settings_color_mode">Farbmodus</string>
   <string name="setting_theme_settings_theme_unknown">Unbekannt</string>
@@ -1764,4 +1762,6 @@
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>
   <string name="theme_name_bubblegum">Bubblegum</string>
+  <string name="log_page_detailed_mode">Detailmodus</string>
+  <string name="log_page_detailed_mode_desc">Alle Anfragen mit Headern, Bodies und Metadaten aufzeichnen</string>
 </resources>

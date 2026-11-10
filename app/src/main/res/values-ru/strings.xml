@@ -787,7 +787,7 @@
   <string name="setting_theme_page_tertiary_color">Третичный цвет</string>
   <string name="setting_theme_page_preview">Предпросмотр</string>
   <string name="setting_theme_page_save">Сохранить</string>
-  <string name="setting_theme_page_dynamic_color_hint">Динамические цвета включены. Отключите их в разделе Настройки &gt; Тема, чтобы использовать пользовательские темы.</string>
+  <string name="setting_theme_page_dynamic_color_hint">Динамические цвета включены. Отключите их в настройках темы, чтобы использовать пользовательские темы.</string>
   <string name="setting_page_tts_service">Служба преобразования текста в речь</string>
   <string name="setting_page_tts_service_desc">Настроить поставщиков службы преобразования текста в речь</string>
   <string name="setting_page_tts_settings">Настройки TTS</string>
@@ -1031,9 +1031,7 @@
   <string name="setting_display_page_custom_font_remove">Удалить пользовательский шрифт</string>
   <string name="setting_display_page_custom_font_title">Пользовательский шрифт</string>
   <string name="setting_page_preferences">Настройки</string>
-  <string name="setting_page_preferences_desc">Тема, уведомления, интерфейс и общие настройки</string>
-  <string name="setting_page_preferences_theme">Тема</string>
-  <string name="setting_page_preferences_theme_desc">Динамические цвета, тема, тёмный режим AMOLED</string>
+  <string name="setting_page_preferences_desc">Уведомления, интерфейс, общие и сетевые настройки</string>
   <string name="setting_page_preferences_notification">Уведомления</string>
   <string name="setting_page_preferences_notification_desc">Оповещения об обновлениях, уведомления о генерации сообщений, фоновое плавающее окно</string>
   <string name="setting_page_preferences_general">Общие</string>
@@ -1178,7 +1176,7 @@
   <string name="setting_asr_configure_step_hotwords">Горячие слова</string>
   <string name="setting_asr_configure_step_hotwords_desc">Список горячих слов через запятую для повышения точности распознавания имён собственных и терминов предметной области</string>
   <string name="log_page_record_requests">Записывать запросы</string>
-  <string name="log_page_record_requests_desc">Записывать заголовки запросов, тела и метаданные ответов</string>
+  <string name="log_page_record_requests_desc">Записывать неудачные запросы; включите подробный режим для записи полных данных запроса</string>
   <string name="chat_message_tool_recent_chats">Посмотреть недавние чаты</string>
   <string name="chat_message_tool_conversation_search">История поиска: %1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">Экранное время</string>
@@ -1755,7 +1753,7 @@
   <string name="chat_page_deselect_all">Снять все</string>
   <string name="chat_page_clear_selection">Снять выделение</string>
   <string name="setting_theme_settings_title">Настройки темы</string>
-  <string name="setting_theme_settings_desc">Цвет темы и цветовой режим</string>
+  <string name="setting_theme_settings_desc">Цвет темы, цветовой режим и динамические цвета</string>
   <string name="setting_theme_settings_theme">Цвет темы</string>
   <string name="setting_theme_settings_color_mode">Цветовой режим</string>
   <string name="setting_theme_settings_theme_unknown">Неизвестно</string>
@@ -1763,4 +1761,6 @@
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>
   <string name="theme_name_bubblegum">Bubblegum</string>
+  <string name="log_page_detailed_mode">Подробный режим</string>
+  <string name="log_page_detailed_mode_desc">Записывать все запросы с заголовками, телами и метаданными</string>
 </resources>

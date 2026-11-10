@@ -478,7 +478,7 @@
   <string name="imggen_page_settings_title">إعدادات توليد الصور</string>
   <string name="imggen_page_title">توليد الصور</string>
   <string name="log_page_record_requests">تسجيل الطلبات</string>
-  <string name="log_page_record_requests_desc">التقاط رؤوس الطلبات وأجسامها والبيانات الوصفية للاستجابة</string>
+  <string name="log_page_record_requests_desc">تسجيل الطلبات الفاشلة؛ فعّل الوضع المفصّل لتسجيل بيانات الطلب الكاملة</string>
   <string name="mcp_picker_syncing">جارٍ مزامنة خوادم MCP...</string>
   <string name="mcp_picker_title">خوادم MCP</string>
   <string name="menu">القائمة</string>
@@ -924,7 +924,7 @@
   <string name="setting_page_message_display_settings">عرض الرسائل</string>
   <string name="setting_page_model_and_services">النماذج والخدمات</string>
   <string name="setting_page_preferences">التفضيلات</string>
-  <string name="setting_page_preferences_desc">المظهر والإشعارات وواجهة المستخدم والإعدادات العامة</string>
+  <string name="setting_page_preferences_desc">الإشعارات وواجهة المستخدم والإعدادات العامة والشبكة</string>
   <string name="setting_page_preferences_general">عام</string>
   <string name="setting_page_preferences_general_desc">سلوك التفاعل، التمرير، إعدادات الإدخال</string>
   <string name="setting_page_preferences_network">الشبكة</string>
@@ -938,8 +938,6 @@
   <string name="setting_page_preferences_network_user_agent_desc">اتركه فارغًا لاستخدام %1$s</string>
   <string name="setting_page_preferences_notification">الإشعارات</string>
   <string name="setting_page_preferences_notification_desc">تنبيهات التحديث، إشعارات توليد الرسائل، النافذة العائمة في الخلفية</string>
-  <string name="setting_page_preferences_theme">المظهر</string>
-  <string name="setting_page_preferences_theme_desc">الألوان الديناميكية، السمة، وضع AMOLED الداكن</string>
   <string name="setting_page_preferences_ui">تفضيلات واجهة المستخدم</string>
   <string name="setting_page_preferences_ui_desc">عرض الرسائل، الخطوط، كتل التعليمات البرمجية</string>
   <string name="setting_page_providers">المزوّدون</string>
@@ -1066,7 +1064,7 @@
   <string name="setting_theme_page_custom_themes">السمات المخصصة</string>
   <string name="setting_theme_page_delete_theme_message">هل أنت متأكد من رغبتك في حذف هذه السمة؟</string>
   <string name="setting_theme_page_delete_theme_title">حذف السمة</string>
-  <string name="setting_theme_page_dynamic_color_hint">اللون الديناميكي مُفعّل. قم بتعطيله في التفضيلات &gt; السمة لاستخدام سمات مخصصة.</string>
+  <string name="setting_theme_page_dynamic_color_hint">اللون الديناميكي مُفعّل. قم بتعطيله في إعدادات السمة لاستخدام سمات مخصصة.</string>
   <string name="setting_theme_page_edit_theme">تعديل السمة</string>
   <string name="setting_theme_page_export_success">تم نسخ JSON السمة إلى الحافظة</string>
   <string name="setting_theme_page_import_success">تم استيراد السمة بنجاح</string>
@@ -1753,7 +1751,7 @@
   <string name="chat_page_deselect_all">إلغاء تحديد الكل</string>
   <string name="chat_page_clear_selection">إلغاء التحديد</string>
   <string name="setting_theme_settings_title">إعدادات السمة</string>
-  <string name="setting_theme_settings_desc">لون السمة ووضع الألوان</string>
+  <string name="setting_theme_settings_desc">لون السمة ووضع الألوان واللون الديناميكي</string>
   <string name="setting_theme_settings_theme">لون السمة</string>
   <string name="setting_theme_settings_color_mode">وضع الألوان</string>
   <string name="setting_theme_settings_theme_unknown">غير معروف</string>
@@ -1761,4 +1759,6 @@
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>
   <string name="theme_name_bubblegum">Bubblegum</string>
+  <string name="log_page_detailed_mode">الوضع المفصّل</string>
+  <string name="log_page_detailed_mode_desc">تسجيل جميع الطلبات مع رؤوسها وأجسامها والبيانات الوصفية</string>
 </resources>

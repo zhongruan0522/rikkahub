@@ -787,7 +787,7 @@
   <string name="setting_theme_page_tertiary_color">第三色</string>
   <string name="setting_theme_page_preview">預覽</string>
   <string name="setting_theme_page_save">儲存</string>
-  <string name="setting_theme_page_dynamic_color_hint">動態顏色已開啟，請在偏好設定 &gt; 主題中關閉以使用自訂主題。</string>
+  <string name="setting_theme_page_dynamic_color_hint">動態顏色已開啟，請在主題設定中關閉以使用自訂主題。</string>
   <string name="setting_page_tts_service">語音服務</string>
   <string name="setting_page_tts_service_desc">配置語音合成與語音識別服務提供商</string>
   <string name="setting_page_tts_settings">TTS設定</string>
@@ -1029,9 +1029,7 @@
   <string name="setting_display_page_custom_font_remove">移除自訂字型</string>
   <string name="setting_display_page_custom_font_title">自訂字型</string>
   <string name="setting_page_preferences">偏好設定</string>
-  <string name="setting_page_preferences_desc">主題、通知、介面與一般設定</string>
-  <string name="setting_page_preferences_theme">主題</string>
-  <string name="setting_page_preferences_theme_desc">動態色彩、主題、AMOLED 深色模式</string>
+  <string name="setting_page_preferences_desc">通知、介面、一般與網路設定</string>
   <string name="setting_page_preferences_notification">通知</string>
   <string name="setting_page_preferences_notification_desc">更新提醒、訊息產生通知、背景懸浮視窗</string>
   <string name="setting_page_preferences_general">一般</string>
@@ -1176,7 +1174,7 @@
   <string name="setting_asr_configure_step_hotwords">熱詞</string>
   <string name="setting_asr_configure_step_hotwords_desc">以逗號分隔的熱詞清單，用於提升專有名詞／領域術語的辨識準確率</string>
   <string name="log_page_record_requests">記錄請求</string>
-  <string name="log_page_record_requests_desc">擷取請求標頭、請求主體和回應元數據</string>
+  <string name="log_page_record_requests_desc">記錄失敗的請求；開啟詳細模式以記錄完整請求資料</string>
   <string name="chat_message_tool_recent_chats">查看最近聊天</string>
   <string name="chat_message_tool_conversation_search">搜尋歷史：%1$s</string>
   <string name="assistant_page_local_tools_screen_time_title">螢幕使用時間</string>
@@ -1753,7 +1751,7 @@
   <string name="chat_page_deselect_all">取消全選</string>
   <string name="chat_page_clear_selection">清除選取</string>
   <string name="setting_theme_settings_title">主題設定</string>
-  <string name="setting_theme_settings_desc">主題配色與顏色模式</string>
+  <string name="setting_theme_settings_desc">主題配色、顏色模式與動態顏色</string>
   <string name="setting_theme_settings_theme">主題配色</string>
   <string name="setting_theme_settings_color_mode">顏色模式</string>
   <string name="setting_theme_settings_theme_unknown">未知</string>
@@ -1761,4 +1759,6 @@
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">單色</string>
   <string name="theme_name_bubblegum">泡泡糖</string>
+  <string name="log_page_detailed_mode">詳細模式</string>
+  <string name="log_page_detailed_mode_desc">記錄所有請求的標頭、主體和元數據</string>
 </resources>

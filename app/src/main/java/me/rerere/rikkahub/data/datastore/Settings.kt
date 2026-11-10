@@ -76,6 +76,9 @@ data class Settings(
     val webServerAccessPassword: String = "",
     val webServerLocalhostOnly: Boolean = false,
     val backupReminderConfig: BackupReminderConfig = BackupReminderConfig(),
+    // 请求日志：默认记录失败的请求，详细模式下记录所有请求及完整元数据
+    val requestLoggingEnabled: Boolean = true,
+    val requestLoggingDetailed: Boolean = false,
 ) {
     companion object {
         // 构造一个用于初始化的settings, 但它不能用于保存，防止使用初始值存储

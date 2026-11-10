@@ -16,6 +16,7 @@
 - 切换类按钮（`ToggleButton` / `IconToggleButton`）选中后只变色，保持原有形状，不再做方角/圆角切换动画
 - web-ui 前端依赖升级至范围内最新版本：react-router 7.18.5、react 19.3.1、radix-ui 1.8.1、tailwindcss 4.3.5 等，并同步刷新 browserslist、js-yaml、baseline-browser-mapping 等传递依赖
 - 每日构建（Latest Build 工作流）同时产出 GitHub 渠道的 debug 与 release APK，一并上传到 Latest Prerelease
+- 每日构建拆分 debug / release 两个并行 job，由 publish job 汇总产物发布；所用 actions 升级至最新主版本（checkout v7、setup-java v6、setup-node v7、pnpm/action-setup v6、gh-release v3 等），Gradle 缓存改用 `gradle/actions/setup-gradle` 并启用 build cache 提速
 
 ### Fixed
 

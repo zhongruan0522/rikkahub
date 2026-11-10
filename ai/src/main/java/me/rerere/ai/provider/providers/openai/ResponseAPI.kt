@@ -31,7 +31,6 @@ import me.rerere.ai.core.MessageRole
 import me.rerere.ai.core.ReasoningLevel
 import me.rerere.ai.core.TokenUsage
 import me.rerere.ai.provider.BuiltInTools
-import me.rerere.ai.provider.Model
 import me.rerere.ai.provider.ModelAbility
 import me.rerere.ai.provider.ProviderSetting
 import me.rerere.ai.provider.TextGenerationParams
@@ -39,7 +38,6 @@ import me.rerere.ai.provider.TextGenerationResult
 import me.rerere.ai.provider.providers.PartGroup
 import me.rerere.ai.provider.providers.groupPartsByToolBoundary
 import me.rerere.ai.provider.stream.SseEvent
-import me.rerere.ai.registry.ModelRegistry
 import me.rerere.ai.ui.OpenAIReasoningMetadata
 import me.rerere.ai.ui.ReasoningType
 import me.rerere.ai.ui.ServerToolMetadata
@@ -74,6 +72,9 @@ import okhttp3.sse.EventSourceListener
 import kotlin.time.Clock
 
 private const val TAG = "ResponseAPI"
+
+// Responses API 规定 max_output_tokens 不小于 16
+private const val MIN_MAX_OUTPUT_TOKENS = 16
 
 /**
  * Responses API 请求的目标：发往哪里、怎么鉴权，以及该网关对请求体的特殊要求（[capabilities]）。
@@ -241,13 +242,14 @@ class ResponseAPI(
             put("stream", stream)
             put("store", false)
 
-            if (capabilities.supportsSamplingParams) {
-                if (isModelAllowTemperature(params.model)) {
-                    if (params.temperature != null) put("temperature", params.temperature)
-                    if (params.topP != null) put("top_p", params.topP)
-                }
-                if (params.maxTokens != null) put("max_output_tokens", params.maxTokens)
+            val reasoningModel = params.model.abilities.contains(ModelAbility.REASONING)
+            // 推理模型不支持自定义采样参数，与 reasoning 同时出现会被直接拒绝
+            if (capabilities.supportsSamplingParams && !reasoningModel) {
+                if (params.temperature != null) put("temperature", params.temperature)
+                if (params.topP != null) put("top_p", params.topP)
             }
+            // 输出上限与采样参数无关，且不允许小于最小值
+            params.maxTokens?.let { put("max_output_tokens", it.coerceAtLeast(MIN_MAX_OUTPUT_TOKENS)) }
 
             // system instructions
             val systemPrompt = messages.firstOrNull { it.role == MessageRole.SYSTEM }
@@ -258,16 +260,12 @@ class ResponseAPI(
             // messages
             putJsonArray("input") {
                 if (!systemPrompt.isNullOrEmpty() && systemRole != null) {
-                    add(buildJsonObject {
-                        put("role", systemRole)
-                        put("content", systemPrompt)
-                    })
+                    addMessageItem(systemRole, listOf(UIMessagePart.Text(systemPrompt)))
                 }
                 buildMessages(messages).forEach { add(it) }
             }
 
             // reasoning
-            val reasoningModel = params.model.abilities.contains(ModelAbility.REASONING)
             if (reasoningModel) {
                 val reasoning = buildJsonObject {
                     if (capabilities.supportsReasoningSummary) {
@@ -276,12 +274,6 @@ class ResponseAPI(
                     capabilities.reasoningEffort(params.reasoningLevel, params.model.modelId)?.let { put("effort", it) }
                 }
                 if (reasoning.isNotEmpty()) put("reasoning", reasoning)
-            }
-            if (capabilities.supportEncryptedContent &&
-                (reasoningModel || capabilities.alwaysIncludeEncryptedContent)) {
-                put("include", buildJsonArray {
-                    add("reasoning.encrypted_content")
-                })
             }
             // 会话 ID 作为 prompt_cache_key，同一会话的请求能命中提示缓存
             params.sessionId?.let { put("prompt_cache_key", it) }
@@ -365,64 +357,34 @@ class ResponseAPI(
                     group.parts.forEach { part ->
                         when (part) {
                             is UIMessagePart.Reasoning -> {
+                                // 无状态回放只接受原样的加密推理内容；没有密文时上游不认明文推理，直接不回放
                                 val reasoningMetadata = part.metadataAs<OpenAIReasoningMetadata>()
-                                val reasoningId = reasoningMetadata?.reasoningId
-                                if (reasoningId != null && !emittedReasoningIds.add(reasoningId)) {
+                                    ?: return@forEach
+                                val encryptedContent = reasoningMetadata.encryptedContent
+                                    ?: return@forEach
+                                val dedupeKey = reasoningMetadata.reasoningId ?: encryptedContent
+                                if (!emittedReasoningIds.add(dedupeKey)) {
                                     return@forEach
                                 }
                                 // 先输出累积的文本/图片内容
                                 if (contentBuffer.isNotEmpty()) {
-                                    addContentItem(MessageRole.ASSISTANT, contentBuffer)
+                                    addMessageItem("assistant", contentBuffer)
                                     contentBuffer.clear()
                                 }
-                                // 输出 reasoning item
-                                val reasoningParts = if (reasoningId == null) {
-                                    listOf(part)
-                                } else {
-                                    group.parts.filterIsInstance<UIMessagePart.Reasoning>().filter {
-                                        it.metadataAs<OpenAIReasoningMetadata>()?.reasoningId == reasoningId
-                                    }
-                                }
+                                // id 属于服务端持久化产物, store=false 时不可依赖
                                 add(buildJsonObject {
                                     put("type", "reasoning")
-                                    reasoningId?.let { put("id", it) }
-                                    put("summary", buildJsonArray {
-                                        reasoningParts
-                                            .filter { it.reasoningType == ReasoningType.SUMMARY_TEXT }
-                                            .filter { it.reasoning.isNotEmpty() }
-                                            .forEach {
-                                                add(buildJsonObject {
-                                                    put("type", "summary_text")
-                                                    put("text", it.reasoning)
-                                                })
-                                            }
-                                    })
-                                    val encryptedContent = reasoningMetadata?.encryptedContent
-                                    val content = reasoningParts
-                                        .filter { it.reasoningType == ReasoningType.REASONING_TEXT }
-                                        .filter { it.reasoning.isNotEmpty() }
-                                    if (encryptedContent == null && content.isNotEmpty()) {
-                                        put("content", buildJsonArray {
-                                            content.forEach {
-                                                add(buildJsonObject {
-                                                    put("type", "reasoning_text")
-                                                    put("text", it.reasoning)
-                                                })
-                                            }
-                                        })
-                                    }
-                                    encryptedContent?.let {
-                                        put("encrypted_content", it)
-                                    }
+                                    put("encrypted_content", encryptedContent)
                                 })
                             }
 
                             is UIMessagePart.Image -> {
                                 if (contentBuffer.isNotEmpty()) {
-                                    addContentItem(MessageRole.ASSISTANT, contentBuffer)
+                                    addMessageItem("assistant", contentBuffer)
                                     contentBuffer.clear()
                                 }
-                                addContentItem(MessageRole.USER, listOf(part))
+                                // assistant 消息的 content 只接受 output_* part，图片只能单独作为 user 消息发送
+                                addMessageItem("user", listOf(part))
                             }
 
                             is UIMessagePart.Text -> {
@@ -431,7 +393,7 @@ class ResponseAPI(
 
                             is UIMessagePart.ServerTool -> {
                                 if (contentBuffer.isNotEmpty()) {
-                                    addContentItem(MessageRole.ASSISTANT, contentBuffer)
+                                    addMessageItem("assistant", contentBuffer)
                                     contentBuffer.clear()
                                 }
                                 addServerToolItem(part)
@@ -445,7 +407,7 @@ class ResponseAPI(
                 is PartGroup.Tools -> {
                     // 先输出累积的内容
                     if (contentBuffer.isNotEmpty()) {
-                        addContentItem(MessageRole.ASSISTANT, contentBuffer)
+                        addMessageItem("assistant", contentBuffer)
                         contentBuffer.clear()
                     }
 
@@ -466,25 +428,7 @@ class ResponseAPI(
                             val hasImage = tool.output.any { it is UIMessagePart.Image }
                             if (hasImage) {
                                 putJsonArray("output") {
-                                    tool.output.forEach { part ->
-                                        when (part) {
-                                            is UIMessagePart.Image -> add(buildJsonObject {
-                                                part.encodeBase64().onSuccess { encoded ->
-                                                    put("type", "input_image")
-                                                    put("image_url", encoded.base64)
-                                                }.onFailure {
-                                                    it.printStackTrace()
-                                                    put("type", "input_text")
-                                                    put("text", "Error: Failed to encode image to base64")
-                                                }
-                                            })
-                                            is UIMessagePart.Text -> add(buildJsonObject {
-                                                put("type", "input_text")
-                                                put("text", part.text)
-                                            })
-                                            else -> {}
-                                        }
-                                    }
+                                    addContentParts(tool.output, "input_text")
                                 }
                             } else {
                                 put(
@@ -501,7 +445,7 @@ class ResponseAPI(
 
         // 输出剩余内容
         if (contentBuffer.isNotEmpty()) {
-            addContentItem(MessageRole.ASSISTANT, contentBuffer)
+            addMessageItem("assistant", contentBuffer)
         }
     }
 
@@ -536,48 +480,49 @@ class ResponseAPI(
     private fun JsonArrayBuilder.addUserItems(message: UIMessage) {
         val contentParts = message.parts.filter { it is UIMessagePart.Text || it is UIMessagePart.Image }
         if (contentParts.isNotEmpty()) {
-            addContentItem(message.role, contentParts)
+            addMessageItem(message.role.toResponseRole(), contentParts)
         }
     }
 
-    private fun JsonArrayBuilder.addContentItem(role: MessageRole, parts: List<UIMessagePart>) {
+    /**
+     * message item：`type` 恒为 message，content 统一为数组形态。
+     * content part 按方向区分，user/system/developer 只能带 input_*，assistant 只能带 output_text。
+     */
+    private fun JsonArrayBuilder.addMessageItem(role: String, parts: List<UIMessagePart>) {
         if (parts.isEmpty()) return
 
         add(buildJsonObject {
-            put("role", JsonPrimitive(role.name.lowercase()))
-
-            if (parts.isOnlyTextPart()) {
-                put("content", (parts.first() as UIMessagePart.Text).text)
-            } else {
-                putJsonArray("content") {
-                    parts.forEach { part ->
-                        when (part) {
-                            is UIMessagePart.Text -> {
-                                add(buildJsonObject {
-                                    put("type", if (role == MessageRole.USER) "input_text" else "output_text")
-                                    put("text", part.text)
-                                })
-                            }
-
-                            is UIMessagePart.Image -> {
-                                add(buildJsonObject {
-                                    part.encodeBase64().onSuccess { encodedImage ->
-                                        put("type", "input_image")
-                                        put("image_url", encodedImage.base64)
-                                    }.onFailure {
-                                        it.printStackTrace()
-                                        put("type", "input_text")
-                                        put("text", "Error: Failed to encode image to base64")
-                                    }
-                                })
-                            }
-
-                            else -> {}
-                        }
-                    }
-                }
+            put("type", "message")
+            put("role", role)
+            putJsonArray("content") {
+                addContentParts(parts, if (role == "assistant") "output_text" else "input_text")
             }
         })
+    }
+
+    private fun JsonArrayBuilder.addContentParts(parts: List<UIMessagePart>, textPartType: String) {
+        parts.forEach { part ->
+            when (part) {
+                is UIMessagePart.Text -> add(buildJsonObject {
+                    put("type", textPartType)
+                    put("text", part.text)
+                })
+
+                is UIMessagePart.Image -> add(buildJsonObject {
+                    part.encodeBase64().onSuccess { encodedImage ->
+                        put("type", "input_image")
+                        put("image_url", encodedImage.base64)
+                        put("detail", "auto")
+                    }.onFailure {
+                        it.printStackTrace()
+                        put("type", textPartType)
+                        put("text", "Error: Failed to encode image to base64")
+                    }
+                })
+
+                else -> {}
+            }
+        }
     }
 
     internal fun parseResponseOutput(jsonObject: JsonObject): TextGenerationResult {
@@ -764,25 +709,19 @@ private fun ServerToolStatus.toOpenAIStatus(): String = when (this) {
     ServerToolStatus.FAILED -> "failed"
 }
 
-private fun isModelAllowTemperature(model: Model): Boolean {
-    return !ModelRegistry.OPENAI_O_MODELS.match(model.modelId) && !ModelRegistry.GPT_5.match(model.modelId)
-}
-
-private fun List<UIMessagePart>.isOnlyTextPart(): Boolean {
-    val gonnaSend = filter { it is UIMessagePart.Text || it is UIMessagePart.Image }.size
-    val texts = filter { it is UIMessagePart.Text }.size
-    return gonnaSend == texts && texts == 1
+// 消息项只有 system/developer/user/assistant 四种 role，不存在 tool；历史里的 TOOL 消息按 user 文本回放
+private fun MessageRole.toResponseRole(): String = when (this) {
+    MessageRole.ASSISTANT -> "assistant"
+    MessageRole.SYSTEM -> "system"
+    MessageRole.USER, MessageRole.TOOL -> "user"
 }
 
 internal data class ResponseProviderCapabilities(
     val supportsReasoningSummary: Boolean = true,
-    val supportEncryptedContent: Boolean = true,
     // 不为 null 时 system 提示以这个角色的消息放在 input 开头，不用 instructions 字段
     val systemMessageRole: String? = null,
-    // 是否接受 temperature、top_p 和 max_output_tokens
+    // 是否接受 temperature、top_p
     val supportsSamplingParams: Boolean = true,
-    // 非推理模型也请求加密推理内容：不保存会话时，自带推理的模型要靠它接上多轮推理
-    val alwaysIncludeEncryptedContent: Boolean = false,
     // 推理档位对应的 reasoning.effort（参数依次是档位、模型 id），返回 null 时不带
     val reasoningEffort: (
         ReasoningLevel,
@@ -794,7 +733,6 @@ internal fun resolveResponseProviderCapabilities(host: String): ResponseProvider
     return when (host) {
         "ark.cn-beijing.volces.com" -> ResponseProviderCapabilities(
             supportsReasoningSummary = false,
-            supportEncryptedContent = false
         )
 
         else -> ResponseProviderCapabilities()

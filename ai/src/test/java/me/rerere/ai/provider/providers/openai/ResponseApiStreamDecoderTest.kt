@@ -123,7 +123,6 @@ class ResponseApiStreamDecoderTest {
         // ResponseAPI must still replay metadata-only reasoning even though generic providers consider it empty.
         val reasoningItem = api.buildMessages(messages).last().jsonObject
         assertEquals("reasoning", reasoningItem["type"]?.jsonPrimitive?.content)
-        assertEquals("rs_test", reasoningItem["id"]?.jsonPrimitive?.content)
         assertEquals("encrypted", reasoningItem["encrypted_content"]?.jsonPrimitive?.content)
     }
 
@@ -192,12 +191,9 @@ class ResponseApiStreamDecoderTest {
         assertEquals("summary", reasoningParts.single { it.reasoningType == ReasoningType.SUMMARY_TEXT }.reasoning)
 
         val reasoningItem = api.buildMessages(messages).last().jsonObject
-        assertEquals(
-            "summary",
-            reasoningItem["summary"]?.jsonArray?.single()?.jsonObject
-                ?.get("text")?.jsonPrimitive?.content,
-        )
+        assertEquals("reasoning", reasoningItem["type"]?.jsonPrimitive?.content)
         assertEquals("encrypted", reasoningItem["encrypted_content"]?.jsonPrimitive?.content)
+        assertFalse(reasoningItem.containsKey("summary"))
         assertFalse(reasoningItem.containsKey("content"))
     }
 
@@ -335,7 +331,6 @@ class ResponseApiStreamDecoderTest {
 
         val reasoningItem = api.buildMessages(listOf(result.message)).single().jsonObject
         assertEquals("reasoning", reasoningItem["type"]?.jsonPrimitive?.content)
-        assertEquals("rs_test", reasoningItem["id"]?.jsonPrimitive?.content)
         assertEquals("encrypted", reasoningItem["encrypted_content"]?.jsonPrimitive?.content)
     }
 

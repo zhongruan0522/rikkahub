@@ -3,6 +3,7 @@ package me.rerere.ai.provider.providers.openai
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -334,7 +335,7 @@ class ResponseApiRequestMessageTest {
     }
 
     @Test
-    fun `encrypted reasoning should not replay plaintext content`() {
+    fun `encrypted reasoning should replay only type and encrypted content`() {
         val reasoningItem = invokeBuildMessages(listOf(
             UIMessage(
                 role = MessageRole.ASSISTANT,
@@ -349,32 +350,114 @@ class ResponseApiRequestMessageTest {
             ),
         )).single().jsonObject
 
+        assertEquals(setOf("type", "encrypted_content"), reasoningItem.keys)
         assertEquals("reasoning", reasoningItem["type"]?.jsonPrimitive?.content)
-        assertEquals("rs_1", reasoningItem["id"]?.jsonPrimitive?.content)
         assertEquals("encrypted", reasoningItem["encrypted_content"]?.jsonPrimitive?.content)
-        assertFalse(reasoningItem.containsKey("content"))
     }
 
     @Test
-    fun `unencrypted reasoning should replay plaintext content`() {
-        val reasoningItem = invokeBuildMessages(listOf(
+    fun `reasoning without encrypted content should not be replayed`() {
+        val items = invokeBuildMessages(listOf(
             UIMessage(
                 role = MessageRole.ASSISTANT,
-                parts = listOf(UIMessagePart.Reasoning(
-                    reasoning = "plaintext reasoning",
-                    metadata = OpenAIReasoningMetadata(reasoningId = "rs_1").toMetadata(),
-                    reasoningType = ReasoningType.REASONING_TEXT,
-                )),
+                parts = listOf(
+                    UIMessagePart.Reasoning(
+                        reasoning = "plaintext reasoning",
+                        metadata = OpenAIReasoningMetadata(reasoningId = "rs_1").toMetadata(),
+                        reasoningType = ReasoningType.REASONING_TEXT,
+                    ),
+                    UIMessagePart.Text("answer"),
+                ),
+            ),
+        ))
+
+        val item = items.single().jsonObject
+        assertEquals("message", item["type"]?.jsonPrimitive?.content)
+        assertEquals(
+            "answer",
+            item["content"]?.jsonArray?.single()?.jsonObject?.get("text")?.jsonPrimitive?.content,
+        )
+    }
+
+    @Test
+    fun `message items should carry type and role scoped content parts`() {
+        val items = invokeBuildMessages(listOf(
+            UIMessage.user("hi"),
+            UIMessage(role = MessageRole.ASSISTANT, parts = listOf(UIMessagePart.Text("hello"))),
+        ))
+
+        val userItem = items[0].jsonObject
+        assertEquals("message", userItem["type"]?.jsonPrimitive?.content)
+        assertEquals("user", userItem["role"]?.jsonPrimitive?.content)
+        val userContent = userItem["content"]?.jsonArray?.single()?.jsonObject
+        assertEquals("input_text", userContent?.get("type")?.jsonPrimitive?.content)
+        assertEquals("hi", userContent?.get("text")?.jsonPrimitive?.content)
+
+        val assistantItem = items[1].jsonObject
+        assertEquals("message", assistantItem["type"]?.jsonPrimitive?.content)
+        assertEquals("assistant", assistantItem["role"]?.jsonPrimitive?.content)
+        val assistantContent = assistantItem["content"]?.jsonArray?.single()?.jsonObject
+        assertEquals("output_text", assistantContent?.get("type")?.jsonPrimitive?.content)
+        assertEquals("hello", assistantContent?.get("text")?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `tool role message should be sent as user message`() {
+        val item = invokeBuildMessages(listOf(
+            UIMessage(role = MessageRole.TOOL, parts = listOf(UIMessagePart.Text("tool output"))),
+        )).single().jsonObject
+
+        assertEquals("message", item["type"]?.jsonPrimitive?.content)
+        assertEquals("user", item["role"]?.jsonPrimitive?.content)
+        assertEquals(
+            "tool output",
+            item["content"]?.jsonArray?.single()?.jsonObject?.get("text")?.jsonPrimitive?.content,
+        )
+    }
+
+    @Test
+    fun `input image should carry detail`() {
+        val item = invokeBuildMessages(listOf(
+            UIMessage(
+                role = MessageRole.USER,
+                parts = listOf(UIMessagePart.Image("data:image/png;base64,iVBORw0KGgo=")),
             ),
         )).single().jsonObject
 
-        val content = reasoningItem["content"]?.jsonArray
-        assertEquals(1, content?.size)
-        assertEquals(
-            "plaintext reasoning",
-            content?.single()?.jsonObject?.get("text")?.jsonPrimitive?.content,
+        val image = item["content"]?.jsonArray?.single()?.jsonObject
+        assertEquals("input_image", image?.get("type")?.jsonPrimitive?.content)
+        assertEquals("auto", image?.get("detail")?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `reasoning model should not send sampling params`() {
+        val requestBody = invokeBuildRequestBody(
+            providerSetting = ProviderSetting.OpenAI(baseUrl = "https://api.openai.com/v1"),
+            params = createReasoningParams().copy(temperature = 0.7f, topP = 0.9f)
         )
-        assertFalse(reasoningItem.containsKey("encrypted_content"))
+
+        assertFalse("temperature should be dropped", requestBody.containsKey("temperature"))
+        assertFalse("top_p should be dropped", requestBody.containsKey("top_p"))
+    }
+
+    @Test
+    fun `max output tokens should be clamped to the api minimum`() {
+        val requestBody = invokeBuildRequestBody(
+            providerSetting = ProviderSetting.OpenAI(baseUrl = "https://api.openai.com/v1"),
+            params = createReasoningParams().copy(maxTokens = 1)
+        )
+
+        assertEquals(16, requestBody["max_output_tokens"]?.jsonPrimitive?.int)
+    }
+
+    @Test
+    fun `request should not ask for encrypted reasoning content via include`() {
+        val requestBody = invokeBuildRequestBody(
+            providerSetting = ProviderSetting.OpenAI(baseUrl = "https://api.openai.com/v1"),
+            params = createReasoningParams()
+        )
+
+        assertFalse(requestBody.containsKey("include"))
     }
 
     @Test

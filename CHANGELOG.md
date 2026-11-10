@@ -13,6 +13,7 @@
 - 移除提供商页面右上角的推荐提供商入口及推荐列表
 - 应用安装包名（applicationId）由 `me.rerere.rikkahub` 改为 `rikka.hub`
 - 切换类按钮（`ToggleButton` / `IconToggleButton`）选中后只变色，保持原有形状，不再做方角/圆角切换动画
+- web-ui 前端依赖升级至范围内最新版本：react-router 7.18.5、react 19.3.1、radix-ui 1.8.1、tailwindcss 4.3.5 等，并同步刷新 browserslist、js-yaml、baseline-browser-mapping 等传递依赖
 
 ### Fixed
 

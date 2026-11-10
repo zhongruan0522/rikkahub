@@ -19,3 +19,4 @@
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败
 - 修复 `ChatMessageActions.kt` 中缺失的闭合括号
+- 通过 pnpm overrides 强制传递依赖版本，消除 web-ui 的 3 条 Dependabot 安全告警：katex 统一为 0.18.10（CVE-2026-103923），tinypool 升至 2.2.0（CVE-2026-104848/104849）

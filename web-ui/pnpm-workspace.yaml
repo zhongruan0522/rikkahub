@@ -1,2 +1,6 @@
+overrides:
+  katex: ^0.18.10
+  tinypool: ^2.1.2
+
 allowBuilds:
   esbuild: true

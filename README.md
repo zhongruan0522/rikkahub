@@ -1,10 +1,10 @@
-<div>
-  <img  align="center" src="docs/icon.png" alt="App 图标" width="100" />
-  <h1  align="center">RikkaHub</h1>
+<div align="center">
+  <img src="docs/icon.png" alt="App 图标" width="100" />
+  <h1 >RikkaHub</h1>
+  <p>一个原生Android LLM 聊天客户端，支持切换不同的供应商进行聊天</p>
+</div>
 
-一个原生Android LLM 聊天客户端，支持切换不同的供应商进行聊天
-
-> 本项目并非官方版本，请仔细鉴别
+> 本项目并非官方版本，请仔细鉴别,需要官方原版请前往[Rikkahub](https://github.com/rikkahub/rikkahub)
 >
 > 本项目主要做来如下修改
 >
@@ -12,8 +12,7 @@
 > 2. 移除了所谓的赞助商、AI翻译
 > 3. 修复了内部服务不可移除掉的逻辑
 > 4. 增加了更多的内置官方提供商（不包含中转站）、搜索渠道（anysearch）
-
-</div>
+> 5. 丰富主题样式
 
 ## ✨ 功能特色
 

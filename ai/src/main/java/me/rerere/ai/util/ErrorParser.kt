@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
 class HttpException(
@@ -17,12 +18,35 @@ fun JsonElement.parseErrorDetail(): HttpException {
             // 尝试获取常见的错误字段
             val errorFields = listOf("error", "detail", "message", "description")
 
+            // OpenRouter guardrail: error.metadata.patterns 携带命中的注入检测模式,
+            // 例如 "ignore all previous instructions"。这里提取出来附到错误信息里,
+            // 以便错误卡片提示用户检查注入条目措辞。
+            val guardrailPatterns = this["metadata"]
+                ?.let { it as? JsonObject }
+                ?.get("patterns")
+                ?.let { it as? JsonArray }
+                ?.mapNotNull { (it as? JsonPrimitive)?.contentOrNull }
+                ?.filter { it.isNotBlank() }
+                ?.takeIf { it.isNotEmpty() }
+
             // 查找第一个存在的错误字段
             val foundField = errorFields.firstOrNull { this[it] != null }
 
             if (foundField != null) {
                 // 递归解析找到的字段值
-                this[foundField]!!.parseErrorDetail()
+                val inner = this[foundField]!!.parseErrorDetail()
+                if (guardrailPatterns != null) {
+                    HttpException(
+                        buildString {
+                            append(inner.message)
+                            appendLine()
+                            append("命中注入检测模式: ")
+                            append(guardrailPatterns.joinToString(", "))
+                        }
+                    )
+                } else {
+                    inner
+                }
             } else {
                 // 如果没有找到任何错误字段，序列化整个对象
                 HttpException(Json.encodeToString(JsonElement.serializer(), this))

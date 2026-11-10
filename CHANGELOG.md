@@ -23,6 +23,7 @@
 ### Fixed
 
 - 修复 Claude 系列 400 报错（共 5 项）：相邻签名思考块被拼接导致签名绑定校验失败（`StreamChunkHandler` 不再合并携带自身签名的 Reasoning 块）；流式 `signature_delta` 覆盖而非累加（改为拼接增量片段）；`redacted_thinking` 块被丢弃（非流式与流式均保留加密数据并原样回传）；thinking 参数与模型世代不符（4.6+ 用 `adaptive`、≤4.5 用 `enabled`+`budget_tokens`、OFF 省略字段）；采样参数 `temperature`/`top_p` 在 4.6+ 上被拒（仅对旧模型且思考关闭时发送）；`max_tokens` 超出旧模型上限（按 modelId clamp 到 4096/8192/64000）；图片编码失败时生成空 text 块违反 `minLength:1`（改为快速失败抛出异常）；启用 thinking 时加 `drop_block` 兜底避免前缀变化触发 400
+- 修复 Claude / OpenRouter 链路 400 与 403 报错（共 5 项）：OpenRouter 链路纯音视频/文档附件消息被序列化成空 `content` 数组触发 `invalid_prompt`（无可发送 Text/Image 时改用文字说明占位）；Claude 图片 `source.data` 收到非合法 base64（`http(s)` URL 改用 `type:"url"` source 直传，`data:` URL 解析出纯 base64 段与真实 mime 再填入）；OpenRouter guardrail 403 错误未提示命中原因（`parseErrorDetail` 提取 `metadata.patterns` 并附到错误信息，错误卡片展示命中注入检测模式）；OpenRouter 对 Claude 系模型拒绝 `reasoning.effort:"none"`（Claude OFF 档省略 `reasoning` 参数，思考为 opt-in 即不启用）；AT_DEPTH 注入深度溢出时插到 system 之前破坏消息序（溢出 clamp 到 system 之后，注入深度 UI 限制最小为 1）
 - 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败

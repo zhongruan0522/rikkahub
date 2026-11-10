@@ -279,13 +279,20 @@ class ChatCompletionsAPI(
                 when (host) {
                     "openrouter.ai" -> {
                         // https://openrouter.ai/docs/use-cases/reasoning-tokens
-                        put("reasoning", buildJsonObject {
-                            when (level) {
-                                ReasoningLevel.OFF -> put("effort", "none")
-                                ReasoningLevel.AUTO -> put("enabled", true)
-                                else -> put("effort", level.effort)
-                            }
-                        })
+                        // Claude 系模型不接受 reasoning.effort:"none" (会返回 400), 且思考为 opt-in;
+                        // 对 Claude 在 OFF 档省略 reasoning 参数即不启用思考, 其余模型仍发送 "none"
+                        val isClaudeModel = params.model.modelId.contains("claude", ignoreCase = true)
+                        if (level == ReasoningLevel.OFF && isClaudeModel) {
+                            // 省略 reasoning 参数
+                        } else {
+                            put("reasoning", buildJsonObject {
+                                when (level) {
+                                    ReasoningLevel.OFF -> put("effort", "none")
+                                    ReasoningLevel.AUTO -> put("enabled", true)
+                                    else -> put("effort", level.effort)
+                                }
+                            })
+                        }
                     }
 
                     "dashscope.aliyuncs.com" -> {
@@ -637,7 +644,9 @@ class ChatCompletionsAPI(
             if (message.parts.isOnlyTextPart()) {
                 put("content", message.parts.filterIsInstance<UIMessagePart.Text>().first().text)
             } else {
-                putJsonArray("content") {
+                // 当前链路只序列化 Text 与 Image; 纯音视频/文档等附件会被跳过,
+                // 此时需要用文字说明占位, 避免序列化成空 content 数组触发 invalid_prompt
+                val contentBlocks = buildList {
                     message.parts.forEach { part ->
                         when (part) {
                             is UIMessagePart.Text -> {
@@ -664,6 +673,17 @@ class ChatCompletionsAPI(
 
                             else -> {}
                         }
+                    }
+                }
+                if (contentBlocks.isEmpty()) {
+                    val placeholder = message.parts
+                        .mapNotNull { it.toUnsupportedAttachmentPlaceholder() }
+                        .joinToString(", ")
+                        .ifBlank { "Unsupported attachment" }
+                    put("content", "[Unsupported attachment: $placeholder]")
+                } else {
+                    putJsonArray("content") {
+                        contentBlocks.forEach { add(it) }
                     }
                 }
             }
@@ -830,5 +850,12 @@ class ChatCompletionsAPI(
         val gonnaSend = filter { it is UIMessagePart.Text || it is UIMessagePart.Image }.size
         val texts = filter { it is UIMessagePart.Text }.size
         return gonnaSend == texts && texts == 1
+    }
+
+    private fun UIMessagePart.toUnsupportedAttachmentPlaceholder(): String? = when (this) {
+        is UIMessagePart.Audio -> "audio"
+        is UIMessagePart.Video -> "video"
+        is UIMessagePart.Document -> "document:$fileName"
+        else -> null
     }
 }

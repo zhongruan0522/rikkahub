@@ -482,7 +482,9 @@ private fun ModeInjectionEditSheet(
                     OutlinedTextField(
                         value = injection.injectDepth.toString(),
                         onValueChange = {
-                            it.toIntOrNull()?.let { d -> onEdit(injection.copy(injectDepth = d)) }
+                            it.toIntOrNull()?.let { d ->
+                                onEdit(injection.copy(injectDepth = d.coerceAtLeast(1)))
+                            }
                         },
                         label = { Text(stringResource(R.string.prompt_page_inject_depth)) },
                         modifier = Modifier.fillMaxWidth(),
@@ -1083,7 +1085,9 @@ private fun RegexInjectionEditDialog(
                     OutlinedTextField(
                         value = entry.injectDepth.toString(),
                         onValueChange = {
-                            it.toIntOrNull()?.let { d -> onEdit(entry.copy(injectDepth = d)) }
+                            it.toIntOrNull()?.let { d ->
+                                onEdit(entry.copy(injectDepth = d.coerceAtLeast(1)))
+                            }
                         },
                         label = { Text(stringResource(R.string.prompt_page_inject_depth)) },
                         modifier = Modifier.fillMaxWidth(),

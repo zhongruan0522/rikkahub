@@ -5,8 +5,8 @@ import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.InjectionPosition
-import me.rerere.rikkahub.data.model.PromptInjection
 import me.rerere.rikkahub.data.model.Lorebook
+import me.rerere.rikkahub.data.model.PromptInjection
 import me.rerere.rikkahub.data.model.extractContextForMatching
 import me.rerere.rikkahub.data.model.isTriggered
 
@@ -193,7 +193,9 @@ internal fun applyInjections(
             val injections = byDepth[depth] ?: return@forEach
             // 计算插入位置：result.size - depth，但要确保在有效范围内
             // depth=1 表示在最后一条消息之前，depth=2 表示在倒数第二条之前...
-            var insertIndex = (result.size - depth.coerceAtLeast(1)).coerceIn(0, result.size)
+            // 溢出时 clamp 下界到 1 (system 消息之后) 而非 0, 避免注入消息插到 system 之前
+            // 破坏消息序并可能触发带签名 thinking 块的前缀校验
+            var insertIndex = (result.size - depth.coerceAtLeast(1)).coerceIn(1, maxOf(1, result.size))
             insertIndex = findSafeInsertIndex(result, insertIndex)
             createMergedInjectionMessages(injections).forEach { message ->
                 result.add(insertIndex, message)
@@ -239,8 +241,8 @@ internal fun findSafeInsertIndex(messages: List<UIMessage>, targetIndex: Int): I
 
         // 不能插入到 USER → ASSISTANT(含Tool) 之间
         val isPrevUser = prevMessage?.role == MessageRole.USER
-        val isCurrentAssistantWithTools = currentMessage?.role == MessageRole.ASSISTANT
-            && currentMessage.getTools().isNotEmpty()
+        val isCurrentAssistantWithTools = currentMessage?.role == MessageRole.ASSISTANT &&
+            currentMessage.getTools().isNotEmpty()
 
         if (isPrevUser && isCurrentAssistantWithTools) {
             index--

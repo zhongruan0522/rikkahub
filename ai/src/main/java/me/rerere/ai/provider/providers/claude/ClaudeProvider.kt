@@ -804,16 +804,28 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
         }
 
         is UIMessagePart.Image -> {
-            val encoded = encodeBase64(withPrefix = false).getOrElse {
-                throw IllegalArgumentException("Failed to encode image for Claude request: $url", it)
-            }
-            buildJsonObject {
-                put("type", "image")
-                put("source", buildJsonObject {
-                    put("type", "base64")
-                    put("media_type", encoded.mimeType)
-                    put("data", encoded.base64)
-                })
+            // http(s) URL 直传为 url source, 避免把 URL 当 base64 塞进 source.data;
+            // data:/file: URL 编码为纯 base64 source
+            if (url.startsWith("http")) {
+                buildJsonObject {
+                    put("type", "image")
+                    put("source", buildJsonObject {
+                        put("type", "url")
+                        put("url", url)
+                    })
+                }
+            } else {
+                val encoded = encodeBase64(withPrefix = false).getOrElse {
+                    throw IllegalArgumentException("Failed to encode image for Claude request: $url", it)
+                }
+                buildJsonObject {
+                    put("type", "image")
+                    put("source", buildJsonObject {
+                        put("type", "base64")
+                        put("media_type", encoded.mimeType)
+                        put("data", encoded.base64)
+                    })
+                }
             }
         }
 

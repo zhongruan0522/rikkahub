@@ -5,8 +5,8 @@ import me.rerere.ai.ui.UIMessage
 import me.rerere.ai.ui.UIMessagePart
 import me.rerere.rikkahub.data.model.Assistant
 import me.rerere.rikkahub.data.model.InjectionPosition
-import me.rerere.rikkahub.data.model.PromptInjection
 import me.rerere.rikkahub.data.model.Lorebook
+import me.rerere.rikkahub.data.model.PromptInjection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -399,7 +399,7 @@ class PromptInjectionTransformerTest {
     }
 
     @Test
-    fun `AT_DEPTH with depth larger than message count should insert at beginning`() {
+    fun `AT_DEPTH with depth larger than message count should insert after system`() {
         val injectionId = Uuid.random()
         val injection = createModeInjection(
             id = injectionId,
@@ -420,8 +420,11 @@ class PromptInjectionTransformerTest {
             lorebooks = emptyList()
         )
 
+        // 溢出时应插到 system 之后 (index 1) 而非之前, 避免破坏消息序
         assertEquals(3, result.size)
-        assertEquals("Large depth content", getMessageText(result[0]))
+        assertEquals(MessageRole.SYSTEM, result[0].role)
+        assertEquals("System prompt", getMessageText(result[0]))
+        assertEquals("Large depth content", getMessageText(result[1]))
     }
 
     @Test

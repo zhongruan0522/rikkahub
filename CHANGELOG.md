@@ -22,7 +22,7 @@
 
 ### Fixed
 
-- 渠道 LOGO 名称识别不出时不再显示文字头像，统一改用渠道类型对应的图标（OpenAI / Google / Claude / ChatGPT / Grok）
+- 修复 Claude 系列 400 报错（共 5 项）：相邻签名思考块被拼接导致签名绑定校验失败（`StreamChunkHandler` 不再合并携带自身签名的 Reasoning 块）；流式 `signature_delta` 覆盖而非累加（改为拼接增量片段）；`redacted_thinking` 块被丢弃（非流式与流式均保留加密数据并原样回传）；thinking 参数与模型世代不符（4.6+ 用 `adaptive`、≤4.5 用 `enabled`+`budget_tokens`、OFF 省略字段）；采样参数 `temperature`/`top_p` 在 4.6+ 上被拒（仅对旧模型且思考关闭时发送）；`max_tokens` 超出旧模型上限（按 modelId clamp 到 4096/8192/64000）；图片编码失败时生成空 text 块违反 `minLength:1`（改为快速失败抛出异常）；启用 thinking 时加 `drop_block` 兜底避免前缀变化触发 400
 - 修复每日构建签名校验失败：release 签名的 `storeFile` 改为按仓库根目录解析，与 CI 写入密钥的 `app/app.key` 路径对齐
 
 - 补充 Room `AutoMigration(32, 33)` 的 `@DeleteTable` spec，修复 KSP 编译失败

@@ -83,8 +83,52 @@ import kotlin.time.Clock
 
 private const val TAG = "ClaudeProvider"
 private const val ANTHROPIC_VERSION = "2023-06-01"
+private const val ANTHROPIC_BETA_THINKING_BINDING = "thinking-binding-controls-2026-08-01"
 private const val CLAUDE_PAUSE_TURN = "pause_turn"
 private const val MAX_PAUSE_TURN_CONTINUATIONS = 5
+
+/**
+ * Claude 模型世代, 用于区分 thinking 参数与采样参数的兼容性.
+ */
+private enum class ClaudeGeneration { LEGACY, NEW }
+
+/**
+ * 从 modelId 推断 Claude 模型世代.
+ * 4.6+ (如 claude-opus-4-6) 归为 [ClaudeGeneration.NEW], 支持 adaptive thinking;
+ * ≤4.5 (如 claude-sonnet-4-5, claude-3-5-sonnet) 归为 [ClaudeGeneration.LEGACY], 使用 enabled + budget_tokens.
+ */
+private fun Model.claudeGeneration(): ClaudeGeneration {
+    // 匹配 "4-6" / "4.6" / "3-5" 等版本模式 (单数字-分隔符-单数字, 且后面不跟数字以排除日期)
+    val match = Regex("""(\d)[-.](\d)(?!\d)""").find(modelId.lowercase()) ?: return ClaudeGeneration.LEGACY
+    val major = match.groupValues[1].toInt()
+    val minor = match.groupValues[2].toInt()
+    return when {
+        major > 4 -> ClaudeGeneration.NEW
+        major == 4 && minor >= 6 -> ClaudeGeneration.NEW
+        else -> ClaudeGeneration.LEGACY
+    }
+}
+
+/**
+ * 从 modelId 推断模型最大输出 token 数, 用于 clamp max_tokens.
+ */
+private fun Model.maxOutputTokens(): Int {
+    val id = modelId.lowercase()
+    return when {
+        // claude-3-5 / claude-3-7 系列: 8192
+        Regex("""3[-.]5|3[-.]7""").containsMatchIn(id) -> 8192
+        // claude-3 (opus/sonnet/haiku): 4096
+        id.contains("claude-3") -> 4096
+        // claude-4+ : 64000
+        else -> 64_000
+    }
+}
+
+/**
+ * 当前请求是否启用了 thinking (模型支持推理且推理等级非 OFF).
+ */
+private fun TextGenerationParams.isThinkingEnabled(): Boolean =
+    model.abilities.contains(ModelAbility.REASONING) && reasoningLevel.isEnabled
 
 internal suspend fun generateClaudeWithPauseTurn(
     messages: List<UIMessage>,
@@ -301,6 +345,11 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
             .post(json.encodeToString(requestBody).toRequestBody("application/json".toMediaType()))
             .addHeader("x-api-key", keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString()))
             .addHeader("anthropic-version", ANTHROPIC_VERSION)
+            .also { builder ->
+                if (params.isThinkingEnabled()) {
+                    builder.addHeader("anthropic-beta", ANTHROPIC_BETA_THINKING_BINDING)
+                }
+            }
             .configureReferHeaders(providerSetting.baseUrl)
             .configureSessionHeaders(providerSetting.baseUrl, params.sessionId)
             .build()
@@ -352,6 +401,11 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
             .addHeader("x-api-key", keyRoulette.next(providerSetting.apiKey, providerSetting.id.toString()))
             .addHeader("anthropic-version", ANTHROPIC_VERSION)
             .addHeader("Content-Type", "application/json")
+            .also { builder ->
+                if (params.isThinkingEnabled()) {
+                    builder.addHeader("anthropic-beta", ANTHROPIC_BETA_THINKING_BINDING)
+                }
+            }
             .configureReferHeaders(providerSetting.baseUrl)
             .configureSessionHeaders(providerSetting.baseUrl, params.sessionId)
             .build()
@@ -437,20 +491,26 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
                 "messages",
                 buildMessages(messages, providerSetting.promptCaching, providerSetting.promptCacheTtl)
             )
-            put("max_tokens", params.maxTokens ?: 64_000)
+            // max_tokens: 按模型输出上限 clamp, 避免超过旧模型上限 (如 claude-3-5 为 8192)
+            val maxOutputLimit = params.model.maxOutputTokens()
+            val effectiveMaxTokens = minOf(params.maxTokens ?: 64_000, maxOutputLimit)
+            put("max_tokens", effectiveMaxTokens)
 
             // 顶层 cache_control: 让 Anthropic 自动管理缓存断点
             if (providerSetting.promptCaching) {
                 put("cache_control", cacheControlEphemeral(providerSetting.promptCacheTtl))
             }
 
-            if (params.temperature != null && !params.reasoningLevel.isEnabled) {
-                put(
-                    "temperature",
-                    params.temperature
-                )
+            // 采样参数: Claude 4.6+ 及新版 API 已禁用 temperature/top_p, 仅对旧模型在思考关闭时发送
+            val generation = params.model.claudeGeneration()
+            if (generation == ClaudeGeneration.LEGACY && !params.reasoningLevel.isEnabled) {
+                if (params.temperature != null) {
+                    put("temperature", params.temperature)
+                }
+                if (params.topP != null) {
+                    put("top_p", params.topP)
+                }
             }
-            if (params.topP != null) put("top_p", params.topP)
 
             put("stream", stream)
 
@@ -471,31 +531,35 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
                 })
             }
 
-            // 处理 thinking
-            // Anthropic 新 API: adaptive 模式 + output_config.effort 控制强度
-            // 旧的 type=enabled + budget_tokens 在 Opus 4.7+ 上已不支持
-            if (params.model.abilities.contains(ModelAbility.REASONING)) {
-                when (params.reasoningLevel) {
-                    ReasoningLevel.OFF -> {
-                        put("thinking", buildJsonObject { put("type", "disabled") })
+            // thinking: 按模型世代映射
+            // - 4.6+: adaptive 模式 (配 output_config.effort)
+            // - ≤4.5: enabled + budget_tokens (≥1024 且 < max_tokens)
+            // - OFF: 省略 thinking 字段 (thinking 是 opt-in, 不发送即关闭)
+            if (params.model.abilities.contains(ModelAbility.REASONING) && params.reasoningLevel.isEnabled) {
+                put("thinking", buildJsonObject {
+                    if (generation == ClaudeGeneration.NEW) {
+                        put("type", "adaptive")
+                        put("display", "summarized")
+                    } else {
+                        val budget = when (params.reasoningLevel) {
+                            ReasoningLevel.AUTO -> minOf(effectiveMaxTokens - 1, 8_000).coerceAtLeast(1024)
+                            else -> params.reasoningLevel.budgetTokens
+                                .coerceIn(1024, effectiveMaxTokens - 1)
+                        }
+                        put("type", "enabled")
+                        put("budget_tokens", budget)
                     }
-
-                    ReasoningLevel.AUTO -> {
-                        put("thinking", buildJsonObject {
-                            put("type", "adaptive")
-                            put("display", "summarized")
-                        })
-                    }
-
-                    else -> {
-                        put("thinking", buildJsonObject {
-                            put("type", "adaptive")
-                            put("display", "summarized")
-                        })
-                        put("output_config", buildJsonObject {
-                            put("effort", params.reasoningLevel.effort)
-                        })
-                    }
+                    // drop_block 兜底: 前缀每轮都可能变化 (system 重建、世界书滑动窗口、tools 重算、
+                    // 占位符/时间提醒), 让 Claude 在签名前缀不匹配时丢弃思考块而非返回 400
+                    put("block_binding", buildJsonObject {
+                        put("prefix_mismatch_behavior", "drop_block")
+                    })
+                })
+                // 4.6+ 特定档位: 通过 output_config.effort 控制强度
+                if (generation == ClaudeGeneration.NEW && params.reasoningLevel != ReasoningLevel.AUTO) {
+                    put("output_config", buildJsonObject {
+                        put("effort", params.reasoningLevel.effort)
+                    })
                 }
             }
 
@@ -739,25 +803,35 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
             put("text", text)
         }
 
-        is UIMessagePart.Image -> buildJsonObject {
-            encodeBase64(withPrefix = false).onSuccess { encoded ->
+        is UIMessagePart.Image -> {
+            val encoded = encodeBase64(withPrefix = false).getOrElse {
+                throw IllegalArgumentException("Failed to encode image for Claude request: $url", it)
+            }
+            buildJsonObject {
                 put("type", "image")
                 put("source", buildJsonObject {
                     put("type", "base64")
                     put("media_type", encoded.mimeType)
                     put("data", encoded.base64)
                 })
-            }.onFailure {
-                Log.w(TAG, "encode image failed: $url", it)
-                put("type", "text")
-                put("text", "")
             }
         }
 
-        is UIMessagePart.Reasoning -> buildJsonObject {
-            put("type", "thinking")
-            put("thinking", reasoning)
-            metadataAs<ClaudeReasoningMetadata>()?.signature?.let { put("signature", it) }
+        is UIMessagePart.Reasoning -> {
+            val reasoningMetadata = metadataAs<ClaudeReasoningMetadata>()
+            val redactedData = reasoningMetadata?.redactedData
+            if (redactedData != null) {
+                buildJsonObject {
+                    put("type", "redacted_thinking")
+                    put("data", redactedData)
+                }
+            } else {
+                buildJsonObject {
+                    put("type", "thinking")
+                    put("thinking", reasoning)
+                    reasoningMetadata?.signature?.let { put("signature", it) }
+                }
+            }
         }
 
         else -> null
@@ -812,7 +886,14 @@ class ClaudeProvider(private val client: OkHttpClient, context: Context? = null)
 
                 "redacted_thinking" -> {
                     val data = block["data"]?.jsonPrimitiveOrNull?.contentOrNull
-                    println(data)
+                    if (data != null) {
+                        parts.add(UIMessagePart.Reasoning(
+                            reasoning = "",
+                            createdAt = Clock.System.now(),
+                            finishedAt = null,
+                            metadata = ClaudeReasoningMetadata(redactedData = data).toMetadata(),
+                        ))
+                    }
                 }
 
                 "tool_use" -> {

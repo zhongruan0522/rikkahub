@@ -42,7 +42,8 @@ class StreamChunkHandlerTest {
         messages = handler.handle(messages, StreamChunk.ReasoningDelta("reasoning-1", "think"))
         messages = handler.handle(messages, StreamChunk.ReasoningEnd("reasoning-1"))
         messages = handler.handle(messages, StreamChunk.ToolCallStart("call-1"))
-        messages = handler.handle(messages,
+        messages = handler.handle(
+            messages,
             StreamChunk.ToolCallDelta(
                 id = "call-1",
                 toolNameDelta = "search",
@@ -50,7 +51,8 @@ class StreamChunkHandlerTest {
             ),
         )
         messages = handler.handle(messages, StreamChunk.ToolCallEnd("call-1"))
-        messages = handler.handle(messages,
+        messages = handler.handle(
+            messages,
             StreamChunk.Usage(TokenUsage(promptTokens = 10, completionTokens = 5)),
         )
 
@@ -174,5 +176,85 @@ class StreamChunkHandlerTest {
         assertEquals(ServerToolStatus.COMPLETED, tool.status)
         assertEquals("raw", tool.metadata?.get("call")?.jsonPrimitive?.content)
         assertEquals("raw", tool.metadata?.get("result")?.jsonPrimitive?.content)
+    }
+
+    @Test
+    fun `non streaming result with separate signed reasoning blocks should not merge them`() {
+        // Regression: adjacent reasoning blocks with different signatures must not be
+        // concatenated into a single block, otherwise the merged content is bound to
+        // only one signature and fails Claude's prefix-binding check.
+        val messages = listOf(
+            UIMessage.user("think twice"),
+            UIMessage(
+                role = MessageRole.ASSISTANT,
+                parts = listOf(
+                    UIMessagePart.Reasoning(
+                        reasoning = "First thinking",
+                        metadata = ClaudeReasoningMetadata(signature = "sig_A").toMetadata(),
+                    ),
+                ),
+            ),
+        )
+        val result = TextGenerationResult(
+            id = "resp-1",
+            model = model.modelId,
+            message = UIMessage(
+                role = MessageRole.ASSISTANT,
+                parts = listOf(
+                    UIMessagePart.Reasoning(
+                        reasoning = "Second thinking",
+                        metadata = ClaudeReasoningMetadata(signature = "sig_B").toMetadata(),
+                    ),
+                    UIMessagePart.Text("answer"),
+                ),
+            ),
+        )
+
+        val parts = messages.handleTextGenerationResult(result, model).last().parts
+        val reasoningParts = parts.filterIsInstance<UIMessagePart.Reasoning>()
+
+        assertEquals("Should have 2 separate reasoning parts", 2, reasoningParts.size)
+        assertEquals("First thinking", reasoningParts[0].reasoning)
+        assertEquals("Second thinking", reasoningParts[1].reasoning)
+
+        val sigA = reasoningParts[0].metadataAs<ClaudeReasoningMetadata>()?.signature
+        val sigB = reasoningParts[1].metadataAs<ClaudeReasoningMetadata>()?.signature
+        assertEquals("sig_A", sigA)
+        assertEquals("sig_B", sigB)
+    }
+
+    @Test
+    fun `non streaming result with unsigned reasoning continuation should merge into prior block`() {
+        // A reasoning delta without metadata is a text continuation of the same block
+        // and should still be merged.
+        val messages = listOf(
+            UIMessage.user("think"),
+            UIMessage(
+                role = MessageRole.ASSISTANT,
+                parts = listOf(
+                    UIMessagePart.Reasoning(
+                        reasoning = "Start",
+                        metadata = ClaudeReasoningMetadata(signature = "sig_A").toMetadata(),
+                    ),
+                ),
+            ),
+        )
+        val result = TextGenerationResult(
+            id = "resp-1",
+            model = model.modelId,
+            message = UIMessage(
+                role = MessageRole.ASSISTANT,
+                parts = listOf(
+                    UIMessagePart.Reasoning(reasoning = " continued", metadata = null),
+                ),
+            ),
+        )
+
+        val parts = messages.handleTextGenerationResult(result, model).last().parts
+        val reasoningParts = parts.filterIsInstance<UIMessagePart.Reasoning>()
+
+        assertEquals("Should merge unsigned continuation into prior block", 1, reasoningParts.size)
+        assertEquals("Start continued", reasoningParts[0].reasoning)
+        assertEquals("sig_A", reasoningParts[0].metadataAs<ClaudeReasoningMetadata>()?.signature)
     }
 }

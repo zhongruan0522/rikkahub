@@ -2,6 +2,7 @@ package me.rerere.ai.provider.providers.claude
 
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -55,6 +56,9 @@ internal class ClaudeStreamDecoder : StreamChunkDecoder {
                 val metadata = when (kind) {
                     "thinking" -> contentBlock["signature"]?.jsonPrimitive?.contentOrNull?.let {
                         ClaudeReasoningMetadata(signature = it).toMetadata()
+                    }
+                    "redacted_thinking" -> contentBlock["data"]?.jsonPrimitive?.contentOrNull?.let {
+                        ClaudeReasoningMetadata(redactedData = it).toMetadata()
                     }
                     else -> null
                 }
@@ -120,10 +124,19 @@ internal class ClaudeStreamDecoder : StreamChunkDecoder {
                         block.metadata,
                     ))
                     "signature_delta" -> {
-                        val metadata = delta["signature"]?.jsonPrimitive?.contentOrNull?.let {
-                            ClaudeReasoningMetadata(signature = it).toMetadata()
+                        // signature_delta 是增量片段, 需累加到已有签名上而非覆盖
+                        val fragment = delta["signature"]?.jsonPrimitive?.contentOrNull
+                        val prevSignature = block.metadata?.let {
+                            runCatching { json.decodeFromJsonElement<ClaudeReasoningMetadata>(it) }
+                                .getOrNull()?.signature
                         }
-                        blocks[index] = block.copy(metadata = metadata ?: block.metadata)
+                        val accumulated = (prevSignature ?: "") + (fragment ?: "")
+                        val metadata = if (accumulated.isNotEmpty()) {
+                            ClaudeReasoningMetadata(signature = accumulated).toMetadata()
+                        } else {
+                            block.metadata
+                        }
+                        blocks[index] = block.copy(metadata = metadata)
                         add(StreamChunk.ReasoningDelta(block.id, "", metadata))
                     }
                     "input_json_delta" -> {

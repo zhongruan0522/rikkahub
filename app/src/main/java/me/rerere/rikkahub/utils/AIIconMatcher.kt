@@ -27,9 +27,6 @@ fun computeAIIconByName(name: String): String? {
         PATTERN_ALIYUN.containsMatchIn(lowerName) -> "alibabacloud-color.svg"
         PATTERN_BYTEDANCE.containsMatchIn(lowerName) -> "bytedance-color.svg"
         PATTERN_SILLICON_CLOUD.containsMatchIn(lowerName) -> "siliconflow.svg"
-        PATTERN_AIHUBMIX.containsMatchIn(lowerName) -> "aihubmix-color.svg"
-        PATTERN_NAAPI.containsMatchIn(lowerName) -> "naapi-color.svg"
-        PATTERN_STA1N.containsMatchIn(lowerName) -> "sta1n.png"
         PATTERN_OLLAMA.containsMatchIn(lowerName) -> "ollama.svg"
         PATTERN_GITHUB.containsMatchIn(lowerName) -> "github.svg"
         PATTERN_CLOUDFLARE.containsMatchIn(lowerName) -> "cloudflare-color.svg"
@@ -38,7 +35,6 @@ fun computeAIIconByName(name: String): String? {
         PATTERN_JUHENEXT.containsMatchIn(lowerName) -> "juhenext.png"
         PATTERN_KIMI.containsMatchIn(lowerName) -> "kimi-color.svg"
         PATTERN_MOONSHOT.containsMatchIn(lowerName) -> "moonshot.svg"
-        PATTERN_302.containsMatchIn(lowerName) -> "302ai.svg"
         PATTERN_STEP.containsMatchIn(lowerName) -> "stepfun-color.svg"
         PATTERN_INTERN.containsMatchIn(lowerName) -> "internlm-color.svg"
         PATTERN_COHERE.containsMatchIn(lowerName) -> "cohere-color.svg"
@@ -91,9 +87,6 @@ private val PATTERN_PERPLEXITY = Regex("perplexity")
 private val PATTERN_BYTEDANCE = Regex("bytedance|火山")
 private val PATTERN_ALIYUN = Regex("aliyun|阿里云|百炼")
 private val PATTERN_SILLICON_CLOUD = Regex("silicon|硅基")
-private val PATTERN_AIHUBMIX = Regex("aihubmix")
-private val PATTERN_NAAPI = Regex("naapi|钠api|鈉api")
-private val PATTERN_STA1N = Regex("sta1n")
 private val PATTERN_OLLAMA = Regex("ollama")
 private val PATTERN_GITHUB = Regex("github")
 private val PATTERN_CLOUDFLARE = Regex("cloudflare")
@@ -102,7 +95,6 @@ private val PATTERN_XAI = Regex("xai")
 private val PATTERN_JUHENEXT = Regex("juhenext")
 private val PATTERN_KIMI = Regex("kimi|k3")
 private val PATTERN_MOONSHOT = Regex("moonshot|月之暗面")
-private val PATTERN_302 = Regex("302")
 private val PATTERN_STEP = Regex("step|阶跃")
 private val PATTERN_INTERN = Regex("intern|书生")
 private val PATTERN_COHERE = Regex("cohere|command-.+")

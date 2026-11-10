@@ -1,10 +1,12 @@
 package me.rerere.ui.sketch
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButtonShapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +29,8 @@ internal fun SketchBrushMenu(state: SketchState) {
             onCheckedChange = {
                 if (state.tool == SketchTool.Brush) expanded = true else state.useBrush(state.brush)
             },
+            // 选中只变色不变形，保持未选中的胶囊形状
+            shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
         ) {
             Icon(state.brush.icon, contentDescription = stringResource(state.brush.label))
         }

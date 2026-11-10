@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.IconToggleButtonShapes
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
@@ -112,7 +114,7 @@ fun ColumnScope.ChatMessageActionButtons(
             val tts = LocalTTSState.current
             val isSpeaking by tts.isSpeaking.collectAsState()
             val isAvailable by tts.isAvailable.collectAsState()
-            // 朗读中换成带底色的方角按钮
+            // 朗读中换成带底色的按钮，只变色不变形
             CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
                 IconToggleButton(
                     checked = isSpeaking,
@@ -131,7 +133,7 @@ fun ColumnScope.ChatMessageActionButtons(
                             tts.stop()
                         }
                     },
-                    shapes = IconButtonDefaults.toggleableShapes(),
+                    shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
                     modifier = Modifier.size(IconButtonDefaults.extraSmallContainerSize()),
                     enabled = isAvailable,
                     colors = IconButtonDefaults.iconToggleButtonColors(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButtonShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -66,12 +67,14 @@ internal fun SketchToolbar(state: SketchState) {
             FilledTonalIconToggleButton(
                 checked = state.tool == SketchTool.Text,
                 onCheckedChange = state::useText,
+                shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
             ) {
                 Icon(HugeIcons.Type, contentDescription = stringResource(R.string.sketch_dialog_text))
             }
             FilledTonalIconToggleButton(
                 checked = state.tool == SketchTool.Select,
                 onCheckedChange = state::useSelect,
+                shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
             ) {
                 Icon(
                     HugeIcons.CursorRectangleSelection01,
@@ -81,6 +84,7 @@ internal fun SketchToolbar(state: SketchState) {
             FilledTonalIconToggleButton(
                 checked = state.erasing,
                 onCheckedChange = state::useEraser,
+                shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
             ) {
                 Icon(HugeIcons.Eraser, contentDescription = stringResource(R.string.sketch_dialog_eraser))
             }

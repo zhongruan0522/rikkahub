@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,6 +47,7 @@ import androidx.compose.material3.FloatingToolbarDefaults.floatingToolbarVertica
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButtonShapes
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -1002,7 +1004,9 @@ private fun ModelPicker(
                                             onModelDeselected(selectedModels.firstOrNull { model -> model.modelId == it.modelId }
                                                 ?: it)
                                         }
-                                    }
+                                    },
+                                    // 选中只变色不变形，保持未选中的胶囊形状
+                                    shapes = IconToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
                                 ) {
                                     Icon(if (added) HugeIcons.Tick01 else HugeIcons.Add01, null)
                                 }

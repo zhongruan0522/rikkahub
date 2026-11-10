@@ -67,6 +67,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.material3.ToggleButtonSize
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
@@ -1020,7 +1021,7 @@ private fun <T> PresetChips(
     }
 }
 
-// 选中时从胶囊变成方角
+// 选中只变色不变形，保持未选中的胶囊形状
 @Composable
 private fun PresetButton(
     selected: Boolean,
@@ -1035,6 +1036,7 @@ private fun PresetButton(
         modifier = Modifier.semantics { role = Role.RadioButton },
         buttonSize = ToggleButtonSize.ExtraSmall,
         icon = icon,
+        shapes = ToggleButtonShapes(shape = CircleShape, pressedShape = CircleShape, checkedShape = CircleShape),
         colors = ToggleButtonDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ),
@@ -1177,17 +1179,22 @@ private fun ToggleParam(
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             options.forEachIndexed { index, (option, text) ->
+                val shapes = when (index) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                }
                 ToggleButton(
                     checked = value == option,
                     onCheckedChange = { onValueChange(option) },
                     modifier = Modifier
                         .weight(1f)
                         .semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    // 选中只变色不变形：勾选和按压都保持未选中时的连接形状
+                    shapes = shapes.copy(
+                        pressedShape = shapes.shape,
+                        checkedShape = shapes.shape,
+                    ),
                     colors = ToggleButtonDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ),

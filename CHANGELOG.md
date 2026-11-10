@@ -10,6 +10,7 @@
 ### Changed
 
 - 应用安装包名（applicationId）由 `me.rerere.rikkahub` 改为 `rikka.hub`
+- 切换类按钮（`ToggleButton` / `IconToggleButton`）选中后只变色，保持原有形状，不再做方角/圆角切换动画
 
 ### Fixed
 

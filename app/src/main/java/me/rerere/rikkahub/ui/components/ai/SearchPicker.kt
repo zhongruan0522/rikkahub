@@ -245,6 +245,11 @@ private fun SearchPicker(
                     targetValue = if (selected) 1.3f else 1f,
                     animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
                 )
+                val shapes = when (index) {
+                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                }
                 ToggleButton(
                     checked = selected,
                     onCheckedChange = { if (!selected) onUpdateSearchMode(mode) },
@@ -252,11 +257,11 @@ private fun SearchPicker(
                         .weight(weight)
                         .heightIn(min = 52.dp)
                         .semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    // 选中只变色不变形：勾选和按压都保持未选中时的连接形状
+                    shapes = shapes.copy(
+                        pressedShape = shapes.shape,
+                        checkedShape = shapes.shape,
+                    ),
                     colors = ToggleButtonDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                     ),

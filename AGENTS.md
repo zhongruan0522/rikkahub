@@ -107,6 +107,18 @@ App 有一个 `distribution` 维度的 product flavor：`github`（默认）和 
   localization. (e.g `Text("Hello world")`)
 - Add, translate or clean up strings with the `tools/i18n` CLI (Bun); see the `i18n-localization` skill.
 
+## 代码风格：对齐上游手写风格
+
+本仓库 fork 自 rikkahub/rikkahub，以它为风格基准。写新代码或同步上游遇到冲突时，向更接近上游的那一侧收敛，不要保留 AI 生成的啰嗦变体。
+
+- 注释只写在非显而易见的 why 处：协议陷阱、边界情况、反直觉的行为假设，一句话说清。private 函数不写 `/** API 文档 */` 式 KDoc，不逐行解释代码在做什么
+- 不为单个问题发明设施层：兼容性分支直接按 host/modelId 用 `when` 处理，不为此新增枚举、私有常量、扩展函数等一整套辅助抽象
+- 表达式直给：优先 `when` 映射与链式调用，少用 `effectiveXxx` 这类防御式中间变量
+- 提交一事一提交：标题一句话说清一件事，不把多项修复塞进一条提交并在标题括号里罗列清单
+- 新写功能优先仿照上游同类文件的既有结构与写法，参照物越具体风格越容易收敛（如 AnySearchService 仿 SearchService 写就保持了上游风格）
+
+感知差异的对照样本：上游 e1667163 与本仓库 f232ebb7 修复的是同类 Claude 思考块签名问题——前者仅 1 处注释、零新增设施，后者注释密集、引入枚举 + 多个扩展函数 + 常量的设施层。
+
 ## 行为反模式警示：拒绝纠错残留
 
 严厉禁止以下“纠偏后残留历史痕迹与自我辩解”的行为模式：

@@ -21,17 +21,16 @@ Material 3 look (cards with dividers, plain forms).
 ## Build, Test, and Development Commands
 
 ```bash
-./gradlew assembleGithubDebug    # 构建 GitHub 渠道的 Debug APK
-./gradlew assembleGithubRelease  # 构建 GitHub Release / 每日构建用的 APK
-./gradlew bundlePlayRelease      # 构建上架 Google Play 的 AAB
-./gradlew test                   # 运行所有模块的 JVM 单元测试
-./gradlew lint                   # 运行 Android Lint
-./gradlew spotlessApply          # 用 ktlint 格式化相对 origin/master 改动过的 Kotlin 文件
-./gradlew spotlessCheck          # 只检查格式不改文件
+./gradlew assembleGithubDebug    # Build the Debug APK for the GitHub channel
+./gradlew assembleGithubRelease  # Build the APK for GitHub Release / daily builds
+./gradlew bundlePlayRelease      # Build the AAB for Google Play
+./gradlew test                   # Run JVM unit tests for all modules
+./gradlew lint                   # Run Android Lint
+./gradlew spotlessApply          # Format Kotlin files changed relative to origin/master with ktlint
+./gradlew spotlessCheck          # Check formatting only without modifying files
 ```
 
-App 有一个 `distribution` 维度的 product flavor：`github`（默认）和 `play`，共用同一个 applicationId。
-渠道差异用 `BuildConfig.IS_PLAY_STORE` 判断（如 Play 版不检查更新、不显示更新提醒）。
+The app has a `distribution` product flavor dimension: `github` (default) and `play`, sharing the same applicationId.
 
 ## Module Structure
 
@@ -107,45 +106,43 @@ App 有一个 `distribution` 维度的 product flavor：`github`（默认）和 
   localization. (e.g `Text("Hello world")`)
 - Add, translate or clean up strings with the `tools/i18n` CLI (Bun); see the `i18n-localization` skill.
 
-## 代码风格：对齐上游手写风格
+## Code Style: Match the Upstream Handwritten Style
 
-本仓库 fork 自 rikkahub/rikkahub，以它为风格基准。写新代码或同步上游遇到冲突时，向更接近上游的那一侧收敛，不要保留 AI 生成的啰嗦变体。
+This repository is forked from rikkahub/rikkahub, which serves as the style baseline. When writing new code or resolving conflicts while syncing upstream, converge toward whichever side is closer to upstream; do not keep verbose AI-generated variants.
 
-- 注释只写在非显而易见的 why 处：协议陷阱、边界情况、反直觉的行为假设，一句话说清。private 函数不写 `/** API 文档 */` 式 KDoc，不逐行解释代码在做什么
-- 不为单个问题发明设施层：兼容性分支直接按 host/modelId 用 `when` 处理，不为此新增枚举、私有常量、扩展函数等一整套辅助抽象
-- 表达式直给：优先 `when` 映射与链式调用，少用 `effectiveXxx` 这类防御式中间变量
-- 提交一事一提交：标题一句话说清一件事，不把多项修复塞进一条提交并在标题括号里罗列清单
-- 新写功能优先仿照上游同类文件的既有结构与写法，参照物越具体风格越容易收敛（如 AnySearchService 仿 SearchService 写就保持了上游风格）
+- Write comments only for non-obvious whys: protocol pitfalls, edge cases, counter-intuitive behavioral assumptions — one sentence each. No `/** API doc */`-style KDoc on private functions, no line-by-line narration of what the code does.
+- Don't invent an infrastructure layer for a single problem: handle compatibility branches directly with `when` on host/modelId instead of adding a whole set of helper abstractions such as enums, private constants, and extension functions.
+- Prefer direct expressions: favor `when` mappings and chained calls over defensive intermediate variables like `effectiveXxx`.
+- One commit per change: the title says one thing in one sentence; don't cram multiple fixes into one commit with a parenthesized checklist in the title.
+- When writing new features, prefer imitating the existing structure and style of similar upstream files; the more specific the reference, the easier the style converges (e.g. AnySearchService written after SearchService kept the upstream style).
 
-感知差异的对照样本：上游 e1667163 与本仓库 f232ebb7 修复的是同类 Claude 思考块签名问题——前者仅 1 处注释、零新增设施，后者注释密集、引入枚举 + 多个扩展函数 + 常量的设施层。
+Contrast sample of perceived divergence: upstream e1667163 and this repo's f232ebb7 fix the same kind of Claude thinking-block signature issue — the former has only 1 comment and zero new infrastructure, while the latter is comment-heavy and introduces an infrastructure layer of enums + multiple extension functions + constants.
 
-## 行为反模式警示：拒绝纠错残留
+## Behavioral Anti-Pattern Warning: No Correction Residue
 
-严厉禁止以下“纠偏后残留历史痕迹与自我辩解”的行为模式：
+Strictly forbid the following behavior pattern of "leaving historical traces and self-justification after correction":
 
-> 用户让做一盘“番茄炒蛋”，Agent 擅自加了“东坡肉”；被指出后虽然去掉了，但提交/PR 时写着「番茄炒蛋（无东坡肉）」，并在注释中大篇幅解释为什么本道菜不需要加东坡肉。
+> The user asks for a plate of "scrambled eggs with tomatoes"; the agent secretly adds "Dongpo pork". After being called out it removes it, but the commit/PR says "scrambled eggs with tomatoes (no Dongpo pork)" and the comments explain at length why the dish does not need Dongpo pork.
 
-**交付要求**：任何代码、注释、文档、提交信息及回复，都必须直接呈现对齐后的**干净终态设计**（Clean final-state design），严禁包含任何前序错误、自我辩解或“在此删掉某逻辑”的纠错痕迹。
+**Delivery requirement**: Any code, comments, documentation, commit messages, and replies must directly present the aligned **clean final-state design**, and must never contain any prior mistakes, self-justification, or correction traces such as "removed X logic here".
 
-## 提交规范
+## Commit Conventions
 
-使用Conventional Commits（`feat:` / `fix:` / `docs:` …），描述用中文；变更同步记录到 CHANGELOG.md（Keep a Changelog）。
+Use Conventional Commits (`feat:` / `fix:` / `docs:` …), write descriptions in Chinese, one commit per fix, and never combine multiple tasks into one commit.
 
-凡使用了 AI 辅助生成或修改的代码，必须在 **commit 信息结尾**（以及对应 **PR 描述**中）按以下格式注明所使用的工具环境和模型：
+Any code generated or modified with AI assistance must note the tool environment and model used at the **end of the commit message** (and in the corresponding **PR description**) in the following format, one line per model/tool when multiple are involved:
 
 ```
 assisted-by：{agent_name}：{model}
 ```
 
-- `{agent_name}`：使用的 AI 编码工具/环境，如 `opencode`、`codex`、`cursor`
-- `{model}`：实际使用的模型（含供应商，格式可参考 `供应商/模型`），如 `Zhipu/GLM-5.3[Max]`
+- `{agent_name}`: the AI coding tool/environment used, e.g. `opencode`, `codex`, `cursor`
+- `{model}`: the actual model used (including provider, format like `provider/model`), e.g. `Zhipu/GLM-5.3[Max]`
 
-示例：
+Example:
 
 ```bash
 git commit -m "feat(channel): support batch model pulling
 
-assisted-by：opencode：Zhipu/GLM-5.3[Max]"
+assisted-by：claude-code：Zhipu/GLM-5.3[Max]"
 ```
-
-多个模型/工具参与时逐行列出。纯人工改动无需此声明，但需在 PR 描述中说明。

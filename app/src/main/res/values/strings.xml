@@ -847,8 +847,6 @@
   <string name="setting_page_search_test_query_hint">Enter test query…</string>
   <string name="setting_page_search_test_run">Run Test</string>
   <string name="setting_page_search_title">Search Service</string>
-  <string name="setting_page_theme_setting">Theme</string>
-  <string name="setting_page_theme_setting_desc">Customize app color scheme</string>
   <string name="setting_theme_page_preset_themes">Preset Themes</string>
   <string name="setting_theme_page_custom_themes">Custom Themes</string>
   <string name="setting_theme_page_add_theme">New</string>
@@ -864,7 +862,6 @@
   <string name="setting_theme_page_import_theme">Import</string>
   <string name="setting_theme_page_export_success">Theme JSON copied to clipboard</string>
   <string name="setting_theme_page_import_success">Theme imported successfully</string>
-  <string name="setting_theme_page_dynamic_color_hint">Dynamic color is enabled. Disable it in Theme Settings to use custom themes.</string>
   <string name="setting_page_tts_service">Speech Services</string>
   <string name="setting_page_tts_service_desc">Configure text-to-speech and speech recognition providers</string>
   <string name="setting_page_tts_settings">TTS Settings</string>
@@ -1743,9 +1740,6 @@
   <string name="chat_page_clear_selection">Clear selection</string>
   <string name="setting_theme_settings_title">Theme Settings</string>
   <string name="setting_theme_settings_desc">Theme color, color mode and dynamic color</string>
-  <string name="setting_theme_settings_theme">Theme Color</string>
-  <string name="setting_theme_settings_color_mode">Color Mode</string>
-  <string name="setting_theme_settings_theme_unknown">Unknown</string>
   <string name="theme_name_default">Default</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>

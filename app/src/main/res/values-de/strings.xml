@@ -855,8 +855,6 @@
   <string name="setting_provider_page_claude_prompt_cache_ttl_5m">5 Minuten</string>
   <string name="setting_provider_page_claude_prompt_caching">Prompt-Caching (cache_control)</string>
   <string name="setting_provider_page_configuration">Konfiguration</string>
-  <string name="setting_page_theme_setting">Design</string>
-  <string name="setting_page_theme_setting_desc">Passe das Farbschema der App an</string>
   <string name="setting_theme_page_preset_themes">Voreingestellte Designs</string>
   <string name="setting_theme_page_custom_themes">Eigene Designs</string>
   <string name="setting_theme_page_add_theme">Neu</string>
@@ -922,7 +920,6 @@
   <string name="setting_theme_page_import_theme">Importieren</string>
   <string name="setting_theme_page_export_success">Theme-JSON in die Zwischenablage kopiert</string>
   <string name="setting_theme_page_import_success">Theme erfolgreich importiert</string>
-  <string name="setting_theme_page_dynamic_color_hint">Dynamische Farbe ist aktiviert. Deaktiviere sie unter Design-Einstellungen, um benutzerdefinierte Themes zu verwenden.</string>
   <string name="setting_page_tts_service">Sprachdienste</string>
   <string name="setting_page_tts_service_desc">Konfiguriere Anbieter für Sprachausgabe und Spracherkennung</string>
   <string name="setting_provider_page_save">Speichern</string>
@@ -1733,9 +1730,6 @@
   <string name="chat_page_clear_selection">Auswahl aufheben</string>
   <string name="setting_theme_settings_title">Design-Einstellungen</string>
   <string name="setting_theme_settings_desc">Designfarbe, Farbmodus und dynamische Farbe</string>
-  <string name="setting_theme_settings_theme">Designfarbe</string>
-  <string name="setting_theme_settings_color_mode">Farbmodus</string>
-  <string name="setting_theme_settings_theme_unknown">Unbekannt</string>
   <string name="theme_name_default">Standard</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>

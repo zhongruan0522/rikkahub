@@ -819,8 +819,6 @@
   <string name="setting_page_search_test_query_hint">输入测试查询…</string>
   <string name="setting_page_search_test_run">运行测试</string>
   <string name="setting_page_search_title">搜索服务</string>
-  <string name="setting_page_theme_setting">主题</string>
-  <string name="setting_page_theme_setting_desc">自定义应用配色方案</string>
   <string name="setting_theme_page_preset_themes">预设主题</string>
   <string name="setting_theme_page_custom_themes">自定义主题</string>
   <string name="setting_theme_page_add_theme">新建</string>
@@ -833,7 +831,6 @@
   <string name="setting_theme_page_tertiary_color">第三色</string>
   <string name="setting_theme_page_preview">预览</string>
   <string name="setting_theme_page_save">保存</string>
-  <string name="setting_theme_page_dynamic_color_hint">动态颜色已开启，请在主题设置中关闭以使用自定义主题。</string>
   <string name="setting_page_tts_service">语音服务</string>
   <string name="setting_page_tts_service_desc">配置语音合成与语音识别服务提供商</string>
   <string name="setting_page_tts_settings">TTS设置</string>
@@ -1745,9 +1742,6 @@ mDNS 地址：使用 .local 主机名，同一网络中的其他设备可通过�
   <string name="chat_page_clear_selection">清除选择</string>
   <string name="setting_theme_settings_title">主题设置</string>
   <string name="setting_theme_settings_desc">主题配色、颜色模式与动态颜色</string>
-  <string name="setting_theme_settings_theme">主题配色</string>
-  <string name="setting_theme_settings_color_mode">颜色模式</string>
-  <string name="setting_theme_settings_theme_unknown">未知</string>
   <string name="theme_name_default">默认</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">单色</string>

@@ -773,8 +773,6 @@
   <string name="setting_page_search_test_query_hint">Введите тестовый запрос…</string>
   <string name="setting_page_search_test_run">Запустить тест</string>
   <string name="setting_page_search_title">Служба поиска</string>
-  <string name="setting_page_theme_setting">Тема</string>
-  <string name="setting_page_theme_setting_desc">Настроить цветовую схему приложения</string>
   <string name="setting_theme_page_preset_themes">Предустановленные темы</string>
   <string name="setting_theme_page_custom_themes">Пользовательские темы</string>
   <string name="setting_theme_page_add_theme">Создать</string>
@@ -787,7 +785,6 @@
   <string name="setting_theme_page_tertiary_color">Третичный цвет</string>
   <string name="setting_theme_page_preview">Предпросмотр</string>
   <string name="setting_theme_page_save">Сохранить</string>
-  <string name="setting_theme_page_dynamic_color_hint">Динамические цвета включены. Отключите их в настройках темы, чтобы использовать пользовательские темы.</string>
   <string name="setting_page_tts_service">Служба преобразования текста в речь</string>
   <string name="setting_page_tts_service_desc">Настроить поставщиков службы преобразования текста в речь</string>
   <string name="setting_page_tts_settings">Настройки TTS</string>
@@ -1732,9 +1729,6 @@
   <string name="chat_page_clear_selection">Снять выделение</string>
   <string name="setting_theme_settings_title">Настройки темы</string>
   <string name="setting_theme_settings_desc">Цвет темы, цветовой режим и динамические цвета</string>
-  <string name="setting_theme_settings_theme">Цвет темы</string>
-  <string name="setting_theme_settings_color_mode">Цветовой режим</string>
-  <string name="setting_theme_settings_theme_unknown">Неизвестно</string>
   <string name="theme_name_default">По умолчанию</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>

@@ -773,8 +773,6 @@
   <string name="setting_page_search_test_query_hint">テストクエリを入力…</string>
   <string name="setting_page_search_test_run">テスト実行</string>
   <string name="setting_page_search_title">検索サービス</string>
-  <string name="setting_page_theme_setting">テーマ</string>
-  <string name="setting_page_theme_setting_desc">アプリの配色をカスタマイズ</string>
   <string name="setting_theme_page_preset_themes">プリセットテーマ</string>
   <string name="setting_theme_page_custom_themes">カスタムテーマ</string>
   <string name="setting_theme_page_add_theme">新規</string>
@@ -787,7 +785,6 @@
   <string name="setting_theme_page_tertiary_color">ターシャリカラー</string>
   <string name="setting_theme_page_preview">プレビュー</string>
   <string name="setting_theme_page_save">保存</string>
-  <string name="setting_theme_page_dynamic_color_hint">ダイナミックカラーが有効です。カスタムテーマを使用するには、テーマ設定で無効にしてください。</string>
   <string name="setting_page_tts_service">音声サービス</string>
   <string name="setting_page_tts_service_desc">音声合成と音声認識のプロバイダーを設定</string>
   <string name="setting_page_tts_settings">TTS設定</string>
@@ -1732,9 +1729,6 @@ mDNSアドレス: .localホスト名を使用し、IPを知らなくても同じ
   <string name="chat_page_clear_selection">選択を解除</string>
   <string name="setting_theme_settings_title">テーマ設定</string>
   <string name="setting_theme_settings_desc">テーマカラー、カラーモード、ダイナミックカラー</string>
-  <string name="setting_theme_settings_theme">テーマカラー</string>
-  <string name="setting_theme_settings_color_mode">カラーモード</string>
-  <string name="setting_theme_settings_theme_unknown">不明</string>
   <string name="theme_name_default">デフォルト</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">モノクロ</string>

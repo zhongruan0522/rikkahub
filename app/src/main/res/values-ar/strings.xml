@@ -955,8 +955,6 @@
   <string name="setting_page_search_test_query_hint">أدخل استعلام الاختبار…</string>
   <string name="setting_page_search_test_run">تشغيل الاختبار</string>
   <string name="setting_page_search_title">خدمة البحث</string>
-  <string name="setting_page_theme_setting">السمة</string>
-  <string name="setting_page_theme_setting_desc">تخصيص نظام ألوان التطبيق</string>
   <string name="setting_page_tts_service">خدمات الكلام</string>
   <string name="setting_page_tts_service_desc">تكوين مزوّدي تحويل النص إلى كلام والتعرّف على الكلام</string>
   <string name="setting_page_tts_settings">إعدادات TTS</string>
@@ -1064,7 +1062,6 @@
   <string name="setting_theme_page_custom_themes">السمات المخصصة</string>
   <string name="setting_theme_page_delete_theme_message">هل أنت متأكد من رغبتك في حذف هذه السمة؟</string>
   <string name="setting_theme_page_delete_theme_title">حذف السمة</string>
-  <string name="setting_theme_page_dynamic_color_hint">اللون الديناميكي مُفعّل. قم بتعطيله في إعدادات السمة لاستخدام سمات مخصصة.</string>
   <string name="setting_theme_page_edit_theme">تعديل السمة</string>
   <string name="setting_theme_page_export_success">تم نسخ JSON السمة إلى الحافظة</string>
   <string name="setting_theme_page_import_success">تم استيراد السمة بنجاح</string>
@@ -1730,9 +1727,6 @@
   <string name="chat_page_clear_selection">إلغاء التحديد</string>
   <string name="setting_theme_settings_title">إعدادات السمة</string>
   <string name="setting_theme_settings_desc">لون السمة ووضع الألوان واللون الديناميكي</string>
-  <string name="setting_theme_settings_theme">لون السمة</string>
-  <string name="setting_theme_settings_color_mode">وضع الألوان</string>
-  <string name="setting_theme_settings_theme_unknown">غير معروف</string>
   <string name="theme_name_default">افتراضي</string>
   <string name="theme_name_t3chat">T3 Chat</string>
   <string name="theme_name_mono">Mono</string>

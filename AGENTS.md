@@ -146,3 +146,9 @@ git commit -m "feat(channel): support batch model pulling
 
 assisted-by：claude-code：Zhipu/GLM-5.3[Max]"
 ```
+
+## PR
+
+由于当前项目为上游项目的二开，并对上游项目做来较多的修改，请在合并来自上游的PR时候仔细对照，若涉及到已经被本项目清理掉的东西，则需要假合并（需要github识别已经合并了对应commit，但是实际上还是修改后的，并非上游代码）
+
+清单：`docs/PR合并/改动.md`，当本项目出现针对性修改的时候也请同步到改动里面

@@ -131,6 +131,7 @@ import me.rerere.rikkahub.ui.pages.setting.SettingMediaPage
 import me.rerere.rikkahub.ui.pages.setting.SettingMediaProviderDetailPage
 import me.rerere.rikkahub.ui.pages.setting.SettingSpeechPage
 import me.rerere.rikkahub.ui.pages.setting.SettingWebPage
+import me.rerere.rikkahub.ui.pages.quickstart.QuickStartPage
 import me.rerere.rikkahub.ui.pages.share.handler.ShareHandlerPage
 import me.rerere.rikkahub.ui.pages.stats.StatsPage
 import me.rerere.rikkahub.ui.pages.webview.WebViewPage
@@ -512,6 +513,10 @@ class RouteActivity : ComponentActivity() {
                                 SettingMcpDetailPage(id = Uuid.parse(key.serverId))
                             }
 
+                            entry<Screen.QuickStart> {
+                                QuickStartPage()
+                            }
+
                             entry<Screen.SettingFiles> {
                                 SettingFilesPage()
                             }
@@ -750,6 +755,9 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data class SettingMcpDetail(val serverId: String) : Screen
+
+    @Serializable
+    data object QuickStart : Screen
 
     @Serializable
     data object SettingFiles : Screen

@@ -324,8 +324,6 @@
   <string name="extension_content_manage">Управлять</string>
   <string name="extension_content_unnamed">Без имени</string>
   <string name="extension_content_unnamed_lorebook">Безымянная книга знаний</string>
-  <string name="extension_selector_go_to_extensions">Управление расширениями</string>
-  <string name="extension_selector_go_to_skills">Перейти к управлению навыками</string>
   <string name="extension_selector_lorebooks_empty">Нет доступных lorebooks</string>
   <string name="extension_selector_mode_injections_empty">Нет доступных внедрений режима</string>
   <string name="extension_selector_quick_messages_empty">Быстрые сообщения отсутствуют</string>

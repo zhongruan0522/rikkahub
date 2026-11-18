@@ -324,8 +324,6 @@
   <string name="extension_content_manage">관리</string>
   <string name="extension_content_unnamed">이름 없음</string>
   <string name="extension_content_unnamed_lorebook">이름 없는 롤북</string>
-  <string name="extension_selector_go_to_extensions">확장 기능 관리</string>
-  <string name="extension_selector_go_to_skills">스킬 관리로 이동</string>
   <string name="extension_selector_lorebooks_empty">사용 가능한 러북이 없습니다</string>
   <string name="extension_selector_mode_injections_empty">사용 가능한 모드 삽입이 없습니다</string>
   <string name="extension_selector_quick_messages_empty">빠른 메시지가 없습니다</string>

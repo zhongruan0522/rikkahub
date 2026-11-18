@@ -412,8 +412,6 @@
   <string name="extension_content_manage">إدارة</string>
   <string name="extension_content_unnamed">بدون اسم</string>
   <string name="extension_content_unnamed_lorebook">كتاب معرفة بلا اسم</string>
-  <string name="extension_selector_go_to_extensions">إدارة الإضافات</string>
-  <string name="extension_selector_go_to_skills">الانتقال إلى إدارة المهارات</string>
   <string name="extension_selector_lorebooks_empty">لا توجد كتب معرفة متاحة</string>
   <string name="extension_selector_mode_injections_empty">لا توجد حقن أوضاع متاحة</string>
   <string name="extension_selector_quick_messages_empty">لا توجد رسائل سريعة متاحة</string>

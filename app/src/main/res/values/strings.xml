@@ -329,8 +329,6 @@
   <string name="extension_content_manage">Manage</string>
   <string name="extension_content_unnamed">Unnamed</string>
   <string name="extension_content_unnamed_lorebook">Unnamed Lorebook</string>
-  <string name="extension_selector_go_to_extensions">Manage Extensions</string>
-  <string name="extension_selector_go_to_skills">Go to manage Skills</string>
   <string name="extension_selector_lorebooks_empty">No lorebooks available</string>
   <string name="extension_selector_mode_injections_empty">No mode injections available</string>
   <string name="extension_selector_quick_messages_empty">No quick messages available</string>

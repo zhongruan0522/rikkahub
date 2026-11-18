@@ -295,8 +295,6 @@
   <string name="extension_content_manage">Verwalten</string>
   <string name="extension_content_unnamed">Unbenannt</string>
   <string name="extension_content_unnamed_lorebook">Unbenanntes Lorebook</string>
-  <string name="extension_selector_go_to_extensions">Erweiterungen verwalten</string>
-  <string name="extension_selector_go_to_skills">Skills verwalten</string>
   <string name="copy_all">Alle kopieren</string>
   <string name="create_fork">Fork erstellen</string>
   <string name="db_migrating">Datenbank wird migriert...</string>

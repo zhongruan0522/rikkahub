@@ -103,7 +103,7 @@ fun ExtensionSelector(
                     } else {
                         ExtensionEmptyState(
                             message = stringResource(R.string.extension_selector_quick_messages_empty),
-                            buttonText = stringResource(R.string.extension_selector_go_to_extensions),
+                            buttonText = stringResource(R.string.extension_content_manage),
                             onAction = onNavigateToQuickMessages,
                             icon = tab.icon,
                         )
@@ -128,7 +128,7 @@ fun ExtensionSelector(
                     } else {
                         ExtensionEmptyState(
                             message = stringResource(R.string.extension_selector_mode_injections_empty),
-                            buttonText = stringResource(R.string.extension_selector_go_to_extensions),
+                            buttonText = stringResource(R.string.extension_content_manage),
                             onAction = onNavigateToPrompts,
                             icon = tab.icon,
                         )
@@ -153,7 +153,7 @@ fun ExtensionSelector(
                     } else {
                         ExtensionEmptyState(
                             message = stringResource(R.string.extension_selector_lorebooks_empty),
-                            buttonText = stringResource(R.string.extension_selector_go_to_extensions),
+                            buttonText = stringResource(R.string.extension_content_manage),
                             onAction = onNavigateToPrompts,
                             icon = tab.icon,
                         )
@@ -178,7 +178,7 @@ fun ExtensionSelector(
                     } else {
                         ExtensionEmptyState(
                             message = stringResource(R.string.extension_selector_skills_empty),
-                            buttonText = stringResource(R.string.extension_selector_go_to_skills),
+                            buttonText = stringResource(R.string.extension_content_manage),
                             onAction = onNavigateToSkills,
                             icon = tab.icon,
                         )

@@ -240,7 +240,6 @@ dependencies {
 
     // okhttp
     implementation(libs.okhttp)
-    implementation(libs.okhttp.sse)
 
     // ktor client
     implementation(libs.ktor.client.core)

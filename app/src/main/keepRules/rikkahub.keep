@@ -21,9 +21,6 @@
 -dontwarn java.beans.Introspector
 -dontwarn java.beans.PropertyDescriptor
 
-# re2j has optional references that are unavailable on Android.
--dontwarn com.google.re2j.**
-
 # Keep generic signatures and inner class info for libraries that read them reflectively at runtime.
 -keepattributes Signature,InnerClasses,EnclosingMethod
 

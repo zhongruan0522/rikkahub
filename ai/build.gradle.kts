@@ -13,21 +13,6 @@ android {
         buildConfig = true
     }
 
-    defaultConfig {
-//        externalNativeBuild {
-//            cmake {
-//                cppFlags += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
-//                abiFilters += listOf("arm64-v8a", "x86_64")
-//            }
-//        }
-    }
-
-//    externalNativeBuild {
-//        cmake {
-//            path = file("src/main/cpp/CMakeLists.txt")
-//            version = "3.22.1"
-//        }
-//    }
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions.optIn.add("kotlin.uuid.ExperimentalUuidApi")
         compilerOptions.optIn.add("kotlin.time.ExperimentalTime")

@@ -333,7 +333,6 @@ dependencies {
     implementation(project(":workspace"))
     implementation(project(":terminal"))
     implementation(project(":oauth"))
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     // tests
     testImplementation(libs.junit)

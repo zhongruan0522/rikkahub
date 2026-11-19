@@ -33,7 +33,6 @@ huge-icons = "1.5"
 image-viewer = "1.1.0-alpha.7"
 jsoup = "1.23.2"
 zxing = "3.5.4"
-leakcanary = "2.14"
 reorderable = "3.1.0"
 mcp = "0.15.0-rikka.4"
 pebble = "4.1.1"
@@ -124,7 +123,6 @@ huge-icons = { group = "com.github.rikkahub", name = "hugeicons-compose", versio
 image-viewer = { group = "com.jvziyaoyao.scale", name = "image-viewer", version.ref = "image-viewer" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
-leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
 modelcontextprotocol-kotlin-sdk = { module = "com.github.rikkahub.mcp-kotlin-sdk:kotlin-sdk-client", version.ref = "mcp" }

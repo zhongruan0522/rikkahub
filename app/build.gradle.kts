@@ -336,9 +336,6 @@ dependencies {
     implementation(project(":oauth"))
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    // Leak Canary
-    // debugImplementation(libs.leakcanary.android)
-
     // tests
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

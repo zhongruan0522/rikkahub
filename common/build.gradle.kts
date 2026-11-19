@@ -34,8 +34,6 @@ dependencies {
     api(libs.floatingx.compose)
     api(libs.floatingx.system)
 
-    implementation(libs.androidx.core.ktx)
-
     // quickjs
     api(libs.quickjs)
 

@@ -35,7 +35,6 @@ image-viewer = "1.1.0-alpha.7"
 jsoup = "1.23.2"
 zxing = "3.5.4"
 leakcanary = "2.14"
-workmanager = "2.12.0"
 reorderable = "3.1.0"
 mcp = "0.15.0-rikka.4"
 pebble = "4.1.1"
@@ -109,7 +108,6 @@ androidx-room-testing = { group = "androidx.room", name = "room-testing", versio
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
 metadata-extractor = { module = "com.drewnoakes:metadata-extractor", version.ref = "metadataExtractor" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-sse = { group = "com.squareup.okhttp3", name = "okhttp-sse", version.ref = "okhttp" }
@@ -123,7 +121,6 @@ quickjs = { module = "io.github.dokar3:quickjs-kt", version.ref = "quickjs" }
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin-bom" }
 koin-android = { group = "io.insert-koin", name = "koin-android" }
 koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose" }
-koin-androidx-workmanager = { group = "io.insert-koin", name = "koin-androidx-workmanager" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization-json" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines-core" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlin-coroutines-core" }

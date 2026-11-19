@@ -194,7 +194,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.process)
-    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.profileinstaller)
     implementation(libs.termux.terminal.view) {
@@ -240,7 +239,6 @@ dependencies {
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    implementation(libs.koin.androidx.workmanager)
 
     // okhttp
     implementation(libs.okhttp)

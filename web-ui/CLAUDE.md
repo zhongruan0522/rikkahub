@@ -35,9 +35,6 @@ pnpm run fmt
 
 # 检查格式
 pnpm run fmt:check
-
-# 生产服务器 (运行 build/server/index.js)
-pnpm run start
 ```
 
 ## Architecture
@@ -52,7 +49,7 @@ app/
 │   └── conversations.tsx     # 主对话页面实现 (650+ 行)
 │
 ├── components/               # 组件库
-│   ├── ui/                   # shadcn/ui 基础组件 (36+ 组件)
+│   ├── ui/                   # shadcn/ui 基础组件
 │   ├── message/              # 消息相关组件 (chat-message, parts/)
 │   ├── markdown/             # Markdown 渲染 (markdown.tsx + code-block.tsx)
 │   ├── input/                # 输入组件 (chat-input, model-list, pickers)

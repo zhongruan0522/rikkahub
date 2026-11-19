@@ -32,6 +32,5 @@ dependencies {
     // 单测里起一个嵌入式 SSH/SFTP 服务器验证 SshWorkspaceBackend
     testImplementation(libs.apache.sshd.core)
     testImplementation(libs.apache.sshd.sftp)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }

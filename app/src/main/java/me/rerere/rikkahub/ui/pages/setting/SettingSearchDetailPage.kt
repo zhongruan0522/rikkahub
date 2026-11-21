@@ -728,10 +728,15 @@ internal fun PerplexityOptions(
             Text(stringResource(R.string.search_detail_max_tokens))
         }
     ) {
+        var maxTokensInput by remember(options.id) {
+            mutableStateOf(options.maxTokens?.takeIf { it > 0 }?.toString() ?: "")
+        }
         OutlinedTextField(
-            value = options.maxTokens?.takeIf { it > 0 }?.toString() ?: "",
+            value = maxTokensInput,
             onValueChange = { value ->
-                onUpdateOptions(options.copy(maxTokens = value.toIntOrNull()))
+                // 编辑期间允许清空/输入中间态，解析成功才落库
+                maxTokensInput = value
+                value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokens = it)) }
             },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -743,10 +748,14 @@ internal fun PerplexityOptions(
             Text(stringResource(R.string.search_detail_max_tokens_per_page))
         }
     ) {
+        var maxTokensPerPageInput by remember(options.id) {
+            mutableStateOf(options.maxTokensPerPage?.takeIf { it > 0 }?.toString() ?: "")
+        }
         OutlinedTextField(
-            value = options.maxTokensPerPage?.takeIf { it > 0 }?.toString() ?: "",
+            value = maxTokensPerPageInput,
             onValueChange = { value ->
-                onUpdateOptions(options.copy(maxTokensPerPage = value.toIntOrNull()))
+                maxTokensPerPageInput = value
+                value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokensPerPage = it)) }
             },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)

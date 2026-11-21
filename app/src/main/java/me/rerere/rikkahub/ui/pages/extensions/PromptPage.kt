@@ -423,6 +423,9 @@ private fun ModeInjectionEditSheet(
             }
         }
     ) {
+        var priorityInput by remember(injection.id) {
+            mutableStateOf(injection.priority.toString())
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -460,9 +463,11 @@ private fun ModeInjectionEditSheet(
                 )
 
                 OutlinedTextField(
-                    value = injection.priority.toString(),
-                    onValueChange = {
-                        it.toIntOrNull()?.let { p -> onEdit(injection.copy(priority = p)) }
+                    value = priorityInput,
+                    onValueChange = { input ->
+                        priorityInput = input
+                        // 编辑期间允许清空/输入中间态，确认落库时再校验
+                        input.toIntOrNull()?.let { p -> onEdit(injection.copy(priority = p)) }
                     },
                     label = { Text(stringResource(R.string.prompt_page_priority_label)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -479,10 +484,14 @@ private fun ModeInjectionEditSheet(
                 )
 
                 AnimatedVisibility(visible = injection.position == InjectionPosition.AT_DEPTH) {
+                    var injectDepthInput by remember(injection.id) {
+                        mutableStateOf(injection.injectDepth.toString())
+                    }
                     OutlinedTextField(
-                        value = injection.injectDepth.toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { d ->
+                        value = injectDepthInput,
+                        onValueChange = { input ->
+                            injectDepthInput = input
+                            input.toIntOrNull()?.let { d ->
                                 onEdit(injection.copy(injectDepth = d.coerceAtLeast(1)))
                             }
                         },
@@ -523,7 +532,7 @@ private fun ModeInjectionEditSheet(
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.prompt_page_cancel))
                 }
-                Button(onClick = onConfirm) {
+                Button(enabled = priorityInput.toIntOrNull() != null, onClick = onConfirm) {
                     Text(stringResource(R.string.prompt_page_confirm))
                 }
             }
@@ -1033,6 +1042,9 @@ private fun RegexInjectionEditDialog(
     onEdit: (PromptInjection.RegexInjection) -> Unit
 ) {
     var newKeyword by remember { mutableStateOf("") }
+    var priorityInput by remember(entry.id) {
+        mutableStateOf(entry.priority.toString())
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1063,9 +1075,11 @@ private fun RegexInjectionEditDialog(
                 )
 
                 OutlinedTextField(
-                    value = entry.priority.toString(),
-                    onValueChange = {
-                        it.toIntOrNull()?.let { p -> onEdit(entry.copy(priority = p)) }
+                    value = priorityInput,
+                    onValueChange = { input ->
+                        priorityInput = input
+                        // 编辑期间允许清空/输入中间态，确认落库时再校验
+                        input.toIntOrNull()?.let { p -> onEdit(entry.copy(priority = p)) }
                     },
                     label = { Text(stringResource(R.string.prompt_page_priority_label)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -1082,10 +1096,14 @@ private fun RegexInjectionEditDialog(
                 )
 
                 AnimatedVisibility(visible = entry.position == InjectionPosition.AT_DEPTH) {
+                    var injectDepthInput by remember(entry.id) {
+                        mutableStateOf(entry.injectDepth.toString())
+                    }
                     OutlinedTextField(
-                        value = entry.injectDepth.toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { d ->
+                        value = injectDepthInput,
+                        onValueChange = { input ->
+                            injectDepthInput = input
+                            input.toIntOrNull()?.let { d ->
                                 onEdit(entry.copy(injectDepth = d.coerceAtLeast(1)))
                             }
                         },
@@ -1180,10 +1198,14 @@ private fun RegexInjectionEditDialog(
                 )
 
                 AnimatedVisibility(visible = !entry.constantActive) {
+                    var scanDepthInput by remember(entry.id) {
+                        mutableStateOf(entry.scanDepth.toString())
+                    }
                     OutlinedTextField(
-                        value = entry.scanDepth.toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { d -> onEdit(entry.copy(scanDepth = d)) }
+                        value = scanDepthInput,
+                        onValueChange = { input ->
+                            scanDepthInput = input
+                            input.toIntOrNull()?.let { d -> onEdit(entry.copy(scanDepth = d)) }
                         },
                         label = { Text(stringResource(R.string.prompt_page_scan_depth)) },
                         modifier = Modifier.fillMaxWidth(),
@@ -1218,7 +1240,8 @@ private fun RegexInjectionEditDialog(
             }
         },
         confirmButton = {
-            val canSave = entry.keywords.isNotEmpty() || entry.constantActive
+            val canSave = (entry.keywords.isNotEmpty() || entry.constantActive) &&
+                priorityInput.toIntOrNull() != null
             TextButton(
                 onClick = onConfirm,
                 enabled = canSave

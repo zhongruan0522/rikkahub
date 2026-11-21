@@ -413,19 +413,20 @@ internal fun AssistantBasicContent(
                 headlineContent = { Text(stringResource(R.string.assistant_page_max_tokens)) },
                 supportingContent = { Text(stringResource(R.string.assistant_page_max_tokens_desc)) },
             ) {
+                var maxTokensInput by remember(assistant.id, assistant.maxTokens) {
+                    mutableStateOf(assistant.maxTokens?.toString() ?: "")
+                }
                 OutlinedTextField(
-                    value = assistant.maxTokens?.toString() ?: "",
+                    value = maxTokensInput,
                     onValueChange = { text ->
+                        // 编辑期间允许清空/输入中间态，解析成功才落库
+                        maxTokensInput = text
                         val tokens = if (text.isBlank()) {
                             null
                         } else {
                             text.toIntOrNull()?.takeIf { it > 0 }
                         }
-                        onUpdate(
-                            assistant.copy(
-                                maxTokens = tokens
-                            )
-                        )
+                        tokens?.let { onUpdate(assistant.copy(maxTokens = it)) }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {

@@ -184,7 +184,7 @@ fun SettingAboutPage() {
                             ),
                             leadingContent = { CardGroupIcon(HugeIcons.Code, containerColor = containerColor, contentColor = contentColor) },
                             supportingContent = {
-                                Text("${BuildConfig.VERSION_NAME} / ${BuildConfig.VERSION_CODE}")
+                                Text("${BuildConfig.VERSION_NAME} / ${BuildConfig.VERSION_CODE} / ${BuildConfig.GIT_HASH}")
                             },
                             headlineContent = { Text(stringResource(R.string.about_page_version)) },
                         )

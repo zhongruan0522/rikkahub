@@ -69,6 +69,9 @@ jobs:
         run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
 
       - name: Gradle Build
+        env:
+          # 构建对应的 commit 完整哈希，Gradle 侧截 7 位写入 BuildConfig.GIT_HASH
+          GIT_HASH: ${{ github.sha }}
         run: |
           chmod +x gradlew
           ./gradlew --build-cache assembleGithubDebug
@@ -131,6 +134,9 @@ jobs:
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
 
       - name: Gradle Build
+        env:
+          # 构建对应的 commit 完整哈希，Gradle 侧截 7 位写入 BuildConfig.GIT_HASH
+          GIT_HASH: ${{ github.sha }}
         run: |
           chmod +x gradlew
           ./gradlew --build-cache assembleGithubRelease

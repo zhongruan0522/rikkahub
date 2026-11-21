@@ -12,6 +12,12 @@ plugins {
     alias(libs.plugins.baselineprofile)
 }
 
+// CI 通过 GIT_HASH 环境变量传入构建 commit（github.sha 完整哈希），本地构建回退取 git HEAD，统一截 7 位
+val gitHash = providers.environmentVariable("GIT_HASH")
+    .orElse(providers.exec { commandLine("git", "rev-parse", "--short=7", "HEAD") }.standardOutput.asText)
+    .map { it.trim().take(7) }
+    .get()
+
 android {
     namespace = "me.rerere.rikkahub"
     compileSdk {
@@ -26,6 +32,8 @@ android {
         targetSdk = 37
         versionCode = 197
         versionName = "3.3.0"
+
+        buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

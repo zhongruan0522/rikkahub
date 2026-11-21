@@ -1095,73 +1095,78 @@ private fun RegexInjectionEditDialog(
                     )
                 }
 
-                // 关键词
-                Text(stringResource(R.string.prompt_page_keywords_label), style = MaterialTheme.typography.titleSmall)
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    entry.keywords.forEach { keyword ->
-                        InputChip(
-                            selected = false,
-                            onClick = {},
-                            label = { Text(keyword) },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        onEdit(entry.copy(keywords = entry.keywords - keyword))
-                                    },
-                                    modifier = Modifier.size(16.dp)
-                                ) {
-                                    Icon(HugeIcons.Cancel01, null, modifier = Modifier.size(12.dp))
-                                }
-                            }
-                        )
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = newKeyword,
-                        onValueChange = { newKeyword = it },
-                        label = { Text(stringResource(R.string.prompt_page_new_keyword)) },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true
-                    )
-                    IconButton(
-                        onClick = {
-                            if (newKeyword.isNotBlank()) {
-                                onEdit(entry.copy(keywords = entry.keywords + newKeyword.trim()))
-                                newKeyword = ""
+                // 常驻激活时触发条件全部失效（isTriggered 直接短路），隐藏避免误导
+                AnimatedVisibility(visible = !entry.constantActive) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // 关键词
+                        Text(stringResource(R.string.prompt_page_keywords_label), style = MaterialTheme.typography.titleSmall)
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            entry.keywords.forEach { keyword ->
+                                InputChip(
+                                    selected = false,
+                                    onClick = {},
+                                    label = { Text(keyword) },
+                                    trailingIcon = {
+                                        IconButton(
+                                            onClick = {
+                                                onEdit(entry.copy(keywords = entry.keywords - keyword))
+                                            },
+                                            modifier = Modifier.size(16.dp)
+                                        ) {
+                                            Icon(HugeIcons.Cancel01, null, modifier = Modifier.size(12.dp))
+                                        }
+                                    }
+                                )
                             }
                         }
-                    ) {
-                        Icon(HugeIcons.Add01, stringResource(R.string.prompt_page_add))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = newKeyword,
+                                onValueChange = { newKeyword = it },
+                                label = { Text(stringResource(R.string.prompt_page_new_keyword)) },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                            IconButton(
+                                onClick = {
+                                    if (newKeyword.isNotBlank()) {
+                                        onEdit(entry.copy(keywords = entry.keywords + newKeyword.trim()))
+                                        newKeyword = ""
+                                    }
+                                }
+                            ) {
+                                Icon(HugeIcons.Add01, stringResource(R.string.prompt_page_add))
+                            }
+                        }
+
+                        FormItem(
+                            label = { Text(stringResource(R.string.prompt_page_use_regex)) },
+                            tail = {
+                                Switch(
+                                    checked = entry.useRegex,
+                                    onCheckedChange = { onEdit(entry.copy(useRegex = it)) }
+                                )
+                            }
+                        )
+
+                        FormItem(
+                            label = { Text(stringResource(R.string.prompt_page_case_sensitive)) },
+                            tail = {
+                                Switch(
+                                    checked = entry.caseSensitive,
+                                    onCheckedChange = { onEdit(entry.copy(caseSensitive = it)) }
+                                )
+                            }
+                        )
                     }
                 }
-
-                FormItem(
-                    label = { Text(stringResource(R.string.prompt_page_use_regex)) },
-                    tail = {
-                        Switch(
-                            checked = entry.useRegex,
-                            onCheckedChange = { onEdit(entry.copy(useRegex = it)) }
-                        )
-                    }
-                )
-
-                FormItem(
-                    label = { Text(stringResource(R.string.prompt_page_case_sensitive)) },
-                    tail = {
-                        Switch(
-                            checked = entry.caseSensitive,
-                            onCheckedChange = { onEdit(entry.copy(caseSensitive = it)) }
-                        )
-                    }
-                )
 
                 FormItem(
                     label = { Text(stringResource(R.string.prompt_page_constant_active)) },
@@ -1174,15 +1179,17 @@ private fun RegexInjectionEditDialog(
                     }
                 )
 
-                OutlinedTextField(
-                    value = entry.scanDepth.toString(),
-                    onValueChange = {
-                        it.toIntOrNull()?.let { d -> onEdit(entry.copy(scanDepth = d)) }
-                    },
-                    label = { Text(stringResource(R.string.prompt_page_scan_depth)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
+                AnimatedVisibility(visible = !entry.constantActive) {
+                    OutlinedTextField(
+                        value = entry.scanDepth.toString(),
+                        onValueChange = {
+                            it.toIntOrNull()?.let { d -> onEdit(entry.copy(scanDepth = d)) }
+                        },
+                        label = { Text(stringResource(R.string.prompt_page_scan_depth)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
 
                 AnimatedVisibility(visible = entry.position.usesStandaloneMessage()) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

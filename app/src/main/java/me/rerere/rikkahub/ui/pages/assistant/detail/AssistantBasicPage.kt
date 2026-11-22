@@ -419,14 +419,14 @@ internal fun AssistantBasicContent(
                 OutlinedTextField(
                     value = maxTokensInput,
                     onValueChange = { text ->
-                        // 编辑期间允许清空/输入中间态，解析成功才落库
+                        // 编辑期间允许输入中间态，清空或解析成功才落库
                         maxTokensInput = text
-                        val tokens = if (text.isBlank()) {
-                            null
-                        } else {
-                            text.toIntOrNull()?.takeIf { it > 0 }
+                        when {
+                            text.isBlank() -> onUpdate(assistant.copy(maxTokens = null))
+                            else -> text.toIntOrNull()
+                                ?.takeIf { it > 0 }
+                                ?.let { onUpdate(assistant.copy(maxTokens = it)) }
                         }
-                        tokens?.let { onUpdate(assistant.copy(maxTokens = it)) }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {

@@ -734,9 +734,12 @@ internal fun PerplexityOptions(
         OutlinedTextField(
             value = maxTokensInput,
             onValueChange = { value ->
-                // 编辑期间允许清空/输入中间态，解析成功才落库
+                // 编辑期间允许输入中间态，清空或解析成功才落库
                 maxTokensInput = value
-                value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokens = it)) }
+                when {
+                    value.isBlank() -> onUpdateOptions(options.copy(maxTokens = null))
+                    else -> value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokens = it)) }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -755,7 +758,10 @@ internal fun PerplexityOptions(
             value = maxTokensPerPageInput,
             onValueChange = { value ->
                 maxTokensPerPageInput = value
-                value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokensPerPage = it)) }
+                when {
+                    value.isBlank() -> onUpdateOptions(options.copy(maxTokensPerPage = null))
+                    else -> value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokensPerPage = it)) }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)

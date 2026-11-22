@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,6 +52,7 @@ import me.rerere.rikkahub.R
 import me.rerere.rikkahub.ui.components.nav.BackButton
 import me.rerere.rikkahub.ui.components.richtext.HighlightCodeVisualTransformation
 import me.rerere.rikkahub.ui.context.LocalNavController
+import me.rerere.rikkahub.ui.context.LocalToaster
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.ui.theme.JetbrainsMono
 import me.rerere.rikkahub.ui.theme.LocalDarkMode
@@ -61,6 +63,7 @@ import me.rerere.search.SearchResult
 import me.rerere.search.SearchService
 import me.rerere.search.SearchServiceOptions
 import me.rerere.ui.components.FormItem
+import me.rerere.ui.toast.ToastType
 import org.koin.androidx.compose.koinViewModel
 import kotlin.uuid.Uuid
 
@@ -709,6 +712,7 @@ internal fun PerplexityOptions(
     options: SearchServiceOptions.PerplexityOptions,
     onUpdateOptions: (SearchServiceOptions.PerplexityOptions) -> Unit
 ) {
+    val toaster = LocalToaster.current
     FormItem(
         label = {
             Text(stringResource(R.string.search_detail_api_key))
@@ -731,6 +735,17 @@ internal fun PerplexityOptions(
         var maxTokensInput by remember(options.id) {
             mutableStateOf(options.maxTokens?.takeIf { it > 0 }?.toString() ?: "")
         }
+        var maxTokensFocused by remember(options.id) {
+            mutableStateOf(false)
+        }
+
+        fun commitMaxTokens() {
+            if (maxTokensInput.isNotBlank() && maxTokensInput.toIntOrNull()?.takeIf { it > 0 } == null) {
+                toaster.show("最大令牌数需要是大于 0 的整数，已恢复为上次的值", type = ToastType.Error)
+                maxTokensInput = options.maxTokens?.takeIf { it > 0 }?.toString() ?: ""
+            }
+        }
+
         OutlinedTextField(
             value = maxTokensInput,
             onValueChange = { value ->
@@ -738,10 +753,19 @@ internal fun PerplexityOptions(
                 maxTokensInput = value
                 when {
                     value.isBlank() -> onUpdateOptions(options.copy(maxTokens = null))
-                    else -> value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokens = it)) }
+                    else -> value.toIntOrNull()
+                        ?.takeIf { it > 0 }
+                        ?.let { onUpdateOptions(options.copy(maxTokens = it)) }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (maxTokensFocused && !focusState.isFocused) {
+                        commitMaxTokens()
+                    }
+                    maxTokensFocused = focusState.isFocused
+                },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
@@ -754,16 +778,36 @@ internal fun PerplexityOptions(
         var maxTokensPerPageInput by remember(options.id) {
             mutableStateOf(options.maxTokensPerPage?.takeIf { it > 0 }?.toString() ?: "")
         }
+        var maxTokensPerPageFocused by remember(options.id) {
+            mutableStateOf(false)
+        }
+
+        fun commitMaxTokensPerPage() {
+            if (maxTokensPerPageInput.isNotBlank() && maxTokensPerPageInput.toIntOrNull()?.takeIf { it > 0 } == null) {
+                toaster.show("每页最大 Tokens 需要是大于 0 的整数，已恢复为上次的值", type = ToastType.Error)
+                maxTokensPerPageInput = options.maxTokensPerPage?.takeIf { it > 0 }?.toString() ?: ""
+            }
+        }
+
         OutlinedTextField(
             value = maxTokensPerPageInput,
             onValueChange = { value ->
                 maxTokensPerPageInput = value
                 when {
                     value.isBlank() -> onUpdateOptions(options.copy(maxTokensPerPage = null))
-                    else -> value.toIntOrNull()?.let { onUpdateOptions(options.copy(maxTokensPerPage = it)) }
+                    else -> value.toIntOrNull()
+                        ?.takeIf { it > 0 }
+                        ?.let { onUpdateOptions(options.copy(maxTokensPerPage = it)) }
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (maxTokensPerPageFocused && !focusState.isFocused) {
+                        commitMaxTokensPerPage()
+                    }
+                    maxTokensPerPageFocused = focusState.isFocused
+                },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }

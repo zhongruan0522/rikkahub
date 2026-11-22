@@ -50,10 +50,12 @@ import me.rerere.rikkahub.ui.components.ui.CardGroup
 import me.rerere.rikkahub.ui.components.ui.TagsInput
 import me.rerere.rikkahub.ui.components.ui.UIAvatar
 import me.rerere.rikkahub.ui.components.ui.switchItem
+import me.rerere.rikkahub.ui.context.LocalToaster
 import me.rerere.rikkahub.ui.hooks.heroAnimation
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.toFixed
 import me.rerere.ui.components.Select
+import me.rerere.ui.toast.ToastType
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.roundToInt
@@ -416,6 +418,18 @@ internal fun AssistantBasicContent(
                 var maxTokensInput by remember(assistant.id, assistant.maxTokens) {
                     mutableStateOf(assistant.maxTokens?.toString() ?: "")
                 }
+                var maxTokensFocused by remember(assistant.id) {
+                    mutableStateOf(false)
+                }
+                val toaster = LocalToaster.current
+
+                fun commitMaxTokens() {
+                    if (maxTokensInput.isNotBlank() && maxTokensInput.toIntOrNull()?.takeIf { it > 0 } == null) {
+                        toaster.show("最大Token数需要是大于 0 的整数，已恢复为上次的值", type = ToastType.Error)
+                        maxTokensInput = assistant.maxTokens?.toString() ?: ""
+                    }
+                }
+
                 OutlinedTextField(
                     value = maxTokensInput,
                     onValueChange = { text ->
@@ -428,7 +442,14 @@ internal fun AssistantBasicContent(
                                 ?.let { onUpdate(assistant.copy(maxTokens = it)) }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (maxTokensFocused && !focusState.isFocused) {
+                                commitMaxTokens()
+                            }
+                            maxTokensFocused = focusState.isFocused
+                        },
                     placeholder = {
                         Text(stringResource(R.string.assistant_page_max_tokens_no_limit))
                     },

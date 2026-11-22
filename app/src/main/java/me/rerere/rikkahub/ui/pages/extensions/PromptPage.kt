@@ -107,6 +107,7 @@ import me.rerere.rikkahub.ui.components.ui.TagType
 import me.rerere.rikkahub.ui.components.ui.cardGroupItemShape
 import me.rerere.rikkahub.ui.components.ui.longPressReorder
 import me.rerere.rikkahub.ui.context.LocalToaster
+import me.rerere.ui.toast.ToastType
 import me.rerere.rikkahub.ui.hooks.useEditState
 import me.rerere.rikkahub.ui.theme.CustomColors
 import me.rerere.rikkahub.utils.plus
@@ -405,6 +406,7 @@ private fun ModeInjectionEditSheet(
     onConfirm: () -> Unit,
     onEdit: (PromptInjection.ModeInjection) -> Unit
 ) {
+    val toaster = LocalToaster.current
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden, enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded))
     val scope = rememberCoroutineScope()
 
@@ -425,6 +427,9 @@ private fun ModeInjectionEditSheet(
     ) {
         var priorityInput by remember(injection.id) {
             mutableStateOf(injection.priority.toString())
+        }
+        var injectDepthInput by remember(injection.id) {
+            mutableStateOf(injection.injectDepth.toString())
         }
         Column(
             modifier = Modifier
@@ -484,9 +489,6 @@ private fun ModeInjectionEditSheet(
                 )
 
                 AnimatedVisibility(visible = injection.position == InjectionPosition.AT_DEPTH) {
-                    var injectDepthInput by remember(injection.id) {
-                        mutableStateOf(injection.injectDepth.toString())
-                    }
                     OutlinedTextField(
                         value = injectDepthInput,
                         onValueChange = { input ->
@@ -532,7 +534,16 @@ private fun ModeInjectionEditSheet(
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.prompt_page_cancel))
                 }
-                Button(enabled = priorityInput.toIntOrNull() != null, onClick = onConfirm) {
+                Button(onClick = {
+                    when {
+                        priorityInput.toIntOrNull() == null ->
+                            toaster.show("优先级需要是整数", type = ToastType.Error)
+                        injection.position == InjectionPosition.AT_DEPTH &&
+                            (injectDepthInput.toIntOrNull() ?: 0) < 1 ->
+                            toaster.show("注入深度需要是大于 0 的整数", type = ToastType.Error)
+                        else -> onConfirm()
+                    }
+                }) {
                     Text(stringResource(R.string.prompt_page_confirm))
                 }
             }
@@ -1045,6 +1056,13 @@ private fun RegexInjectionEditDialog(
     var priorityInput by remember(entry.id) {
         mutableStateOf(entry.priority.toString())
     }
+    var injectDepthInput by remember(entry.id) {
+        mutableStateOf(entry.injectDepth.toString())
+    }
+    var scanDepthInput by remember(entry.id) {
+        mutableStateOf(entry.scanDepth.toString())
+    }
+    val toaster = LocalToaster.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1096,9 +1114,6 @@ private fun RegexInjectionEditDialog(
                 )
 
                 AnimatedVisibility(visible = entry.position == InjectionPosition.AT_DEPTH) {
-                    var injectDepthInput by remember(entry.id) {
-                        mutableStateOf(entry.injectDepth.toString())
-                    }
                     OutlinedTextField(
                         value = injectDepthInput,
                         onValueChange = { input ->
@@ -1198,9 +1213,6 @@ private fun RegexInjectionEditDialog(
                 )
 
                 AnimatedVisibility(visible = !entry.constantActive) {
-                    var scanDepthInput by remember(entry.id) {
-                        mutableStateOf(entry.scanDepth.toString())
-                    }
                     OutlinedTextField(
                         value = scanDepthInput,
                         onValueChange = { input ->
@@ -1240,11 +1252,20 @@ private fun RegexInjectionEditDialog(
             }
         },
         confirmButton = {
-            val canSave = (entry.keywords.isNotEmpty() || entry.constantActive) &&
-                priorityInput.toIntOrNull() != null
             TextButton(
-                onClick = onConfirm,
-                enabled = canSave
+                onClick = {
+                    when {
+                        priorityInput.toIntOrNull() == null ->
+                            toaster.show("优先级需要是整数", type = ToastType.Error)
+                        entry.position == InjectionPosition.AT_DEPTH &&
+                            (injectDepthInput.toIntOrNull() ?: 0) < 1 ->
+                            toaster.show("注入深度需要是大于 0 的整数", type = ToastType.Error)
+                        !entry.constantActive && (scanDepthInput.toIntOrNull() ?: -1) < 0 ->
+                            toaster.show("扫描深度需要是大于或等于 0 的整数", type = ToastType.Error)
+                        else -> onConfirm()
+                    }
+                },
+                enabled = entry.keywords.isNotEmpty() || entry.constantActive
             ) {
                 Text(stringResource(R.string.prompt_page_confirm))
             }

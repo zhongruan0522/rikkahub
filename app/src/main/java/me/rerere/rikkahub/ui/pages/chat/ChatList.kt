@@ -81,6 +81,7 @@ fun ChatList(
     state: LazyListState,
     previewListState: LazyListState,
     selectionState: ChatSelectionState,
+    scrollAnchor: ChatScrollAnchorState,
     loading: Boolean,
     compressing: Boolean = false,
     processingStatus: String? = null,
@@ -141,6 +142,7 @@ fun ChatList(
                 innerPadding = innerPadding,
                 conversation = conversation,
                 state = state,
+                scrollAnchor = scrollAnchor,
                 loading = loading,
                 compressing = compressing,
                 processingStatus = processingStatus,
@@ -211,6 +213,7 @@ private fun ChatListNormal(
     innerPadding: PaddingValues,
     conversation: Conversation,
     state: LazyListState,
+    scrollAnchor: ChatScrollAnchorState,
     loading: Boolean,
     compressing: Boolean,
     processingStatus: String? = null,
@@ -273,6 +276,13 @@ private fun ChatListNormal(
     // 自动跟随键盘滚动
     ImeLazyListAutoScroller(lazyListState = state)
 
+    // 发送后用户消息置顶，最后一条消息把下面不够一屏的部分用空白补上
+    val lastNodeMinHeight = scrollAnchor.rememberLastNodeMinHeight(
+        listState = state,
+        nodes = conversation.messageNodes,
+        bottomKey = ScrollBottomKey,
+    )
+
     val assistant = remember(
         settings.assistants,
         conversation.assistantId,
@@ -294,12 +304,12 @@ private fun ChatListNormal(
         modifier = Modifier
             .fillMaxSize(),
     ) {
-        // 自动滚动到底部
+        // 自动滚动到底部；发送过消息后改为用户消息置顶，回复不再跟随
         if (settings.displaySetting.enableAutoScroll) {
             LaunchedEffect(state) {
                 snapshotFlow { state.layoutInfo.visibleItemsInfo }.collect { visibleItemsInfo ->
                     // println("is bottom = ${visibleItemsInfo.isAtBottom()}, scroll = ${state.isScrollInProgress}, can_scroll = ${state.canScrollForward}, loading = $loading")
-                    if (!state.isScrollInProgress && loadingState) {
+                    if (!state.isScrollInProgress && loadingState && scrollAnchor.nodeId == null) {
                         if (visibleItemsInfo.isAtBottom()) {
                             state.requestScrollToItem(conversationUpdated.messageNodes.lastIndex + 10)
                             // Log.i(TAG, "ChatList: scroll to ${conversationUpdated.messageNodes.lastIndex}")
@@ -340,7 +350,10 @@ private fun ChatListNormal(
                 items = conversation.messageNodes,
                 key = { index, item -> item.id },
             ) { index, node ->
-                Column {
+                Column(
+                    modifier = if (index == lastMessageIndex) Modifier.chatAnchorMinHeight(lastNodeMinHeight) else Modifier,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
                     ListSelectableItem(
                         key = node.id,
                         onSelectChange = {
@@ -390,6 +403,13 @@ private fun ChatListNormal(
                             lastMessage = index == lastMessageIndex,
                         )
                     }
+                    // 加载行放在最后一条消息的 item 里，置顶补的空白才会在它下面，而不是把它挤到输入框上面
+                    if (loading && index == lastMessageIndex) {
+                        ChatLoadingIndicator(
+                            processingStatus = processingStatus,
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                        )
+                    }
                 }
             }
 
@@ -402,27 +422,10 @@ private fun ChatListNormal(
                 }
             }
 
-            // 压缩时也用这一行，processingStatus 显示的是压缩中
-            if (loading) {
+            // 还没有消息时没有地方放加载行，单独占一项
+            if (loading && conversation.messageNodes.isEmpty()) {
                 item(LoadingIndicatorKey) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        ContainedLoadingIndicator(
-                            modifier = Modifier.size(28.dp)
-                        )
-                        AnimatedVisibility(
-                            visible = processingStatus != null,
-                        ) {
-                            Text(
-                                text = processingStatus ?: "",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
+                    ChatLoadingIndicator(processingStatus = processingStatus)
                 }
             }
 
@@ -497,6 +500,29 @@ private fun ChatListNormal(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
+        }
+    }
+}
+
+// 压缩时也用这一行，processingStatus 显示的是压缩中
+@Composable
+private fun ChatLoadingIndicator(processingStatus: String?, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        ContainedLoadingIndicator(
+            modifier = Modifier.size(28.dp)
+        )
+        AnimatedVisibility(
+            visible = processingStatus != null,
+        ) {
+            Text(
+                text = processingStatus ?: "",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

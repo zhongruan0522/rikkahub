@@ -849,7 +849,7 @@ class ChatService(
             appEventBus.tryEmit(AppEvent.ChatGenerationEnded(conversationId, senderName, null))
             session.inbox.pause()
             Log.e(TAG, "runTurn: out of memory", e)
-            Logging.log(TAG, "runTurn: $e")
+            Logging.log(TAG, "runTurn: $e", detail = e.stackTraceToString())
             addError(
                 IllegalStateException(
                     "Out of memory while building the request. The conversation likely contains too many " +
